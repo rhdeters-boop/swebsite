@@ -19,23 +19,23 @@ const Landing: React.FC = () => {
   const features = [
     {
       icon: <Shield className="h-8 w-8" />,
-      title: "Secure & Private",
-      description: "Don't want 'OnlyFans' showing up on your bank statement? Our platform ensures discreet billing with fake SFW information."
+      title: "Discreet & Private",
+      description: "Explore your desires with peace of mind. Our platform ensures discreet billing so not even your bank knows what you are up to."
     },
     {
       icon: <Users className="h-8 w-8" />,
-      title: "Discover Amazing Creators",
-      description: "Browse and subscribe to exclusive creators producing premium content not seen on any other platform"
+      title: "Exclusive Creators",
+      description: "Discover creators we personally recruited so you won't find them anywhere else."
     },
     {
       icon: <Video className="h-8 w-8" />,
-      title: "Easy to View Content",
-      description: "All your content is easily accessible in one place, so you can enjoy all your fantasies at the same time"
+      title: "Seamless Experience",
+      description: "Your fantasies, all in one place. Enjoy your unlocked content effortlessly, anytime you wish."
     },
     {
       icon: <Crown className="h-8 w-8" />,
-      title: "Flexible Prices",
-      description: "Creators will have a set price for their content, but you can make offers to negotiate a better deal or request custom content"
+      title: "Personalized Desires",
+      description: "Beyond subscriptions, you can negotiate prices or commission custom content that's uniquely yours."
     },
     
   ];
