@@ -1,0 +1,129 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for void seductive theme */
+:root {
+  /* Legacy pink variables for backwards compatibility */
+  --brand-pink: #ec4899;
+  --brand-pink-light: #f9a8d4;
+  --brand-pink-dark: #be185d;
+  --gradient-bg: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #fbcfe8 100%);
+  
+  /* Void theme variables */
+  --void-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #a23b72 100%);
+  --void-subtle: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  --seductive-void: linear-gradient(135deg, #1a1a2e 0%, #a23b72 50%, #c084fc 100%);
+  --void-accent: #a855f7;
+  --void-accent-light: #c084fc;
+  --seductive: #ec4899;
+  --seductive-light: #f472b6;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--void-bg);
+  min-height: 100vh;
+  margin: 0;
+  color: #e5e7eb;
+}
+
+/* Custom button styles */
+.btn-primary {
+  @apply bg-gradient-to-r from-void-accent to-seductive text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-void-accent/25;
+}
+
+.btn-secondary {
+  @apply bg-void-dark-900/80 hover:bg-void-dark-800 text-void-accent-light border-2 border-void-accent font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105;
+}
+
+/* Additional button styles */
+.btn-primary-sm {
+  @apply bg-gradient-to-r from-void-accent to-seductive text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 text-sm hover:shadow-void-accent/20;
+}
+
+.btn-secondary-sm {
+  @apply bg-void-dark-900/80 hover:bg-void-dark-800 text-void-accent-light border border-void-accent font-medium py-2 px-4 rounded-lg transition-all duration-200 text-sm;
+}
+
+.btn-outline {
+  @apply bg-transparent hover:bg-void-accent text-void-accent hover:text-white border-2 border-void-accent font-semibold py-3 px-6 rounded-lg transition-all duration-200;
+}
+
+.btn-sm {
+  @apply font-medium py-2 px-4 rounded-lg transition-all duration-200 text-sm;
+}
+
+/* Card styles */
+.card {
+  @apply bg-void-dark-900/80 backdrop-blur-sm rounded-xl shadow-xl p-6 border border-void-500/20;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #ec4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Media gallery styles */
+.media-item {
+  @apply rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border border-void-500/20;
+}
+
+/* Subscription tier cards */
+.tier-card {
+  @apply bg-void-dark-900/80 backdrop-blur-sm rounded-xl p-8 shadow-xl border-2 border-transparent hover:border-void-accent transition-all duration-300 transform hover:scale-105;
+}
+
+.tier-card.featured {
+  @apply border-void-accent bg-gradient-to-br from-void-dark-900/90 to-void-dark-800/90;
+}
+
+/* Loading animations */
+.loading-pulse {
+  @apply animate-pulse bg-gradient-to-r from-void-500/20 via-void-accent/30 to-void-500/20;
+}
+
+/* Line clamp utilities */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Creator card styles */
+.creator-card {
+  @apply bg-void-dark-900/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] border border-void-500/20;
+}
+
+/* Form styles */
+.form-input {
+  @apply w-full px-4 py-3 border border-void-500/30 bg-void-dark-900/50 text-gray-200 rounded-xl focus:ring-2 focus:ring-void-accent focus:border-transparent transition-all duration-200 placeholder-gray-400;
+}
+
+.form-textarea {
+  @apply w-full px-4 py-3 border border-void-500/30 bg-void-dark-900/50 text-gray-200 rounded-xl focus:ring-2 focus:ring-void-accent focus:border-transparent transition-all duration-200 resize-none placeholder-gray-400;
+}
+
+/* Category tag styles */
+.category-tag {
+  @apply px-3 py-1 bg-void-accent/10 text-void-accent-light rounded-full text-sm font-medium transition-all duration-200 cursor-pointer hover:bg-void-accent hover:text-white border border-void-accent/20;
+}
+
+.category-tag.selected {
+  @apply bg-void-accent text-white border-void-accent;
+}
