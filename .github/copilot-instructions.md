@@ -18,10 +18,6 @@ This is a full-stack subscription-based web application for hosting and selling 
 - PostgreSQL database for user data, subscriptions, and media metadata
 - S3 bucket for secure media storage with signed URLs
 
-## Subscription Tiers
-1. **Picture Tier** ($9.99/month) - Access to premium photo galleries
-2. **Solo Video Tier** ($19.99/month) - Pictures + solo video content  
-3. **Collab Video Tier** ($29.99/month) - All content including collaborative videos
 
 ## Key Features
 - Tiered subscription system with Stripe integration

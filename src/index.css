@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Lato:wght@400;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -23,7 +23,8 @@
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  /* Update the font-family to use Lato as the default */
+  font-family: 'Lato', sans-serif;
   background: var(--void-bg);
   min-height: 100vh;
   margin: 0;

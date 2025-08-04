@@ -11,7 +11,7 @@ const Dashboard: React.FC = () => {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-accent1 to-accent2 bg-clip-text text-transparent">
-            Welcome back, {user?.firstName}!
+            Welcome back, {user?.displayName}!
           </h1>
           <p className="text-body mt-2">Manage your subscription and account settings</p>
         </div>

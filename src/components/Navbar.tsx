@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Circle, LogOut, User, Zap, Menu, X } from 'lucide-react';
+import { LogOut, User, Menu, X } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const { isAuthenticated, user, logout } = useAuth();
@@ -19,18 +19,14 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="bg-void-dark-900/95 backdrop-blur-sm shadow-xl border-b border-void-500/20 sticky top-0 z-50 relative">
+    <nav className="bg-abyss-black/95 backdrop-blur-sm shadow-xl border-b border-void-500/20 sticky top-0 z-50 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group">
             <div className="relative">
-              <Circle className="h-8 w-8 text-void-accent group-hover:scale-110 transition-transform duration-200" />
-              <Zap className="h-4 w-4 text-seductive-light absolute -top-1 -right-1 animate-pulse" />
+              <img src="/symbol-transparent.png" alt="Logo" className="h-20 w-20" />
             </div>
-            <span className="font-bold text-xl bg-gradient-to-r from-void-accent-light via-seductive-light to-void-accent bg-clip-text text-transparent">
-              Void of Desire
-            </span>
           </Link>
 
           {/* Desktop Navigation and Auth */}
@@ -42,13 +38,6 @@ const Navbar: React.FC = () => {
                 className="text-gray-300 hover:text-void-accent-light transition-colors duration-200 font-medium"
               >
                 Browse Creators
-              </Link>
-              
-              <Link 
-                to="/tiers" 
-                className="text-gray-300 hover:text-void-accent-light transition-colors duration-200 font-medium"
-              >
-                Subscription Tiers
               </Link>
               
               {isAuthenticated && (

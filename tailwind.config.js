@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+import plugin from 'tailwindcss/plugin';
+
 export default {
   content: [
     "./index.html",
@@ -7,6 +9,14 @@ export default {
   theme: {
     extend: {
       colors: {
+        // New Primary Color Palette (The Abyss)
+        'abyss-black': '#000000',
+        'abyss-dark-gray': '#333333',
+        'abyss-light-gray': '#999999',
+
+        // New Accent Color (The Lust/Intrigue)
+        'lust-violet': '#4B0082', // Deep Violet
+
         // Legacy pink theme for backwards compatibility
         pink: {
           50: '#fdf2f8',
@@ -67,16 +77,36 @@ export default {
         accent2: '#a8211f'
       },
       fontFamily: {
-        'sans': ['Inter', 'ui-sans-serif', 'system-ui'],
+        'sans': ['Lato', 'ui-sans-serif', 'system-ui'],
+        'serif': ['"Cormorant Garamond"', 'serif'],
       },
       backgroundImage: {
+        'hero': "url('/background2.jpg')", 
+
         'void-gradient': 'linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #a23b72 100%)',
         'void-subtle': 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
         'seductive-void': 'linear-gradient(135deg, #1a1a2e 0%, #a23b72 50%, #c084fc 100%)',
+      },
+      textShadow: {
+        'glow': '0 0 8px rgba(192, 132, 252, 0.4)',
+      },
+      boxShadow: {
+        'glow-primary': '0 0 20px rgba(138, 43, 226, 0.5)',
+        'glow-secondary': '0 0 20px rgba(192, 132, 252, 0.4)',
       },
     },
   },
   plugins: [
     require('@tailwindcss/forms'),
+    plugin(function ({ matchUtilities, theme }) {
+      matchUtilities(
+        {
+          'text-shadow': (value) => ({
+            textShadow: value,
+          }),
+        },
+        { values: theme('textShadow') }
+      )
+    }),
   ],
 }
