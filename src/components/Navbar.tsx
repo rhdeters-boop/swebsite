@@ -22,20 +22,19 @@ const Navbar: React.FC = () => {
     <nav className="bg-abyss-black/95 backdrop-blur-sm shadow-xl border-b border-void-500/20 sticky top-0 z-50 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 group">
-            <div className="relative">
-              <img src="/symbol-transparent.png" alt="Logo" className="h-20 w-20" />
-            </div>
-          </Link>
+          {/* Logo and Left Navigation */}
+          <div className="flex items-center space-x-8">
+            <Link to="/" className="flex items-center space-x-2 group">
+              <div className="relative">
+                <img src="/symbol-transparent.png" alt="Logo" className="h-20 w-20" />
+              </div>
+            </Link>
 
-          {/* Desktop Navigation and Auth */}
-          <div className="hidden md:flex items-center space-x-8">
-            {/* Navigation Links */}
-            <div className="flex items-center space-x-8">
+            {/* Left Navigation Links */}
+            <div className="hidden md:flex items-center space-x-6">
               <Link 
                 to="/creators" 
-                className="text-abyss-light-gray hover:text-seductive transition-colors duration-300 font-medium relative group"
+                className="text-abyss-light-gray hover:text-seductive transition-all duration-300 font-medium relative group px-3 py-2 rounded-md hover:bg-seductive/10"
               >
                 <span className="relative z-10">Browse Creators</span>
                 <span className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-void-accent to-seductive transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
@@ -44,33 +43,37 @@ const Navbar: React.FC = () => {
               {isAuthenticated && (
                 <Link 
                   to="/gallery" 
-                  className="text-abyss-light-gray hover:text-seductive transition-colors duration-300 font-medium relative group"
+                  className="text-abyss-light-gray hover:text-seductive transition-all duration-300 font-medium relative group px-3 py-2 rounded-md hover:bg-seductive/10"
                 >
                   <span className="relative z-10">Gallery</span>
                   <span className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-void-accent to-seductive transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
                 </Link>
               )}
             </div>
+          </div>
+
+          {/* Desktop Auth Section */}
+          <div className="hidden md:flex items-center space-x-6">
 
             {/* Auth Section */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3">
               {isAuthenticated ? (
                 <div className="flex items-center space-x-4">
                   <Link
                     to="/dashboard"
-                    className="flex items-center space-x-2 text-gray-300 hover:text-void-accent-light transition-colors duration-200"
+                    className="flex items-center space-x-2 text-abyss-light-gray hover:text-seductive transition-colors duration-300 group"
                   >
-                    <User className="h-5 w-5" />
+                    <User className="h-5 w-5 group-hover:text-seductive transition-colors duration-300" />
                     <span className="hidden sm:inline font-medium">
                       {user?.displayName}
                     </span>
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center space-x-1 text-gray-400 hover:text-red-400 transition-colors duration-200"
+                    className="flex items-center space-x-1 text-abyss-light-gray hover:text-red-400 transition-colors duration-300 group"
                     title="Logout"
                   >
-                    <LogOut className="h-5 w-5" />
+                    <LogOut className="h-5 w-5 group-hover:text-red-400 transition-colors duration-300" />
                     <span className="hidden sm:inline">Logout</span>
                   </button>
                 </div>
@@ -78,19 +81,19 @@ const Navbar: React.FC = () => {
                 <div className="flex items-center space-x-3">
                   <Link
                     to="/login"
-                    className="text-gray-300 hover:text-void-accent-light transition-colors duration-200 font-medium"
+                    className="text-abyss-light-gray hover:text-seductive transition-all duration-300 font-medium px-4 py-2 rounded-md border border-transparent hover:border-seductive/30 hover:bg-seductive/5"
                   >
                     Login
                   </Link>
                   <Link
                     to="/register"
-                    className="text-gray-300 hover:text-void-accent-light transition-colors duration-200 font-medium"
+                    className="text-abyss-light-gray hover:text-white transition-all duration-300 font-medium px-4 py-2 rounded-md border border-seductive/40 hover:border-seductive/60 hover:bg-seductive/10"
                   >
                     Register
                   </Link>
                   <Link
                     to="/become-creator"
-                    className="bg-gradient-to-r from-void-accent to-seductive-light text-white px-4 py-2 rounded-full font-medium hover:shadow-lg hover:shadow-void-accent/25 transition-all duration-200"
+                    className="bg-gradient-to-r from-lust-violet to-seductive text-white px-4 py-2 rounded-md font-medium hover:shadow-glow-primary transition-all duration-300 transform hover:scale-[1.02] border border-seductive/30"
                   >
                     Become a Creator
                   </Link>
@@ -121,7 +124,7 @@ const Navbar: React.FC = () => {
               <Link 
                 to="/creators" 
                 onClick={closeMobileMenu}
-                className="block text-gray-300 hover:text-void-accent-light transition-colors duration-200 font-medium py-2"
+                className="block text-abyss-light-gray hover:text-seductive transition-colors duration-300 font-medium py-2"
               >
                 Browse Creators
               </Link>
@@ -130,7 +133,7 @@ const Navbar: React.FC = () => {
                 <Link 
                   to="/gallery" 
                   onClick={closeMobileMenu}
-                  className="block text-gray-300 hover:text-void-accent-light transition-colors duration-200 font-medium py-2"
+                  className="block text-abyss-light-gray hover:text-seductive transition-colors duration-300 font-medium py-2"
                 >
                   Gallery
                 </Link>
@@ -143,7 +146,7 @@ const Navbar: React.FC = () => {
                   <Link
                     to="/dashboard"
                     onClick={closeMobileMenu}
-                    className="flex items-center space-x-2 text-gray-300 hover:text-void-accent-light transition-colors duration-200 py-2"
+                    className="flex items-center space-x-2 text-abyss-light-gray hover:text-seductive transition-colors duration-300 py-2"
                   >
                     <User className="h-5 w-5" />
                     <span className="font-medium">
@@ -152,7 +155,7 @@ const Navbar: React.FC = () => {
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center space-x-2 text-gray-400 hover:text-red-400 transition-colors duration-200 py-2"
+                    className="flex items-center space-x-2 text-abyss-light-gray hover:text-red-400 transition-colors duration-300 py-2"
                   >
                     <LogOut className="h-5 w-5" />
                     <span>Logout</span>
@@ -163,21 +166,21 @@ const Navbar: React.FC = () => {
                   <Link
                     to="/login"
                     onClick={closeMobileMenu}
-                    className="block text-gray-300 hover:text-void-accent-light transition-colors duration-200 font-medium py-2"
+                    className="block text-abyss-light-gray hover:text-seductive transition-colors duration-300 font-medium py-2"
                   >
                     Login
                   </Link>
                   <Link
                     to="/register"
                     onClick={closeMobileMenu}
-                    className="block text-gray-300 hover:text-void-accent-light transition-colors duration-200 font-medium py-2"
+                    className="block text-abyss-light-gray hover:text-seductive transition-colors duration-300 font-medium py-2"
                   >
                     Register
                   </Link>
                   <Link
                     to="/become-creator"
                     onClick={closeMobileMenu}
-                    className="block bg-gradient-to-r from-void-accent to-seductive-light text-white px-4 py-3 rounded-lg font-medium hover:shadow-lg hover:shadow-void-accent/25 transition-all duration-200 text-center"
+                    className="block bg-gradient-to-r from-lust-violet to-seductive text-white px-4 py-3 rounded-lg font-medium hover:shadow-glow-primary transition-all duration-300 text-center"
                   >
                     Become a Creator
                   </Link>

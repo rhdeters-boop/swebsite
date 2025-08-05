@@ -22,13 +22,22 @@
   --seductive-light: #f472b6;
 }
 
-body {
+html {
+  background: var(--void-bg);
+  /* Prevent overscrolling to avoid white space */
+  overscroll-behavior: none;
+  height: 100%;
+}
+
+html, body {
   /* Update the font-family to use Lato as the default */
   font-family: 'Lato', sans-serif;
   background: var(--void-bg);
   min-height: 100vh;
   margin: 0;
   color: #e5e7eb;
+  /* Prevent overscrolling to avoid white space */
+  overscroll-behavior: none;
 }
 
 /* Custom button styles */

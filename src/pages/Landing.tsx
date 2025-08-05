@@ -114,6 +114,14 @@ const Landing: React.FC = () => {
         </div>
       </section>
 
+      {/* Separator */}
+      <div className="bg-abyss-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="border-t border-gradient-to-r from-transparent via-seductive/30 to-transparent"></div>
+          <div className="h-px bg-gradient-to-r from-transparent via-seductive/50 to-transparent"></div>
+        </div>
+      </div>
+
       {/* Creator Section */}
       <section className="relative py-20 bg-abyss-black">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
