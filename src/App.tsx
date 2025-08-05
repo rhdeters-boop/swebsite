@@ -24,6 +24,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 // Context
 import { AuthProvider } from './context/AuthContext';
+import CreateProfile from './pages/CreateProfile';
 
 // Initialize Stripe
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_...');
@@ -54,12 +55,14 @@ const AppContent = () => {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/create-profile" element={<CreateProfile />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/tiers" element={<SubscriptionTiers />} />
           <Route path="/become-creator" element={<BecomeCreator />} />
           <Route path="/creators" element={<CreatorSearch />} />
           <Route path="/creator/:creatorId" element={<CreatorProfile />} />
+
           
           {/* Protected Routes */}
           <Route

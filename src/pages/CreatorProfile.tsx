@@ -175,7 +175,7 @@ const CreatorProfile: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           <div className="animate-pulse">
             <div className="h-64 bg-gray-300 rounded-2xl mb-8"></div>
@@ -203,7 +203,7 @@ const CreatorProfile: React.FC = () => {
 
   if (error || !creatorData?.data.creator) {
     return (
-      <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl mx-auto text-center">
           <div className="text-6xl mb-6">😢</div>
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
@@ -227,7 +227,7 @@ const CreatorProfile: React.FC = () => {
   const stats = creatorData.data.stats;
 
   return (
-    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         {/* Cover Image & Profile */}
         <div className="relative bg-gradient-to-br from-brand-pink to-brand-purple rounded-2xl overflow-hidden mb-8">
@@ -410,7 +410,7 @@ const CreatorProfile: React.FC = () => {
 
               {/* Media Grid */}
               {filteredMedia.length === 0 ? (
-                <div className="text-center py-12">
+                <div className="text-center py-8">
                   <div className="text-6xl mb-4">📷</div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">No content yet</h3>
                   <p className="text-gray-600">

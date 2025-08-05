@@ -161,7 +161,7 @@ const CreatorSearch: React.FC = () => {
   const creators = creatorsData?.data?.creators || [];
 
   return (
-    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -265,7 +265,7 @@ const CreatorSearch: React.FC = () => {
             ))}
           </div>
         ) : error ? (
-          <div className="text-center py-12">
+          <div className="text-center py-8">
             <p className="text-gray-600 mb-4">Something went wrong. Please try again.</p>
             <button
               onClick={() => refetch()}
@@ -275,7 +275,7 @@ const CreatorSearch: React.FC = () => {
             </button>
           </div>
         ) : creators.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="text-center py-8">
             <Heart className="h-16 w-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">No creators found</h3>
             <p className="text-gray-600">

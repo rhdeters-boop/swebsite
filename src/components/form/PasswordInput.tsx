@@ -17,6 +17,7 @@ interface PasswordInputProps {
     uppercase: boolean;
     lowercase: boolean;
     number: boolean;
+    specialChar: boolean;
   };
   showPassword?: boolean;
   onTogglePassword?: () => void;
@@ -38,16 +39,17 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
   onTogglePassword
 }) => {
   const [internalShowPassword, setInternalShowPassword] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   
   // Use external control if provided, otherwise use internal state
   const showPassword = externalShowPassword !== undefined ? externalShowPassword : internalShowPassword;
   const togglePassword = onTogglePassword || (() => setInternalShowPassword(!internalShowPassword));
+  
+  // Label should be positioned as floating when focused or has value
+  const isLabelFloating = isFocused || value.length > 0;
 
   return (
-    <div>
-      <label htmlFor={id} className="block text-sm font-medium text-gray-300 mb-2">
-        {label}
-      </label>
+    <div className="relative">
       <div className="relative">
         <input
           id={id}
@@ -56,10 +58,22 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
           required={required}
           value={value}
           onChange={onChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
           disabled={disabled}
-          className={`form-input pr-10 ${className}`}
-          placeholder={placeholder}
+          className={`form-input pt-6 pr-10 ${className}`}
+          placeholder=""
         />
+        <label 
+          htmlFor={id} 
+          className={`absolute left-3 px-2 text-sm font-medium text-gray-300 transition-all duration-200 pointer-events-none ${
+            isLabelFloating 
+              ? '-top-2.5 bg-void-dark-900 text-gray-300' 
+              : 'top-1/2 -translate-y-1/2 text-gray-400'
+          }`}
+        >
+          {label}
+        </label>
         <button
           type="button"
           onClick={togglePassword}
@@ -76,10 +90,13 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
 
       {showValidation && validation && value && (
         <div className="mt-2 space-y-1">
-          <ValidationItem isValid={validation.length} text="At least 8 characters" />
-          <ValidationItem isValid={validation.uppercase} text="One uppercase letter" />
-          <ValidationItem isValid={validation.lowercase} text="One lowercase letter" />
-          <ValidationItem isValid={validation.number} text="One number" />
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+            <ValidationItem isValid={validation.length} text="At least 8 characters" />
+            <ValidationItem isValid={validation.uppercase} text="One uppercase letter" />
+            <ValidationItem isValid={validation.lowercase} text="One lowercase letter" />
+            <ValidationItem isValid={validation.number} text="One number" />
+            <ValidationItem isValid={validation.specialChar} text="One special character" />
+          </div>
         </div>
       )}
     </div>

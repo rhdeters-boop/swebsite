@@ -7,7 +7,7 @@ const Dashboard: React.FC = () => {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 bg-main text-body">
+    <div className="min-h-screen py-2 sm:py-4 px-4 sm:px-6 lg:px-8 bg-main text-body">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-accent1 to-accent2 bg-clip-text text-transparent">

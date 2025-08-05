@@ -5,6 +5,7 @@ interface PasswordValidation {
   uppercase: boolean;
   lowercase: boolean;
   number: boolean;
+  specialChar: boolean;
 }
 
 export const usePasswordValidation = () => {
@@ -13,6 +14,7 @@ export const usePasswordValidation = () => {
     uppercase: false,
     lowercase: false,
     number: false,
+    specialChar: false,
   });
 
   const validatePassword = (password: string) => {
@@ -21,6 +23,7 @@ export const usePasswordValidation = () => {
       uppercase: /[A-Z]/.test(password),
       lowercase: /[a-z]/.test(password),
       number: /\d/.test(password),
+      specialChar: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
     });
   };
 

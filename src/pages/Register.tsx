@@ -79,7 +79,7 @@ const Register: React.FC = () => {
       <AuthCard
         title={
           <>
-            Join the <span className="text-lust-violet text-shadow-void-glow">Void</span>
+            Enter the <span className="text-lust-violet text-shadow-void-glow">Void</span>
           </>
         }
         subtitle="Create your account - we'll set up your profile next"
@@ -176,7 +176,7 @@ const Register: React.FC = () => {
             name="terms"
             type="checkbox"
             required
-            className="h-4 w-4 text-void-accent focus:ring-void-accent border-void-500/30 rounded bg-void-dark-900/50"
+            className="h-4 w-4 text-void-accent focus:ring-void-accent border-void-500/30 rounded bg-void-dark-900"
           />
           <label htmlFor="terms" className="ml-2 block text-sm text-gray-300">
             I agree to the{' '}

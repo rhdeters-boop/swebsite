@@ -159,7 +159,7 @@ const BecomeCreator: React.FC = () => {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl mx-auto text-center">
           <Heart className="h-16 w-16 text-brand-pink mx-auto mb-6" />
           <h1 className="text-3xl font-bold gradient-text mb-4">
@@ -188,7 +188,7 @@ const BecomeCreator: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
