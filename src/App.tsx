@@ -7,6 +7,7 @@ import { Elements } from '@stripe/react-stripe-js';
 // Components
 import Navbar from './components/Navbar';
 import Landing from './pages/Landing';
+import ModelsShowcase from './pages/ModelsShowcase';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
@@ -52,11 +53,7 @@ const AppContent = () => {
       {!hideNavbar && <Navbar />}
       <main>
         <Routes>
-          <Route path="/" element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
+          <Route path="/" element={<ModelsShowcase />} />
           <Route path="/landing" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -70,6 +67,14 @@ const AppContent = () => {
 
           
           {/* Protected Routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/profile"
             element={
