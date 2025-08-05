@@ -24,7 +24,6 @@ const FormInput: React.FC<FormInputProps> = ({
   value,
   onChange,
   label,
-  placeholder,
   required = false,
   disabled = false,
   className = "",
