@@ -35,17 +35,19 @@ const Navbar: React.FC = () => {
             <div className="flex items-center space-x-8">
               <Link 
                 to="/creators" 
-                className="text-gray-300 hover:text-void-accent-light transition-colors duration-200 font-medium"
+                className="text-abyss-light-gray hover:text-seductive transition-colors duration-300 font-medium relative group"
               >
-                Browse Creators
+                <span className="relative z-10">Browse Creators</span>
+                <span className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-void-accent to-seductive transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
               </Link>
               
               {isAuthenticated && (
                 <Link 
                   to="/gallery" 
-                  className="text-gray-300 hover:text-void-accent-light transition-colors duration-200 font-medium"
+                  className="text-abyss-light-gray hover:text-seductive transition-colors duration-300 font-medium relative group"
                 >
-                  Gallery
+                  <span className="relative z-10">Gallery</span>
+                  <span className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-void-accent to-seductive transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
                 </Link>
               )}
             </div>

@@ -86,10 +86,10 @@ const Landing: React.FC = () => {
       <section className="py-20 bg-abyss-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-abyss-light-gray mb-4 font-serif">
+            <h2 className="text-3xl md:text-4xl font-bold text-void-600 mb-4 font-serif">
               Why Choose Void of Desire?
             </h2>
-            <p className="text-xl max-w-2xl mx-auto text-lust-violet">
+            <p className="text-xl max-w-2xl mx-auto text-abyss-light-gray">
               Experience the difference with our carefully curated content and user-friendly platform
             </p>
           </div>
@@ -102,7 +102,7 @@ const Landing: React.FC = () => {
                     {feature.icon}
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold text-abyss-light-gray mb-2 font-serif">
+                <h3 className="text-2xl font-semibold text-void-500 mb-2 font-serif">
                   {feature.title}
                 </h3>
                 <p className="leading-relaxed text-abyss-light-gray">
@@ -118,8 +118,8 @@ const Landing: React.FC = () => {
       <section className="relative py-20 bg-abyss-black">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-abyss-light-gray mb-4 font-serif">
-              Content site for creators
+            <h2 className="text-3xl md:text-4xl font-bold text-seductive-dark mb-4 font-serif">
+              We Value our Creators
             </h2>
             <p className="text-xl max-w-3xl mx-auto text-abyss-light-gray">
               Turn your passion into income. Join our platform and start earning from your content today.
@@ -129,42 +129,42 @@ const Landing: React.FC = () => {
           <div className="flex justify-center">
             <div className="max-w-2xl">
               <div className="space-y-6">
-                <div className="flex items-start space-x-4">
+                <div className="flex items-center space-x-4">
                   <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center bg-lust-violet">
                     <DollarSign className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-abyss-light-gray mb-2 font-serif">Set Your Own Prices</h4>
+                    <h4 className="font-semibold text-seductive font-serif text-xl">Set Your Own Prices</h4>
                     <p className="text-abyss-light-gray">Full control over your subscription pricing and earning potential</p>
                   </div>
                 </div>
                 
-                <div className="flex items-start space-x-4">
+                <div className="flex items-center space-x-4">
                   <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center bg-lust-violet">
                     <Shield className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-abyss-light-gray mb-2 font-serif">Secure Platform</h4>
-                    <p className="text-abyss-light-gray">Your content and payments are protected with enterprise-level security</p>
+                    <h4 className="font-semibold text-seductive text-xl font-serif">Earn more</h4>
+                    <p className="text-abyss-light-gray">Participate in sale drives and promotions to boost your earnings</p>
                   </div>
                 </div>
                 
-                <div className="flex items-start space-x-4">
+                <div className="flex items-center space-x-4">
                   <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center bg-lust-violet">
                     <Users className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-abyss-light-gray mb-2 font-serif">Build Your Community</h4>
+                    <h4 className="font-semibold text-seductive text-xl font-serif">Build Your Community</h4>
                     <p className="text-abyss-light-gray">Connect with fans and build lasting relationships with your audience</p>
                   </div>
                 </div>
                 
-                <div className="flex items-start space-x-4">
+                <div className="flex items-center space-x-4">
                   <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center bg-lust-violet">
                     <DollarSign className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-abyss-light-gray mb-2 font-serif">The Money You Earn Is Yours</h4>
+                    <h4 className="font-semibold text-seductive text-xl font-serif">The Money You Earn Is Yours</h4>
                     <p className="text-abyss-light-gray">No initial costs to join. We only take a flat 5% commission on your earnings</p>
                   </div>
                 </div>

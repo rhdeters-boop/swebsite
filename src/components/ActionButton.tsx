@@ -24,8 +24,8 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   const baseClasses = "text-white font-semibold px-8 py-4 rounded-lg transition-colors duration-200 inline-flex items-center hover:opacity-90";
   
   const variantClasses = {
-    primary: "bg-lust-violet shadow-glow-primary",
-    secondary: "bg-abyss-dark-gray shadow-glow-secondary"
+    primary: "bg-seductive shadow-glow-secondary hover:bg-seductive-light",
+    secondary: "bg-void-accent-dark shadow-glow-secondary hover:bg-void-accent-light",
   };
 
   const combinedClasses = `${baseClasses} ${variantClasses[variant]} ${className}`;

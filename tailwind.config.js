@@ -12,7 +12,7 @@ export default {
         // New Primary Color Palette (The Abyss)
         'abyss-black': '#000000',
         'abyss-dark-gray': '#333333',
-        'abyss-light-gray': '#999999',
+        'abyss-light-gray': '#cccccc',
 
         // New Accent Color (The Lust/Intrigue)
         'lust-violet': '#4B0082', // Deep Violet
