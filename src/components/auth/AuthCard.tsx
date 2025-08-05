@@ -16,8 +16,8 @@ const AuthCard: React.FC<AuthCardProps> = ({
   footer
 }) => {
   return (
-    <div className="min-h-screen bg-abyss-black flex flex-col justify-start py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md sm:max-w-lg lg:max-w-xl w-full mx-auto space-y-8">
+    <div className="bg-abyss-black py-4 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md sm:max-w-lg lg:max-w-xl w-full mx-auto space-y-6">
         {/* Header */}
         <div className="text-center">
           {icon && (
