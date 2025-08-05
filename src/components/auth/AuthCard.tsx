@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface AuthCardProps {
-  title: string;
+  title: string | React.ReactNode;
   subtitle?: string;
   icon?: React.ReactNode;
   children: React.ReactNode;
@@ -17,7 +17,7 @@ const AuthCard: React.FC<AuthCardProps> = ({
 }) => {
   return (
     <div className="min-h-screen bg-abyss-black flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+      <div className="max-w-md sm:max-w-lg lg:max-w-xl w-full space-y-8">
         {/* Header */}
         <div className="text-center">
           {icon && (

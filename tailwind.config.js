@@ -16,23 +16,6 @@ export default {
 
         // New Accent Color (The Lust/Intrigue)
         'lust-violet': '#4B0082', // Deep Violet
-
-        // Legacy pink theme for backwards compatibility
-        pink: {
-          50: '#fdf2f8',
-          100: '#fce7f3',
-          200: '#fbcfe8',
-          300: '#f9a8d4',
-          400: '#f472b6',
-          500: '#ec4899',
-          600: '#db2777',
-          700: '#be185d',
-          800: '#9d174d',
-          900: '#831843',
-        },
-        'brand-pink': '#ec4899',
-        'brand-pink-light': '#f9a8d4',
-        'brand-pink-dark': '#be185d',
         
         // Void theme - Dark and seductive with purple/magenta accents
         void: {
@@ -89,6 +72,7 @@ export default {
       },
       textShadow: {
         'glow': '0 0 8px rgba(192, 132, 252, 0.4)',
+        'void-glow': '0 0 2px #fdefea, 0 0 12px rgba(192, 132, 252, 0.6), 0 0 20px rgba(75, 0, 130, 0.4)',
       },
       boxShadow: {
         'glow-primary': '0 0 20px rgba(138, 43, 226, 0.5)',

@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { loadStripe } from '@stripe/stripe-js';
@@ -38,78 +38,91 @@ const queryClient = new QueryClient({
   },
 });
 
+// Create a component that conditionally renders navbar
+const AppContent = () => {
+  const location = useLocation();
+  
+  // Routes where navbar should be hidden
+  const authRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
+  const hideNavbar = authRoutes.includes(location.pathname);
+
+  return (
+    <div className="min-h-screen bg-abyss-black">
+      {!hideNavbar && <Navbar />}
+      <main>
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/tiers" element={<SubscriptionTiers />} />
+          <Route path="/become-creator" element={<BecomeCreator />} />
+          <Route path="/creators" element={<CreatorSearch />} />
+          <Route path="/creator/:creatorId" element={<CreatorProfile />} />
+          
+          {/* Protected Routes */}
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/account-settings"
+            element={
+              <ProtectedRoute>
+                <AccountSettings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/gallery/:tier"
+            element={
+              <ProtectedRoute>
+                <MediaGallery />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/gallery"
+            element={
+              <ProtectedRoute>
+                <MediaGallery />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/creator/application-success"
+            element={
+              <ProtectedRoute>
+                <CreatorApplicationSuccess />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </main>
+    </div>
+  );
+};
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Elements stripe={stripePromise}>
         <AuthProvider>
           <Router>
-            <div className="min-h-screen bg-abyss-black">
-              <Navbar />
-              <main>
-                <Routes>
-                  <Route path="/" element={<Landing />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                  <Route path="/forgot-password" element={<ForgotPassword />} />
-                  <Route path="/reset-password" element={<ResetPassword />} />
-                  <Route path="/tiers" element={<SubscriptionTiers />} />
-                  <Route path="/become-creator" element={<BecomeCreator />} />
-                  <Route path="/creators" element={<CreatorSearch />} />
-                  <Route path="/creator/:creatorId" element={<CreatorProfile />} />
-                  
-                  {/* Protected Routes */}
-                  <Route
-                    path="/profile"
-                    element={
-                      <ProtectedRoute>
-                        <Profile />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/account-settings"
-                    element={
-                      <ProtectedRoute>
-                        <AccountSettings />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/dashboard"
-                    element={
-                      <ProtectedRoute>
-                        <Dashboard />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/gallery/:tier"
-                    element={
-                      <ProtectedRoute>
-                        <MediaGallery />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/gallery"
-                    element={
-                      <ProtectedRoute>
-                        <MediaGallery />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/creator/application-success"
-                    element={
-                      <ProtectedRoute>
-                        <CreatorApplicationSuccess />
-                      </ProtectedRoute>
-                    }
-                  />
-                </Routes>
-              </main>
-            </div>
+            <AppContent />
           </Router>
         </AuthProvider>
       </Elements>

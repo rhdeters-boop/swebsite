@@ -18,6 +18,8 @@ interface PasswordInputProps {
     lowercase: boolean;
     number: boolean;
   };
+  showPassword?: boolean;
+  onTogglePassword?: () => void;
 }
 
 const PasswordInput: React.FC<PasswordInputProps> = ({
@@ -31,9 +33,15 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
   className = "",
   label,
   showValidation = false,
-  validation
+  validation,
+  showPassword: externalShowPassword,
+  onTogglePassword
 }) => {
-  const [showPassword, setShowPassword] = useState(false);
+  const [internalShowPassword, setInternalShowPassword] = useState(false);
+  
+  // Use external control if provided, otherwise use internal state
+  const showPassword = externalShowPassword !== undefined ? externalShowPassword : internalShowPassword;
+  const togglePassword = onTogglePassword || (() => setInternalShowPassword(!internalShowPassword));
 
   return (
     <div>
@@ -54,7 +62,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
         />
         <button
           type="button"
-          onClick={() => setShowPassword(!showPassword)}
+          onClick={togglePassword}
           disabled={disabled}
           className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-300 disabled:opacity-50"
         >
