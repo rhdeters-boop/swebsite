@@ -144,7 +144,7 @@ function convertCreatorToFrontend(creator: Creator): FrontendCreator {
   
   return {
     id: creator.id, // Now string UUID
-    name: creator.displayName || 'Unknown Creator',
+    name: creator.displayName,
     image: creator.profilePicture || '/placeholder-avatar.jpg',
     likes: creator.likeCount || 0,
     subscribers: formatSubscriberCount(creator.followerCount || 0),

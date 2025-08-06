@@ -1,26 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import NavbarLogo from './navbar/NavbarLogo';
 import DesktopNavigation from './navbar/DesktopNavigation';
-import AuthenticatedDesktopAuth from './navbar/AuthenticatedDesktopAuth';
-import UnauthenticatedDesktopAuth from './navbar/UnauthenticatedDesktopAuth';
-import MobileMenuButton from './navbar/MobileMenuButton';
-import MobileMenu from './navbar/MobileMenu';
+import AccountDropdown from './navbar/AccountDropdown';
 
 const Navbar: React.FC = () => {
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate('/');
-    setIsMobileMenuOpen(false);
-  };
-
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -29,30 +20,15 @@ const Navbar: React.FC = () => {
         <div className="flex justify-between items-center h-16 nav:h-24 py-4">
           <NavbarLogo />
           <DesktopNavigation isAuthenticated={isAuthenticated} />
-          {/* Desktop Auth Section */}
-          <div className="hidden nav:flex items-center space-x-6">
-            {isAuthenticated ? (
-              <AuthenticatedDesktopAuth user={user} onLogout={handleLogout} />
-            ) : (
-              <UnauthenticatedDesktopAuth />
-            )}
+          {/* Auth Section - works for both desktop and mobile */}
+          <div className="flex items-center space-x-6">
+            <AccountDropdown 
+              isAuthenticated={isAuthenticated}
+              user={user}
+              onLogout={handleLogout}
+            />
           </div>
-
-          {/* Mobile menu button */}
-          <MobileMenuButton 
-            isOpen={isMobileMenuOpen} 
-            onToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
-          />
         </div>
-
-        {/* Mobile menu */}
-        <MobileMenu
-          isOpen={isMobileMenuOpen}
-          isAuthenticated={isAuthenticated}
-          user={user}
-          onLogout={handleLogout}
-          onClose={closeMobileMenu}
-        />
       </div>
     </nav>
   );

@@ -24,11 +24,14 @@ class AuthService {
       }
     }
 
+    // Default displayName to username if not provided
+    const finalDisplayName = displayName || username;
+
     // Create user
     const user = await User.create({
       email,
       password,
-      displayName,
+      displayName: finalDisplayName,
       username
     });
 
