@@ -80,20 +80,20 @@ const Footer: React.FC = () => {
             <h3 className="text-white font-semibold mb-4">Support</h3>
             <ul className="space-y-2">
               <li>
-                <a 
-                  href="#" 
+                <Link 
+                  to="/help" 
                   className="text-abyss-light-gray hover:text-seductive transition-colors duration-200 text-sm"
                 >
                   Help Center
-                </a>
+                </Link>
               </li>
               <li>
-                <a 
-                  href="#" 
+                <Link 
+                  to="/contact" 
                   className="text-abyss-light-gray hover:text-seductive transition-colors duration-200 text-sm"
                 >
                   Contact Us
-                </a>
+                </Link>
               </li>
               <li>
                 <a 
@@ -119,28 +119,28 @@ const Footer: React.FC = () => {
             <h3 className="text-white font-semibold mb-4">Legal</h3>
             <ul className="space-y-2">
               <li>
-                <a 
-                  href="#" 
+                <Link 
+                  to="/privacy" 
                   className="text-abyss-light-gray hover:text-seductive transition-colors duration-200 text-sm"
                 >
                   Privacy Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a 
-                  href="#" 
+                <Link 
+                  to="/terms" 
                   className="text-abyss-light-gray hover:text-seductive transition-colors duration-200 text-sm"
                 >
                   Terms of Service
-                </a>
+                </Link>
               </li>
               <li>
-                <a 
-                  href="#" 
+                <Link 
+                  to="/refund-policy" 
                   className="text-abyss-light-gray hover:text-seductive transition-colors duration-200 text-sm"
                 >
-                  Cookie Policy
-                </a>
+                  Refund Policy
+                </Link>
               </li>
               <li>
                 <a 

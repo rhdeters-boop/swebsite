@@ -22,30 +22,38 @@ import {
 
 interface Creator {
   id: string;
+  userId: string;
   displayName: string;
   bio: string;
-  profilePictureUrl?: string;
-  coverImageUrl?: string;
+  profileImage?: string; // Changed from profileImageUrl
+  profileImageUrl?: string; // Keep both for compatibility
+  coverImage?: string; // Changed from coverImageUrl
+  coverImageUrl?: string; // Keep both for compatibility
   categories: string[];
   subscriptionPrice: number;
+  isVerified: boolean;
+  isActive: boolean;
   followerCount: number;
   subscriberCount: number;
   likeCount: number;
+  dislikeCount: number;
   location?: string;
-  createdAt: string;
-  isActive: boolean;
   socialLinks: {
     instagram?: string;
     twitter?: string;
     tiktok?: string;
-    onlyfans?: string;
   };
+  createdAt: string;
+  updatedAt: string;
+  isFollowed?: boolean; // Changed from isFollowing
+  isFollowing?: boolean; // Keep both for compatibility
+  isSubscribed?: boolean;
   user: {
     displayName: string;
     username: string;
+    email?: string;
   };
-  isFollowing?: boolean;
-  isSubscribed?: boolean;
+  mediaItems?: MediaItem[];
 }
 
 interface MediaItem {
@@ -62,15 +70,7 @@ interface MediaItem {
 
 interface CreatorResponse {
   success: boolean;
-  data: {
-    creator: Creator;
-    mediaItems: MediaItem[];
-    stats: {
-      totalContent: number;
-      totalImages: number;
-      totalVideos: number;
-    };
-  };
+  creator: Creator;
 }
 
 const CreatorProfile: React.FC = () => {
@@ -81,11 +81,18 @@ const CreatorProfile: React.FC = () => {
   const [selectedTier, setSelectedTier] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  // Fetch creator profile
+  // Determine if creatorId is a username or UUID
+  const isUsername = creatorId && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(creatorId);
+
+  // Fetch creator profile using appropriate method
   const { data: creatorData, isLoading, error } = useQuery<CreatorResponse>({
-    queryKey: ['creator', creatorId],
+    queryKey: ['creator', creatorId, isUsername ? 'username' : 'id'],
     queryFn: async () => {
-      const response = await fetch(`/api/creators/${creatorId}`, {
+      const url = isUsername 
+        ? `/api/creators/username/${creatorId}`
+        : `/api/creators/${creatorId}`;
+      
+      const response = await fetch(url, {
         headers: isAuthenticated ? {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         } : {}
@@ -106,7 +113,13 @@ const CreatorProfile: React.FC = () => {
   // Follow/Unfollow mutation
   const followMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch(`/api/creators/${creatorId}/follow`, {
+      // Use the actual creator ID from the fetched data, not the URL parameter
+      const actualCreatorId = creatorData?.creator?.id;
+      if (!actualCreatorId) {
+        throw new Error('Creator ID not available');
+      }
+
+      const response = await fetch(`/api/creators/${actualCreatorId}/follow`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -121,7 +134,7 @@ const CreatorProfile: React.FC = () => {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['creator', creatorId] });
+      queryClient.invalidateQueries({ queryKey: ['creator', creatorId, isUsername ? 'username' : 'id'] });
     },
   });
 
@@ -160,7 +173,7 @@ const CreatorProfile: React.FC = () => {
     });
   };
 
-  const filteredMedia = creatorData?.data.mediaItems.filter(item => {
+  const filteredMedia = creatorData?.creator?.mediaItems?.filter((item: any) => {
     if (selectedTier === 'all') return true;
     return item.tier === selectedTier;
   }) || [];
@@ -200,7 +213,7 @@ const CreatorProfile: React.FC = () => {
     );
   }
 
-  if (error || !creatorData?.data.creator) {
+  if (error || !creatorData?.creator) {
     return (
       <div className="py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl mx-auto text-center">
@@ -222,8 +235,23 @@ const CreatorProfile: React.FC = () => {
     );
   }
 
-  const creator = creatorData.data.creator;
-  const stats = creatorData.data.stats;
+  const creator = creatorData?.creator;
+  const stats = {
+    totalContent: creator?.mediaItems?.length || 0,
+    totalImages: creator?.mediaItems?.filter((item: any) => item.mediaType === 'image').length || 0,
+    totalVideos: creator?.mediaItems?.filter((item: any) => item.mediaType === 'video').length || 0
+  };
+
+  if (!creator) {
+    return (
+      <div className="py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto text-center">
+          <h1 className="text-2xl font-bold text-white mb-4">Creator not found</h1>
+          <p className="text-abyss-light-gray">The creator you're looking for doesn't exist or has been removed.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
@@ -245,9 +273,9 @@ const CreatorProfile: React.FC = () => {
           <div className="absolute bottom-6 left-6 right-6">
             <div className="flex items-end space-x-6">
               <div className="w-24 h-24 rounded-full bg-background-primary p-1 shadow-elevated">
-                {creator.profilePictureUrl ? (
+                {(creator.profileImageUrl || creator.profileImage) ? (
                   <img
-                    src={creator.profilePictureUrl}
+                    src={creator.profileImageUrl || creator.profileImage}
                     alt={creator.displayName}
                     className="w-full h-full rounded-full object-cover"
                   />
@@ -298,7 +326,7 @@ const CreatorProfile: React.FC = () => {
               <p className="text-text-secondary leading-relaxed mb-6">{creator.bio}</p>
               
               <div className="flex flex-wrap gap-2 mb-6">
-                {creator.categories.map((category) => (
+                {creator.categories.map((category: string) => (
                   <span
                     key={category}
                     className="category-tag"
@@ -463,15 +491,15 @@ const CreatorProfile: React.FC = () => {
                 )}
 
                 <button
-                  onClick={creator.isFollowing ? undefined : handleFollow}
-                  disabled={creator.isFollowing || followMutation.isPending}
+                  onClick={(creator.isFollowing || creator.isFollowed) ? undefined : handleFollow}
+                  disabled={(creator.isFollowing || creator.isFollowed) || followMutation.isPending}
                   className={`w-full btn ${
-                    creator.isFollowing
+                    (creator.isFollowing || creator.isFollowed)
                       ? 'bg-background-secondary text-text-secondary border border-border-secondary'
                       : 'btn-secondary'
                   }`}
                 >
-                  {creator.isFollowing ? (
+                  {(creator.isFollowing || creator.isFollowed) ? (
                     <>
                       <UserCheck className="h-4 w-4 mr-2" />
                       Following

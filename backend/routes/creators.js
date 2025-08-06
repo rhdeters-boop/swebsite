@@ -95,6 +95,28 @@ router.get('/new-rising', optionalAuth, async (req, res, next) => {
   }
 });
 
+// Get creator by username (public)
+router.get('/username/:username', optionalAuth, async (req, res, next) => {
+  try {
+    const { username } = req.params;
+
+    const creator = await CreatorService.getCreatorByUsername(username, req.user?.id);
+
+    res.json({
+      success: true,
+      creator
+    });
+  } catch (error) {
+    if (error.message === 'Creator not found') {
+      return res.status(404).json({
+        success: false,
+        message: error.message
+      });
+    }
+    next(error);
+  }
+});
+
 // Get creator by ID (public)
 router.get('/:id', optionalAuth, async (req, res, next) => {
   try {

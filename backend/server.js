@@ -5,6 +5,7 @@ import compression from 'compression';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -28,6 +29,7 @@ import { connectDB } from './config/database.js';
 
 // Import services
 import S3Service from './services/S3Service.js';
+import LogRotator from './utils/LogRotator.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -40,6 +42,24 @@ const PORT = process.env.PORT || 5000;
 
 // Connect to database
 connectDB();
+
+// Create logs directory if it doesn't exist
+const logsDir = join(__dirname, 'logs');
+if (!fs.existsSync(logsDir)) {
+  fs.mkdirSync(logsDir, { recursive: true });
+}
+
+// Create a write stream for access logs
+const accessLogPath = join(logsDir, 'access.log');
+const accessLogStream = fs.createWriteStream(accessLogPath, { flags: 'a' });
+
+// Initialize log rotator
+const logRotator = new LogRotator(accessLogPath);
+
+// Check for log rotation every hour
+setInterval(() => {
+  logRotator.rotateIfNeeded();
+}, 60 * 60 * 1000);
 
 // Rate limiting
 const limiter = rateLimit({
@@ -54,7 +74,23 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 app.use(compression());
-app.use(morgan('combined'));
+
+// Configure Morgan logging based on environment
+if (process.env.NODE_ENV === 'production') {
+  // In production, log to file only
+  app.use(morgan('combined', { stream: accessLogStream }));
+} else {
+  // In development, log errors to console but access logs to file
+  app.use(morgan('combined', { 
+    stream: accessLogStream,
+    skip: (req, res) => res.statusCode < 400 // Only log errors to file in dev
+  }));
+  // Optional: Keep a minimal console log for development (only errors)
+  app.use(morgan('dev', {
+    skip: (req, res) => res.statusCode < 400
+  }));
+}
+
 app.use(limiter);
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:5173',

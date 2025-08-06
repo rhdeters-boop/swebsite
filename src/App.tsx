@@ -7,6 +7,7 @@ import { Elements } from '@stripe/react-stripe-js';
 // Components
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ScrollToTop from './components/ScrollToTop';
 import Landing from './pages/Landing';
 import Explore from './pages/Explore';
 import Login from './pages/Login';
@@ -20,7 +21,13 @@ import MediaGallery from './pages/MediaGallery';
 import BecomeCreator from './pages/BecomeCreator';
 import CreatorSearch from './pages/CreatorSearch';
 import CreatorProfile from './pages/CreatorProfile';
+import UserProfile from './pages/UserProfile';
 import CreatorApplicationSuccess from './pages/CreatorApplicationSuccess';
+import HelpCenter from './pages/HelpCenter';
+import Contact from './pages/Contact';
+import TermsOfService from './pages/TermsOfService';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import RefundPolicy from './pages/RefundPolicy';
 import ProtectedRoute from './components/ProtectedRoute';
 
 // Context
@@ -50,6 +57,7 @@ const AppContent = () => {
 
   return (
     <div className="bg-abyss-black flex flex-col min-h-screen">
+      <ScrollToTop />
       {!hideNavbar && <Navbar />}
       <main className="flex-1">
         <Routes>
@@ -63,6 +71,12 @@ const AppContent = () => {
           <Route path="/become-creator" element={<BecomeCreator />} />
           <Route path="/creators" element={<CreatorSearch />} />
           <Route path="/creator/:creatorId" element={<CreatorProfile />} />
+          <Route path="/user/:userId" element={<UserProfile />} />
+          <Route path="/help" element={<HelpCenter />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/refund-policy" element={<RefundPolicy />} />
 
           
           {/* Protected Routes */}

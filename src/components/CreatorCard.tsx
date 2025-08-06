@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Heart, TrendingUp, Eye } from 'lucide-react';
 
 interface FrontendCreator {
-  id: number;
+  id: string; // Changed from number to string
   name: string;
   image: string;
   likes: number;
@@ -11,9 +11,16 @@ interface FrontendCreator {
   isOnline: boolean;
   totalViews?: number;
   weeklyEngagement?: number;
+  username?: string; // Added username for routing
+  isCreator?: boolean; // New prop to distinguish creators from regular users/models
 }
 
-const CreatorCard: React.FC<{ creator: FrontendCreator }> = ({ creator }) => {
+interface CreatorCardProps {
+  creator: FrontendCreator;
+  viewAsUser?: boolean; // New prop to force user profile view
+}
+
+const CreatorCard: React.FC<CreatorCardProps> = ({ creator, viewAsUser = false }) => {
   const formatViews = (views: number) => {
     if (views >= 1000000) return `${(views / 1000000).toFixed(1)}M`;
     if (views >= 1000) return `${(views / 1000).toFixed(1)}K`;
@@ -22,9 +29,21 @@ const CreatorCard: React.FC<{ creator: FrontendCreator }> = ({ creator }) => {
 
   const isTrending = creator.weeklyEngagement && creator.weeklyEngagement > 100;
 
+  // Determine the correct route based on user type and view preference
+  const getProfileRoute = () => {
+    if (viewAsUser || creator.isCreator === false) {
+      return `/user/${creator.id}`;
+    }
+    // Use username for creator profiles if available, otherwise fall back to ID
+    if (creator.username) {
+      return `/creator/${creator.username}`;
+    }
+    return `/creator/${creator.id}`;
+  };
+
   return (
     <Link 
-      to={`/creator/${creator.id}`}
+      to={getProfileRoute()}
       className="group relative flex-shrink-0 w-56 bg-abyss-black rounded-xl overflow-hidden hover:scale-105 transition-transform duration-300 border border-void-500/20 hover:border-seductive/50"
     >
       <div className="relative">

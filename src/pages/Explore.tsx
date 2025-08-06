@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { TrendingUp, Sparkles, Crown } from 'lucide-react';
+import { TrendingUp, Sparkles, Crown, Users } from 'lucide-react';
 import Following from './Following';
 import CreatorRow from '../components/CreatorRow';
 import { useCreators } from '../hooks/useCreators';
+import { useScrollMaintenance } from '../hooks/useScrollRestoration';
 
 const Explore: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<'explore' | 'feed'>('explore');
   const { topCreators, trendingCreators, newCreators, loading, error } = useCreators();
+  
+  // Maintain scroll position when returning to this page
+  useScrollMaintenance();
 
   // Initialize tab from URL parameter
   useEffect(() => {
@@ -94,6 +98,12 @@ const Explore: React.FC = () => {
             title="Trending Now"
             creators={trendingCreators}
             icon={<TrendingUp className="h-6 w-6 text-seductive" />}
+          />
+          
+          <CreatorRow
+            title="Featured Creators"
+            creators={topCreators.slice(0, 6)}
+            icon={<Users className="h-6 w-6 text-seductive" />}
           />
           
           <CreatorRow

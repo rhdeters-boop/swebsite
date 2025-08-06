@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 
 interface Creator {
-  id: number;
+  id: string; // Changed from number to string
   name: string;
   image: string;
   likes: number;
@@ -11,6 +11,8 @@ interface Creator {
   subscriptionType?: 'free' | 'basic' | 'premium';
   totalViews?: number;
   weeklyEngagement?: number;
+  username?: string;
+  isCreator?: boolean;
 }
 
 interface CreatorCarouselProps {

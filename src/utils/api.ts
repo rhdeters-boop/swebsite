@@ -33,14 +33,20 @@ api.interceptors.response.use(
 // Creator interface matching backend data structure
 // Backend Creator interface with analytics
 interface Creator {
-  id: number;
+  id: string; // Changed from number to string to match UUID
+  userId: string;
   displayName: string;
   profilePicture?: string;
   likeCount: number;
   followerCount: number;
   isOnline: boolean;
+  user: {
+    displayName: string;
+    username: string;
+    email?: string;
+  };
   mediaItems?: {
-    id: number;
+    id: string;
     title: string;
     mediaType: string;
     analytics: {
@@ -54,7 +60,7 @@ interface Creator {
 
 // Frontend interface for compatibility with existing components
 export interface FrontendCreator {
-  id: number;
+  id: string; // Changed from number to string to match UUID
   name: string;
   image: string;
   likes: number;
@@ -62,6 +68,9 @@ export interface FrontendCreator {
   isOnline: boolean;
   totalViews?: number;
   weeklyEngagement?: number;
+  username?: string; // Added username for routing
+  isCreator?: boolean; // Added to distinguish creators from regular users
+  subscriptionType?: 'free' | 'basic' | 'premium'; // Added for subscription filtering
 }
 
 // API response interfaces
@@ -82,6 +91,34 @@ export interface CreatorsResponse {
 export interface CreatorResponse {
   success: boolean;
   creator: Creator;
+}
+
+// Subscription interfaces
+export interface SubscriptionData {
+  id: string;
+  userId: string;
+  creatorId: string;
+  tier: string;
+  status: string;
+  stripeSubscriptionId?: string;
+  createdAt: string;
+  updatedAt: string;
+  creator: {
+    id: string;
+    displayName: string;
+    profilePicture?: string;
+    subscriptionPrice: number;
+    categories: string[];
+    user: {
+      displayName: string;
+      username: string;
+    };
+  };
+}
+
+export interface UserSubscriptionsResponse {
+  success: boolean;
+  subscriptions: SubscriptionData[];
 }
 
 // Utility function to format subscriber count
@@ -106,14 +143,16 @@ function convertCreatorToFrontend(creator: Creator): FrontendCreator {
   const weeklyEngagement = weeklyViews + totalLikes;
   
   return {
-    id: creator.id,
+    id: creator.id, // Now string UUID
     name: creator.displayName || 'Unknown Creator',
     image: creator.profilePicture || '/placeholder-avatar.jpg',
     likes: creator.likeCount || 0,
     subscribers: formatSubscriberCount(creator.followerCount || 0),
     isOnline: creator.isOnline || false,
     totalViews,
-    weeklyEngagement
+    weeklyEngagement,
+    username: creator.user?.username,
+    isCreator: true
   };
 }
 
@@ -132,13 +171,19 @@ export const creatorsApi = {
   },
 
   // Get creator by ID
-  getCreator: async (id: number): Promise<CreatorResponse> => {
+  getCreator: async (id: string): Promise<CreatorResponse> => {
     const response = await api.get(`/creators/${id}`);
     return response.data;
   },
 
+  // Get creator by username
+  getCreatorByUsername: async (username: string): Promise<CreatorResponse> => {
+    const response = await api.get(`/creators/username/${username}`);
+    return response.data;
+  },
+
   // Follow/unfollow creator
-  followCreator: async (id: number): Promise<{ success: boolean; message: string; isFollowed: boolean }> => {
+  followCreator: async (id: string): Promise<{ success: boolean; message: string; isFollowed: boolean }> => {
     const response = await api.post(`/creators/${id}/follow`);
     return response.data;
   },
@@ -188,6 +233,33 @@ export const creatorsApi = {
       console.error('Error fetching new creators:', error);
       return [];
     }
+  },
+};
+
+// Subscription API functions
+export const subscriptionsApi = {
+  // Get user's creator subscriptions
+  getUserCreatorSubscriptions: async (): Promise<UserSubscriptionsResponse> => {
+    const response = await api.get('/subscriptions/my-creators');
+    return response.data;
+  },
+
+  // Subscribe to a creator
+  subscribeToCreator: async (creatorId: string, tier: string): Promise<{ success: boolean; message: string; subscription: SubscriptionData }> => {
+    const response = await api.post(`/subscriptions/creator/${creatorId}/subscribe`, { tier });
+    return response.data;
+  },
+
+  // Unsubscribe from a creator
+  unsubscribeFromCreator: async (creatorId: string): Promise<{ success: boolean; message: string }> => {
+    const response = await api.delete(`/subscriptions/creator/${creatorId}/unsubscribe`);
+    return response.data;
+  },
+
+  // Get current subscription status
+  getCurrentSubscription: async (): Promise<{ success: boolean; subscription: any }> => {
+    const response = await api.get('/subscriptions/current');
+    return response.data;
   },
 };
 

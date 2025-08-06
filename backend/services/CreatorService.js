@@ -240,6 +240,61 @@ class CreatorService {
   }
 
   /**
+   * Get creator by username
+   */
+  async getCreatorByUsername(username, userId = null) {
+    const creator = await Creator.findOne({
+      where: { isActive: true },
+      include: [
+        {
+          model: User,
+          as: 'user',
+          where: { username },
+          attributes: ['displayName', 'username'],
+        },
+        {
+          model: MediaItem,
+          as: 'mediaItems',
+          where: { isPublished: true },
+          required: false,
+          limit: 6,
+          order: [['publishedAt', 'DESC']],
+        },
+      ],
+    });
+
+    if (!creator) {
+      throw new Error('Creator not found');
+    }
+
+    let creatorData = creator.toJSON();
+
+    // Add user-specific status if authenticated
+    if (userId) {
+      const [follow, subscription] = await Promise.all([
+        Follow.findOne({
+          where: {
+            followerId: userId,
+            creatorId: creator.id
+          }
+        }),
+        CreatorSubscription.findOne({
+          where: {
+            userId: userId,
+            creatorId: creator.id,
+            status: 'active'
+          }
+        })
+      ]);
+
+      creatorData.isFollowed = !!follow;
+      creatorData.isSubscribed = !!subscription;
+    }
+
+    return creatorData;
+  }
+
+  /**
    * Create a new creator profile
    */
   async createCreator(userId, creatorData) {

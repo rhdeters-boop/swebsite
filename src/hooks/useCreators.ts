@@ -60,7 +60,7 @@ interface UseCreatorReturn {
   refetch: () => Promise<void>;
 }
 
-export const useCreator = (id: number): UseCreatorReturn => {
+export const useCreator = (id: string): UseCreatorReturn => {
   const [creator, setCreator] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -85,6 +85,40 @@ export const useCreator = (id: number): UseCreatorReturn => {
       fetchCreator();
     }
   }, [id]);
+
+  return {
+    creator,
+    loading,
+    error,
+    refetch: fetchCreator,
+  };
+};
+
+export const useCreatorByUsername = (username: string): UseCreatorReturn => {
+  const [creator, setCreator] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchCreator = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await creatorsApi.getCreatorByUsername(username);
+      setCreator(response.creator);
+    } catch (err) {
+      console.error('Error fetching creator by username:', err);
+      setError('Failed to load creator profile. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (username) {
+      fetchCreator();
+    }
+  }, [username]);
 
   return {
     creator,
