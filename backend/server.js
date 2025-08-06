@@ -16,6 +16,7 @@ import subscriptionRoutes from './routes/subscriptions.js';
 import mediaRoutes from './routes/media.js';
 import paymentRoutes from './routes/payments.js';
 import healthRoutes from './routes/health.js';
+import analyticsRoutes from './routes/analytics.js';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler.js';
@@ -76,6 +77,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', authenticateToken, userRoutes);
 app.use('/api/subscriptions', authenticateToken, subscriptionRoutes);
 app.use('/api/media', authenticateToken, mediaRoutes);
+app.use('/api/analytics', analyticsRoutes); // Mixed public and protected routes
 app.use('/api/payments', paymentRoutes); // Some payment routes need to be public for webhooks
 app.use('/api/creators', creatorRoutes); // Mixed public and protected routes
 

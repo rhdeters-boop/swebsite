@@ -1,15 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Star } from 'lucide-react';
-
-interface Creator {
-  id: number;
-  name: string;
-  image: string;
-  rating: number;
-  subscribers: string;
-  isOnline: boolean;
-}
+import type { Creator } from './CreatorCarousel';
 
 const CreatorCard: React.FC<{ creator: Creator }> = ({ creator }) => (
   <Link 

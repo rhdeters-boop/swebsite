@@ -3,6 +3,7 @@ import multer from 'multer';
 import { MediaItem, Subscription } from '../models/index.js';
 import { requireSubscription, requireAuth } from '../middleware/auth.js';
 import S3Service from '../services/S3Service.js';
+import AnalyticsService from '../services/AnalyticsService.js';
 
 const router = express.Router();
 
@@ -271,6 +272,10 @@ router.get('/:id', requireSubscription('picture'), async (req, res, next) => {
     const signedUrl = mediaItem.s3Key 
       ? await S3Service.getSignedUrl(mediaItem.s3Key, 3600) // 1 hour expiry
       : null;
+
+    // Record view analytics (async, don't wait for completion)
+    AnalyticsService.recordView(id, req.user?.id)
+      .catch(error => console.error('Error recording view:', error));
 
     res.json({
       success: true,

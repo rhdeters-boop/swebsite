@@ -5,6 +5,7 @@ import Payment from './Payment.js';
 import Creator from './Creator.js';
 import CreatorSubscription from './CreatorSubscription.js';
 import Follow from './Follow.js';
+import MediaAnalytics from './MediaAnalytics.js';
 import { PasswordResetToken } from './PasswordResetToken.js';
 
 // User associations
@@ -119,6 +120,18 @@ MediaItem.belongsTo(Creator, {
   as: 'creator',
 });
 
+MediaItem.hasMany(MediaAnalytics, {
+  foreignKey: 'media_item_id', // Use snake_case for the actual column name
+  as: 'analytics',
+  onDelete: 'CASCADE',
+});
+
+// MediaAnalytics associations
+MediaAnalytics.belongsTo(MediaItem, {
+  foreignKey: 'media_item_id', // Use snake_case for the actual column name
+  as: 'mediaItem',
+});
+
 // PasswordResetToken associations
 PasswordResetToken.belongsTo(User, {
   foreignKey: 'userId',
@@ -134,6 +147,7 @@ export {
   Creator,
   CreatorSubscription,
   Follow,
+  MediaAnalytics,
   PasswordResetToken,
 };
 
@@ -146,5 +160,6 @@ export default {
   Creator,
   CreatorSubscription,
   Follow,
+  MediaAnalytics,
   PasswordResetToken,
 };
