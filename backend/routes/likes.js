@@ -1,13 +1,27 @@
 import express from 'express';
-import { body, validationResult } from 'express-validator';
+import { body, param, validationResult } from 'express-validator';
 import { Creator, CreatorLike } from '../models/index.js';
 import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
+// UUID validation middleware
+const validateCreatorId = [
+  param('creatorId').isUUID().withMessage('Invalid creator ID format'),
+];
+
 // Get creator like counts and user's vote status
-router.get('/:creatorId/likes', async (req, res, next) => {
+router.get('/:creatorId/likes', validateCreatorId, async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid creator ID format',
+        errors: errors.array()
+      });
+    }
+
     const { creatorId } = req.params;
     const userId = req.user?.id; // Optional auth
 
@@ -44,7 +58,7 @@ router.get('/:creatorId/likes', async (req, res, next) => {
 });
 
 // Like a creator
-router.post('/:creatorId/like', authenticateToken, [
+router.post('/:creatorId/like', authenticateToken, validateCreatorId, [
   body('isLike').isBoolean().withMessage('isLike must be a boolean'),
 ], async (req, res, next) => {
   try {
@@ -103,8 +117,17 @@ router.post('/:creatorId/like', authenticateToken, [
 });
 
 // Remove like/dislike
-router.delete('/:creatorId/like', authenticateToken, async (req, res, next) => {
+router.delete('/:creatorId/like', authenticateToken, validateCreatorId, async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
     const { creatorId } = req.params;
     const userId = req.user.id;
 

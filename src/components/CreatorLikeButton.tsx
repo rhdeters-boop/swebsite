@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Heart, HeartOff } from 'lucide-react';
 
 interface CreatorLikeButtonProps {
-  creatorId: number;
+  creatorId: string; // Changed from number to string for UUID
   onLikeChange?: (liked: boolean, newLikeCount: number) => void;
   className?: string;
 }
@@ -30,6 +30,13 @@ const CreatorLikeButton: React.FC<CreatorLikeButtonProps> = ({
   };
 
   const fetchLikeData = async () => {
+    // Validate creatorId before making API call
+    if (!creatorId || creatorId === 'undefined' || creatorId === 'null' || creatorId.includes('NaN')) {
+      console.warn('Invalid creatorId provided to CreatorLikeButton:', creatorId);
+      setLoading(false);
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:5001/api/likes/${creatorId}/likes`, {
@@ -39,6 +46,8 @@ const CreatorLikeButton: React.FC<CreatorLikeButtonProps> = ({
       if (response.ok) {
         const result = await response.json();
         setLikeData(result.data);
+      } else {
+        console.error('Failed to fetch like data:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Error fetching like data:', error);
@@ -49,6 +58,13 @@ const CreatorLikeButton: React.FC<CreatorLikeButtonProps> = ({
 
   const handleVote = async (isLike: boolean) => {
     if (submitting || !likeData) return;
+
+    // Validate creatorId before making API call
+    if (!creatorId || creatorId === 'undefined' || creatorId === 'null' || creatorId.includes('NaN')) {
+      console.warn('Invalid creatorId provided to handleVote:', creatorId);
+      alert('Invalid creator ID. Cannot process vote.');
+      return;
+    }
 
     const token = localStorage.getItem('token');
     if (!token) {

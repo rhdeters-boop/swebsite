@@ -1,60 +1,20 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
 import CreatorLikeButton from '../components/CreatorLikeButton';
+import MediaItemCard from '../components/MediaItemCard';
+import UnauthenticatedContent from '../components/UnauthenticatedContent';
+import AuthenticatedContent from '../components/AuthenticatedContent';
+import SubscriptionCard from '../components/SubscriptionCard';
+import { useCreatorProfile } from '../hooks/useCreatorProfile';
 import { 
-  Heart, 
   Users, 
   MapPin,
   Instagram,
   Twitter,
   Globe,
-  UserPlus,
-  UserCheck,
-  Play,
-  Image as ImageIcon,
-  Lock,
-  Eye,
-  Grid,
-  List
+  Star
 } from 'lucide-react';
-
-interface Creator {
-  id: string;
-  userId: string;
-  displayName: string;
-  bio: string;
-  profileImage?: string; // Changed from profileImageUrl
-  profileImageUrl?: string; // Keep both for compatibility
-  coverImage?: string; // Changed from coverImageUrl
-  coverImageUrl?: string; // Keep both for compatibility
-  categories: string[];
-  subscriptionPrice: number;
-  isVerified: boolean;
-  isActive: boolean;
-  followerCount: number;
-  subscriberCount: number;
-  likeCount: number;
-  dislikeCount: number;
-  location?: string;
-  socialLinks: {
-    instagram?: string;
-    twitter?: string;
-    tiktok?: string;
-  };
-  createdAt: string;
-  updatedAt: string;
-  isFollowed?: boolean; // Changed from isFollowing
-  isFollowing?: boolean; // Keep both for compatibility
-  isSubscribed?: boolean;
-  user: {
-    displayName: string;
-    username: string;
-    email?: string;
-  };
-  mediaItems?: MediaItem[];
-}
 
 interface MediaItem {
   id: string;
@@ -62,128 +22,37 @@ interface MediaItem {
   title: string;
   description?: string;
   thumbnailUrl: string;
-  url?: string; // Only if user has access
+  url?: string;
   tier: 'picture' | 'solo_video' | 'collab_video';
+  accessLevel: 'free' | 'private';
   createdAt: string;
   hasAccess: boolean;
-}
-
-interface CreatorResponse {
-  success: boolean;
-  creator: Creator;
 }
 
 const CreatorProfile: React.FC = () => {
   const { creatorId } = useParams<{ creatorId: string }>();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [selectedTier, setSelectedTier] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  // Determine if creatorId is a username or UUID
-  const isUsername = creatorId && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(creatorId);
+  const {
+    creatorData,
+    isLoading,
+    error,
+    followMutation,
+    handleFollow,
+    handleSubscribe,
+    handleTip
+  } = useCreatorProfile(creatorId, isAuthenticated);
 
-  // Fetch creator profile using appropriate method
-  const { data: creatorData, isLoading, error } = useQuery<CreatorResponse>({
-    queryKey: ['creator', creatorId, isUsername ? 'username' : 'id'],
-    queryFn: async () => {
-      const url = isUsername 
-        ? `/api/creators/username/${creatorId}`
-        : `/api/creators/${creatorId}`;
-      
-      const response = await fetch(url, {
-        headers: isAuthenticated ? {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        } : {}
-      });
-
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error('Creator not found');
-        }
-        throw new Error('Failed to fetch creator profile');
-      }
-
-      return response.json();
-    },
-    enabled: !!creatorId,
-  });
-
-  // Follow/Unfollow mutation
-  const followMutation = useMutation({
-    mutationFn: async () => {
-      // Use the actual creator ID from the fetched data, not the URL parameter
-      const actualCreatorId = creatorData?.creator?.id;
-      if (!actualCreatorId) {
-        throw new Error('Creator ID not available');
-      }
-
-      const response = await fetch(`/api/creators/${actualCreatorId}/follow`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to follow creator');
-      }
-
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['creator', creatorId, isUsername ? 'username' : 'id'] });
-    },
-  });
-
-  const handleFollow = () => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
+  const filteredMedia = creatorData?.creator?.mediaItems?.filter((item: MediaItem) => {
+    if (!isAuthenticated && item.accessLevel === 'private') {
+      return false;
     }
-    followMutation.mutate();
-  };
-
-  const handleSubscribe = () => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
-    navigate(`/creator/${creatorId}/subscribe`);
-  };
-
-  const handleTip = () => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
-    navigate(`/creator/${creatorId}/tip`);
-  };
-
-  const formatPrice = (price: number) => {
-    return `$${(price / 100).toFixed(2)}`;
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long'
-    });
-  };
-
-  const filteredMedia = creatorData?.creator?.mediaItems?.filter((item: any) => {
     if (selectedTier === 'all') return true;
     return item.tier === selectedTier;
   }) || [];
-
-  const tierOptions = [
-    { value: 'all', label: 'All Content' },
-    { value: 'picture', label: 'Pictures' },
-    { value: 'solo_video', label: 'Solo Videos' },
-    { value: 'collab_video', label: 'Collab Videos' },
-  ];
 
   if (isLoading) {
     return (
@@ -236,10 +105,15 @@ const CreatorProfile: React.FC = () => {
   }
 
   const creator = creatorData?.creator;
+  const freeMedia = creator?.mediaItems?.filter((item: MediaItem) => item.accessLevel === 'free') || [];
+  const privateMedia = creator?.mediaItems?.filter((item: MediaItem) => item.accessLevel === 'private') || [];
+  
   const stats = {
     totalContent: creator?.mediaItems?.length || 0,
-    totalImages: creator?.mediaItems?.filter((item: any) => item.mediaType === 'image').length || 0,
-    totalVideos: creator?.mediaItems?.filter((item: any) => item.mediaType === 'video').length || 0
+    totalImages: creator?.mediaItems?.filter((item: MediaItem) => item.type === 'image').length || 0,
+    totalVideos: creator?.mediaItems?.filter((item: MediaItem) => item.type === 'video').length || 0,
+    freeContent: freeMedia.length,
+    privateContent: privateMedia.length
   };
 
   if (!creator) {
@@ -296,12 +170,12 @@ const CreatorProfile: React.FC = () => {
                     {creator.followerCount} followers
                   </div>
                   <div className="flex items-center">
-                    <Heart className="h-4 w-4 mr-1" />
+                    <Star className="h-4 w-4 mr-1" />
                     {creator.subscriberCount} subscribers
                   </div>
                   <div className="flex items-center">
                     <CreatorLikeButton 
-                      creatorId={Number(creator.id)} 
+                      creatorId={creator.id} 
                       className="flex-1"
                     />
                   </div>
@@ -380,305 +254,37 @@ const CreatorProfile: React.FC = () => {
             <div className="card">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-display-sm text-text-primary">Content</h2>
-                
-                <div className="flex items-center space-x-4">
-                  {/* Tier Filter */}
-                  <select
-                    value={selectedTier}
-                    onChange={(e) => setSelectedTier(e.target.value)}
-                    className="form-select"
-                  >
-                    {tierOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-
-                  {/* View Mode Toggle */}
-                  <div className="flex bg-background-secondary rounded-lg p-1">
-                    <button
-                      onClick={() => setViewMode('grid')}
-                      className={`p-2 rounded transition-colors ${
-                        viewMode === 'grid'
-                          ? 'bg-background-primary text-void-accent shadow-sm'
-                          : 'text-text-tertiary hover:text-text-secondary'
-                      }`}
-                    >
-                      <Grid className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => setViewMode('list')}
-                      className={`p-2 rounded transition-colors ${
-                        viewMode === 'list'
-                          ? 'bg-background-primary text-void-accent shadow-sm'
-                          : 'text-text-tertiary hover:text-text-secondary'
-                      }`}
-                    >
-                      <List className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
               </div>
 
-              {/* Content Stats */}
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="text-center p-4 bg-background-secondary rounded-xl">
-                  <div className="text-2xl font-bold text-void-accent">{stats.totalContent}</div>
-                  <div className="text-sm text-text-tertiary">Total Items</div>
-                </div>
-                <div className="text-center p-4 bg-background-secondary rounded-xl">
-                  <div className="text-2xl font-bold text-void-accent">{stats.totalImages}</div>
-                  <div className="text-sm text-text-tertiary">Pictures</div>
-                </div>
-                <div className="text-center p-4 bg-background-secondary rounded-xl">
-                  <div className="text-2xl font-bold text-void-accent">{stats.totalVideos}</div>
-                  <div className="text-sm text-text-tertiary">Videos</div>
-                </div>
-              </div>
-
-              {/* Media Grid */}
-              {filteredMedia.length === 0 ? (
-                <div className="text-center py-8">
-                  <div className="text-6xl mb-4">📷</div>
-                  <h3 className="text-xl font-semibold text-text-primary mb-2">No content yet</h3>
-                  <p className="text-text-secondary">
-                    This creator hasn't uploaded any content in this category yet.
-                  </p>
-                </div>
+              {!isAuthenticated ? (
+                <UnauthenticatedContent
+                  freeMedia={freeMedia}
+                  stats={stats}
+                  creatorName={creator.displayName}
+                />
               ) : (
-                <div className={`grid gap-4 ${
-                  viewMode === 'grid' 
-                    ? 'grid-cols-2 md:grid-cols-3' 
-                    : 'grid-cols-1'
-                }`}>
-                  {filteredMedia.map((item) => (
-                    <MediaItemCard
-                      key={item.id}
-                      item={item}
-                      viewMode={viewMode}
-                    />
-                  ))}
-                </div>
+                <AuthenticatedContent
+                  filteredMedia={filteredMedia}
+                  stats={stats}
+                  selectedTier={selectedTier}
+                  setSelectedTier={setSelectedTier}
+                  viewMode={viewMode}
+                  setViewMode={setViewMode}
+                />
               )}
             </div>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Subscription Card */}
-            <div className="card">
-              <div className="text-center mb-6">
-                <div className="text-3xl font-bold text-void-accent mb-2">
-                  {formatPrice(creator.subscriptionPrice)}
-                  <span className="text-lg font-normal text-text-secondary">/month</span>
-                </div>
-                <p className="text-text-secondary">Get exclusive access to all content</p>
-              </div>
-
-              <div className="space-y-3">
-                {creator.isSubscribed ? (
-                  <div className="w-full bg-success/10 text-success border border-success/20 rounded-xl py-3 px-4 text-center font-medium">
-                    ✓ Subscribed
-                  </div>
-                ) : (
-                  <button
-                    onClick={handleSubscribe}
-                    className="btn-primary w-full"
-                  >
-                    Subscribe Now
-                  </button>
-                )}
-
-                <button
-                  onClick={(creator.isFollowing || creator.isFollowed) ? undefined : handleFollow}
-                  disabled={(creator.isFollowing || creator.isFollowed) || followMutation.isPending}
-                  className={`w-full btn ${
-                    (creator.isFollowing || creator.isFollowed)
-                      ? 'bg-background-secondary text-text-secondary border border-border-secondary'
-                      : 'btn-secondary'
-                  }`}
-                >
-                  {(creator.isFollowing || creator.isFollowed) ? (
-                    <>
-                      <UserCheck className="h-4 w-4 mr-2" />
-                      Following
-                    </>
-                  ) : (
-                    <>
-                      <UserPlus className="h-4 w-4 mr-2" />
-                      {followMutation.isPending ? 'Following...' : 'Follow'}
-                    </>
-                  )}
-                </button>
-
-                <button
-                  onClick={handleTip}
-                  className="btn-outline w-full"
-                >
-                  💝 Send a Tip
-                </button>
-              </div>
-            </div>
-
-            {/* Creator Info */}
-            <div className="card">
-              <h3 className="text-lg font-semibold text-text-primary mb-4">Creator Info</h3>
-              <div className="space-y-3 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-text-secondary">Member since</span>
-                  <span className="font-medium">{formatDate(creator.createdAt)}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-text-secondary">Content items</span>
-                  <span className="font-medium">{stats.totalContent}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-text-secondary">Followers</span>
-                  <span className="font-medium">{creator.followerCount}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-text-secondary">Subscribers</span>
-                  <span className="font-medium">{creator.subscriberCount}</span>
-                </div>
-              </div>
-            </div>
+            <SubscriptionCard
+              creator={creator}
+              followMutation={followMutation}
+              onSubscribe={handleSubscribe}
+              onFollow={handleFollow}
+              onTip={handleTip}
+            />
           </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-interface MediaItemCardProps {
-  item: MediaItem;
-  viewMode: 'grid' | 'list';
-}
-
-const MediaItemCard: React.FC<MediaItemCardProps> = ({ item, viewMode }) => {
-  const navigate = useNavigate();
-
-  const handleClick = () => {
-    if (item.hasAccess) {
-      navigate(`/media/${item.id}`);
-    } else {
-      // Show subscription prompt
-    }
-  };
-
-  const getTierBadge = (tier: string) => {
-    const badges = {
-      picture: { label: 'Picture', color: 'badge-info' },
-      solo_video: { label: 'Solo Video', color: 'badge-void' },
-      collab_video: { label: 'Collab Video', color: 'badge-accent' },
-    };
-    return badges[tier as keyof typeof badges] || badges.picture;
-  };
-
-  if (viewMode === 'list') {
-    return (
-      <div className="flex bg-background-secondary rounded-xl overflow-hidden hover:shadow-md transition-shadow">
-        <div className="relative w-32 h-24 flex-shrink-0">
-          <img
-            src={item.thumbnailUrl}
-            alt={item.title}
-            className="w-full h-full object-cover"
-          />
-          {item.type === 'video' && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Play className="h-8 w-8 text-text-on-dark drop-shadow-lg" />
-            </div>
-          )}
-          {!item.hasAccess && (
-            <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
-              <Lock className="h-6 w-6 text-text-on-dark" />
-            </div>
-          )}
-        </div>
-        
-        <div className="flex-1 p-4 flex items-center justify-between">
-          <div>
-            <h4 className="font-medium text-text-primary mb-1">{item.title}</h4>
-            {item.description && (
-              <p className="text-sm text-text-secondary line-clamp-1">{item.description}</p>
-            )}
-            <div className="flex items-center space-x-2 mt-2">
-              <span className={`${getTierBadge(item.tier).color}`}>
-                {getTierBadge(item.tier).label}
-              </span>
-              <span className="text-xs text-text-tertiary">
-                {new Date(item.createdAt).toLocaleDateString()}
-              </span>
-            </div>
-          </div>
-          
-          <button
-            onClick={handleClick}
-            className="btn-secondary-sm"
-            disabled={!item.hasAccess}
-          >
-            {item.hasAccess ? (
-              <>
-                <Eye className="h-4 w-4 mr-1" />
-                View
-              </>
-            ) : (
-              <>
-                <Lock className="h-4 w-4 mr-1" />
-                Subscribe
-              </>
-            )}
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="relative group cursor-pointer" onClick={handleClick}>
-      <div className="aspect-square bg-background-secondary rounded-xl overflow-hidden">
-        <img
-          src={item.thumbnailUrl}
-          alt={item.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-        />
-        
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-          <div className="absolute bottom-3 left-3 right-3">
-            <h4 className="text-text-on-dark font-medium text-sm mb-1 line-clamp-1">{item.title}</h4>
-            <div className="flex items-center justify-between">
-              <span className={`${getTierBadge(item.tier).color}`}>
-                {getTierBadge(item.tier).label}
-              </span>
-              {item.type === 'video' && (
-                <Play className="h-4 w-4 text-text-on-dark" />
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Lock overlay for non-subscribers */}
-        {!item.hasAccess && (
-          <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
-            <div className="text-center text-text-on-dark">
-              <Lock className="h-8 w-8 mx-auto mb-2" />
-              <p className="text-sm font-medium">Subscribe to view</p>
-            </div>
-          </div>
-        )}
-
-        {/* Type indicator */}
-        <div className="absolute top-3 right-3">
-          {item.type === 'video' ? (
-            <div className="bg-black bg-opacity-60 rounded-full p-1">
-              <Play className="h-4 w-4 text-text-on-dark fill-current" />
-            </div>
-          ) : (
-            <div className="bg-black bg-opacity-60 rounded-full p-1">
-              <ImageIcon className="h-4 w-4 text-text-on-dark" />
-            </div>
-          )}
         </div>
       </div>
     </div>

@@ -200,6 +200,53 @@ If you prefer to set up services individually:
 
 See [MinIO Setup Guide](./docs/MINIO_SETUP.md) for detailed information.
 
+## 🐛 Development & Debugging
+
+### Quick Log Access
+
+**Read clean logs without ANSI color codes:**
+```bash
+# Use our convenient script
+./scripts/clean-logs.sh
+
+# Or manually strip colors
+cat logs/frontend.log | sed 's/\x1b\[[0-9;]*m//g'
+cat logs/backend.log | sed 's/\x1b\[[0-9;]*m//g'
+```
+
+**Monitor logs in real-time:**
+```bash
+tail -f logs/frontend.log  # Frontend
+tail -f logs/backend.log   # Backend
+npm run logs:all          # Both logs
+```
+
+📋 **For detailed logging and debugging information, see [Logs and Debugging Guide](./docs/LOGS.md)**
+
+### Development Commands
+
+**Check application status:**
+```bash
+# Check if servers are running
+lsof -i :5173  # Frontend
+lsof -i :5000  # Backend
+
+# Restart development servers
+npm run dev
+```
+
+**Database operations:**
+```bash
+# Reset database (if needed)
+npm run db:reset
+
+# Run migrations
+npm run db:migrate
+
+# Seed database with sample data
+npm run db:seed
+```
+
 ## 📁 Project Structure
 
 ```
@@ -287,14 +334,6 @@ The application uses a custom pink girly theme with:
 - `POST /api/payments/tips` - Create tip payment
 - `GET /api/payments/history` - Get payment history
 - `POST /api/payments/webhooks/stripe` - Stripe webhook
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
 
 ## 📄 License
 
