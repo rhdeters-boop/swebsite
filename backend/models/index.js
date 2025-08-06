@@ -6,6 +6,7 @@ import Creator from './Creator.js';
 import CreatorSubscription from './CreatorSubscription.js';
 import Follow from './Follow.js';
 import MediaAnalytics from './MediaAnalytics.js';
+import CreatorLike from './CreatorLike.js';
 import { PasswordResetToken } from './PasswordResetToken.js';
 
 // User associations
@@ -39,6 +40,12 @@ User.hasMany(Follow, {
   onDelete: 'CASCADE',
 });
 
+User.hasMany(CreatorLike, {
+  foreignKey: 'userId',
+  as: 'creatorLikes',
+  onDelete: 'CASCADE',
+});
+
 User.hasMany(PasswordResetToken, {
   foreignKey: 'userId',
   as: 'passwordResetTokens',
@@ -66,6 +73,12 @@ Creator.hasMany(CreatorSubscription, {
 Creator.hasMany(Follow, {
   foreignKey: 'creatorId',
   as: 'followers',
+  onDelete: 'CASCADE',
+});
+
+Creator.hasMany(CreatorLike, {
+  foreignKey: 'creatorId',
+  as: 'likes',
   onDelete: 'CASCADE',
 });
 
@@ -103,6 +116,17 @@ Follow.belongsTo(Creator, {
   as: 'creator',
 });
 
+// CreatorLike associations
+CreatorLike.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user',
+});
+
+CreatorLike.belongsTo(Creator, {
+  foreignKey: 'creatorId',
+  as: 'creator',
+});
+
 // Payment associations
 Payment.belongsTo(User, {
   foreignKey: 'userId',
@@ -121,14 +145,14 @@ MediaItem.belongsTo(Creator, {
 });
 
 MediaItem.hasMany(MediaAnalytics, {
-  foreignKey: 'media_item_id', // Use snake_case for the actual column name
+  foreignKey: 'mediaItemId', // Use camelCase for the foreign key attribute
   as: 'analytics',
   onDelete: 'CASCADE',
 });
 
 // MediaAnalytics associations
 MediaAnalytics.belongsTo(MediaItem, {
-  foreignKey: 'media_item_id', // Use snake_case for the actual column name
+  foreignKey: 'mediaItemId', // Use camelCase for the foreign key attribute
   as: 'mediaItem',
 });
 
@@ -148,6 +172,7 @@ export {
   CreatorSubscription,
   Follow,
   MediaAnalytics,
+  CreatorLike,
   PasswordResetToken,
 };
 
@@ -161,5 +186,6 @@ export default {
   CreatorSubscription,
   Follow,
   MediaAnalytics,
+  CreatorLike,
   PasswordResetToken,
 };

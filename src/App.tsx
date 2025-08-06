@@ -6,6 +6,7 @@ import { Elements } from '@stripe/react-stripe-js';
 
 // Components
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import Landing from './pages/Landing';
 import Explore from './pages/Explore';
 import Login from './pages/Login';
@@ -14,7 +15,6 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Profile from './pages/Profile';
 import AccountSettings from './pages/AccountSettings';
-import SubscriptionTiers from './pages/SubscriptionTiers';
 import Dashboard from './pages/Dashboard';
 import MediaGallery from './pages/MediaGallery';
 import BecomeCreator from './pages/BecomeCreator';
@@ -49,9 +49,9 @@ const AppContent = () => {
   const hideNavbar = authRoutes.includes(location.pathname);
 
   return (
-    <div className="min-h-screen bg-abyss-black">
+    <div className="bg-abyss-black flex flex-col min-h-screen">
       {!hideNavbar && <Navbar />}
-      <main>
+      <main className="flex-1">
         <Routes>
           <Route path="/" element={<Explore />} />
           <Route path="/landing" element={<Landing />} />
@@ -60,7 +60,6 @@ const AppContent = () => {
           <Route path="/create-profile" element={<CreateProfile />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/tiers" element={<SubscriptionTiers />} />
           <Route path="/become-creator" element={<BecomeCreator />} />
           <Route path="/creators" element={<CreatorSearch />} />
           <Route path="/creator/:creatorId" element={<CreatorProfile />} />
@@ -125,6 +124,7 @@ const AppContent = () => {
           />
         </Routes>
       </main>
+      {!hideNavbar && <Footer />}
     </div>
   );
 };

@@ -16,7 +16,7 @@ const AuthenticatedDesktopAuth: React.FC<AuthenticatedDesktopAuthProps> = ({ use
     <div className="flex items-center space-x-4">
       <Link
         to="/dashboard"
-        className="flex items-center space-x-2 text-abyss-light-gray hover:text-seductive transition-colors duration-300 group"
+        className="flex items-center space-x-2 text-abyss-light-gray hover:text-seductive transition-colors duration-300 group px-2 py-3 h-12 rounded-md hover:bg-seductive/10"
       >
         <User className="h-5 w-5 group-hover:text-seductive transition-colors duration-300" />
         <span className="hidden sm:inline font-medium">
@@ -25,7 +25,7 @@ const AuthenticatedDesktopAuth: React.FC<AuthenticatedDesktopAuthProps> = ({ use
       </Link>
       <button
         onClick={onLogout}
-        className="flex items-center space-x-1 text-abyss-light-gray hover:text-red-400 transition-colors duration-300 group"
+        className="flex items-center space-x-1 text-abyss-light-gray hover:text-red-400 transition-colors duration-300 group px-2 py-3 h-12 rounded-md hover:bg-red-400/10"
         title="Logout"
       >
         <LogOut className="h-5 w-5 group-hover:text-red-400 transition-colors duration-300" />

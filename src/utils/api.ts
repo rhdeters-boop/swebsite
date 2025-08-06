@@ -31,35 +31,25 @@ api.interceptors.response.use(
 );
 
 // Creator interface matching backend data structure
-export interface Creator {
+// Backend Creator interface with analytics
+interface Creator {
   id: number;
   displayName: string;
-  bio?: string;
-  categories: string[];
-  subscriptionPrice: number;
-  rating: number;
-  ratingCount: number;
+  profilePicture?: string;
+  likeCount: number;
   followerCount: number;
-  subscriberCount: number;
-  isVerified: boolean;
-  isActive: boolean;
-  profileImageUrl?: string;
-  bannerImageUrl?: string;
-  socialLinks: {
-    instagram?: string;
-    twitter?: string;
-    tiktok?: string;
-    youtube?: string;
-  };
-  user?: {
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-  isFollowed?: boolean;
-  isSubscribed?: boolean;
-  createdAt: string;
-  updatedAt: string;
+  isOnline: boolean;
+  mediaItems?: {
+    id: number;
+    title: string;
+    mediaType: string;
+    analytics: {
+      totalViews: number;
+      totalLikes: number;
+      weeklyViews: number;
+      avgRating: number;
+    };
+  }[];
 }
 
 // Frontend interface for compatibility with existing components
@@ -67,9 +57,11 @@ export interface FrontendCreator {
   id: number;
   name: string;
   image: string;
-  rating: number;
+  likes: number;
   subscribers: string;
   isOnline: boolean;
+  totalViews?: number;
+  weeklyEngagement?: number;
 }
 
 // API response interfaces
@@ -103,14 +95,27 @@ const formatSubscriberCount = (count: number): string => {
 };
 
 // Convert backend creator to frontend format
-export const convertCreatorToFrontend = (creator: Creator): FrontendCreator => ({
-  id: creator.id,
-  name: creator.displayName,
-  image: creator.profileImageUrl || '/api/placeholder/300/400',
-  rating: Math.round(creator.rating * 10) / 10,
-  subscribers: formatSubscriberCount(creator.followerCount),
-  isOnline: Math.random() > 0.3, // Random online status for now
-});
+function convertCreatorToFrontend(creator: Creator): FrontendCreator {
+  const totalViews = creator.mediaItems?.reduce((sum, item) => 
+    sum + (item.analytics?.totalViews || 0), 0) || 0;
+  const weeklyViews = creator.mediaItems?.reduce((sum, item) => 
+    sum + (item.analytics?.weeklyViews || 0), 0) || 0;
+  const totalLikes = creator.mediaItems?.reduce((sum, item) => 
+    sum + (item.analytics?.totalLikes || 0), 0) || 0;
+  
+  const weeklyEngagement = weeklyViews + totalLikes;
+  
+  return {
+    id: creator.id,
+    name: creator.displayName || 'Unknown Creator',
+    image: creator.profilePicture || '/placeholder-avatar.jpg',
+    likes: creator.likeCount || 0,
+    subscribers: formatSubscriberCount(creator.followerCount || 0),
+    isOnline: creator.isOnline || false,
+    totalViews,
+    weeklyEngagement
+  };
+}
 
 // Creator API functions
 export const creatorsApi = {
@@ -152,19 +157,37 @@ export const creatorsApi = {
     }
   },
 
-  // Get top creators
+  // Get top creators (analytics-based)
   getTopCreators: async (limit: number = 10): Promise<FrontendCreator[]> => {
-    return creatorsApi.getCreatorsByCategory('popular', limit);
+    try {
+      const response = await api.get('/creators/top-performers', { params: { limit } });
+      return response.data.creators.map(convertCreatorToFrontend);
+    } catch (error) {
+      console.error('Error fetching top creators:', error);
+      return [];
+    }
   },
 
-  // Get trending creators
+  // Get trending creators (analytics-based)
   getTrendingCreators: async (limit: number = 10): Promise<FrontendCreator[]> => {
-    return creatorsApi.getCreatorsByCategory('rating', limit);
+    try {
+      const response = await api.get('/creators/trending', { params: { limit } });
+      return response.data.creators.map(convertCreatorToFrontend);
+    } catch (error) {
+      console.error('Error fetching trending creators:', error);
+      return [];
+    }
   },
 
   // Get new creators
   getNewCreators: async (limit: number = 10): Promise<FrontendCreator[]> => {
-    return creatorsApi.getCreatorsByCategory('newest', limit);
+    try {
+      const response = await api.get('/creators/new-rising', { params: { limit } });
+      return response.data.creators.map(convertCreatorToFrontend);
+    } catch (error) {
+      console.error('Error fetching new creators:', error);
+      return [];
+    }
   },
 };
 

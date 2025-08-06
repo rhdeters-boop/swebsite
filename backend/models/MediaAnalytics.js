@@ -106,13 +106,13 @@ const MediaAnalytics = sequelize.define('MediaAnalytics', {
   },
 }, {
   // Table options
-  tableName: 'mediaAnalytics',
+  tableName: 'media_analytics', // Use snake_case for table name
   timestamps: true, // Adds createdAt and updatedAt
   indexes: [
     // Unique constraint for one entry per media item per date
     {
       unique: true,
-      fields: ['mediaItemId', 'date'],
+      fields: ['media_item_id', 'date'],
       name: 'unique_media_date',
     },
     // Index for quick date range queries
@@ -122,12 +122,12 @@ const MediaAnalytics = sequelize.define('MediaAnalytics', {
     },
     // Index for quick media item queries
     {
-      fields: ['mediaItemId'],
+      fields: ['media_item_id'],
       name: 'idx_media_analytics_media_item',
     },
     // Composite index for creator analytics
     {
-      fields: ['mediaItemId', 'date'],
+      fields: ['media_item_id', 'date'],
       name: 'idx_media_analytics_media_date',
     },
   ],

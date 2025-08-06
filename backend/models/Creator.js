@@ -77,11 +77,11 @@ const Creator = sequelize.define('Creator', {
     type: DataTypes.INTEGER, // In cents
     defaultValue: 0,
   },
-  rating: {
-    type: DataTypes.DECIMAL(3, 2), // 0.00 to 5.00
-    defaultValue: 0.00,
+  likeCount: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
   },
-  ratingCount: {
+  dislikeCount: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
@@ -99,7 +99,7 @@ const Creator = sequelize.define('Creator', {
       using: 'gin',
     },
     {
-      fields: ['rating'],
+      fields: ['like_count'],
     },
     {
       fields: ['follower_count'],
@@ -115,11 +115,16 @@ Creator.prototype.getFormattedPrice = function() {
   return (this.subscriptionPrice / 100).toFixed(2);
 };
 
-Creator.prototype.updateRating = async function(newRating) {
-  const totalRating = (this.rating * this.ratingCount) + newRating;
-  this.ratingCount += 1;
-  this.rating = totalRating / this.ratingCount;
+Creator.prototype.updateLikeCounts = async function() {
+  // This method will be called to sync like counts from CreatorLike table
+  const { default: CreatorLike } = await import('./CreatorLike.js');
+  const counts = await CreatorLike.getLikeCounts(this.id);
+  
+  this.likeCount = counts.likes;
+  this.dislikeCount = counts.dislikes;
   await this.save();
+  
+  return counts;
 };
 
 export default Creator;

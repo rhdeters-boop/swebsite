@@ -8,10 +8,10 @@ interface MobileMenuButtonProps {
 
 const MobileMenuButton: React.FC<MobileMenuButtonProps> = ({ isOpen, onToggle }) => {
   return (
-    <div className="md:hidden">
+    <div className="nav:hidden flex items-center">
       <button 
         onClick={onToggle}
-        className="text-gray-300 hover:text-void-accent-light transition-colors duration-200"
+        className="p-2 h-12 w-12 flex items-center justify-center text-gray-300 hover:text-void-accent-light transition-colors duration-200 rounded-md hover:bg-void-accent/10"
       >
         {isOpen ? (
           <X className="h-6 w-6" />

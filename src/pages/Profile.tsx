@@ -93,7 +93,7 @@ const Profile: React.FC = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-void-dark-950 flex items-center justify-center">
+      <div className="bg-void-dark-950 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-void-accent mx-auto mb-4"></div>
           <p className="text-gray-400">Loading...</p>
@@ -106,7 +106,7 @@ const Profile: React.FC = () => {
     <>
       <BackButton />
       
-      <div className="min-h-screen bg-void-dark-950 py-2 sm:py-4">
+      <div className="bg-void-dark-950 py-2 sm:py-4">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-void-dark-900 rounded-2xl shadow-2xl border border-void-500/20 overflow-hidden">
             {/* Header */}
@@ -195,7 +195,7 @@ const Profile: React.FC = () => {
                       <label className="block text-sm font-medium text-gray-300 mb-2">
                         Bio
                       </label>
-                      <div className="w-full px-4 py-3 bg-void-dark-900/50 border border-void-500/30 rounded-lg text-gray-200 min-h-[100px]">
+                      <div className="form-textarea min-h-24">
                         {(user as any).bio || 'No bio added yet'}
                       </div>
                     </div>

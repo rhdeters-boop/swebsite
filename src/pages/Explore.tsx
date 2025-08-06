@@ -1,17 +1,32 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { TrendingUp, Sparkles, Crown } from 'lucide-react';
 import Following from './Following';
 import CreatorRow from '../components/CreatorRow';
 import { useCreators } from '../hooks/useCreators';
 
 const Explore: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<'explore' | 'feed'>('explore');
   const { topCreators, trendingCreators, newCreators, loading, error } = useCreators();
 
+  // Initialize tab from URL parameter
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'feed' || tab === 'explore') {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
+
+  // Update URL when tab changes
+  const handleTabChange = (tab: 'explore' | 'feed') => {
+    setActiveTab(tab);
+    setSearchParams({ tab });
+  };
+
   if (loading) {
     return (
-      <div className="bg-abyss-black min-h-screen flex items-center justify-center">
+      <div className="bg-abyss-black flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-seductive mx-auto mb-4"></div>
           <p className="text-abyss-light-gray">Loading creators...</p>
@@ -22,7 +37,7 @@ const Explore: React.FC = () => {
 
   if (error) {
     return (
-      <div className="bg-abyss-black min-h-screen flex items-center justify-center">
+      <div className="bg-abyss-black flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-400 mb-4">{error}</p>
           <button 
@@ -37,13 +52,13 @@ const Explore: React.FC = () => {
   }
 
   return (
-    <div className="bg-abyss-black min-h-screen">
+    <div className="bg-abyss-black ">
       {/* Tab Navigation */}
       <div className="border-b border-void-500/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex space-x-8">
             <button
-              onClick={() => setActiveTab('explore')}
+              onClick={() => handleTabChange('explore')}
               className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
                 activeTab === 'explore'
                   ? 'border-seductive text-seductive'
@@ -53,7 +68,7 @@ const Explore: React.FC = () => {
               Explore
             </button>
             <button
-              onClick={() => setActiveTab('feed')}
+              onClick={() => handleTabChange('feed')}
               className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
                 activeTab === 'feed'
                   ? 'border-seductive text-seductive'
@@ -90,28 +105,6 @@ const Explore: React.FC = () => {
       ) : (
         <Following />
       )}
-
-      {/* CTA Section */}
-      <div className="bg-gradient-to-r from-abyss-black to-abyss-black py-16 px-4 sm:px-6 lg:px-8 mt-16">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-void-600 mb-4 font-serif">Ready to join the Void?</h2>
-          <p className="text-abyss-light-gray mb-8">Start your premium experience today</p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link
-              to="/register"
-              className="bg-seductive hover:bg-seductive-dark text-white px-8 py-3 rounded-lg font-semibold transition-colors duration-200"
-            >
-              Sign Up Now
-            </Link>
-            <Link
-              to="/become-creator"
-              className="bg-lust-violet hover:bg-lust-violet/80 text-white px-8 py-3 rounded-lg font-semibold transition-colors duration-200"
-            >
-              Become a Creator
-            </Link>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

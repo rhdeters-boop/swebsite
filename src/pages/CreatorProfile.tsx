@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
+import CreatorLikeButton from '../components/CreatorLikeButton';
 import { 
   Heart, 
   Users, 
-  Star,
   MapPin,
   Instagram,
   Twitter,
@@ -30,8 +30,7 @@ interface Creator {
   subscriptionPrice: number;
   followerCount: number;
   subscriberCount: number;
-  rating: number;
-  ratingCount: number;
+  likeCount: number;
   location?: string;
   createdAt: string;
   isActive: boolean;
@@ -42,8 +41,8 @@ interface Creator {
     onlyfans?: string;
   };
   user: {
-    firstName: string;
-    lastName: string;
+    displayName: string;
+    username: string;
   };
   isFollowing?: boolean;
   isSubscribed?: boolean;
@@ -175,7 +174,7 @@ const CreatorProfile: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
+      <div className="py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           <div className="animate-pulse">
             <div className="h-64 bg-gray-300 rounded-2xl mb-8"></div>
@@ -203,7 +202,7 @@ const CreatorProfile: React.FC = () => {
 
   if (error || !creatorData?.data.creator) {
     return (
-      <div className="min-h-screen py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
+      <div className="py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl mx-auto text-center">
           <div className="text-6xl mb-6">😢</div>
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
@@ -227,10 +226,10 @@ const CreatorProfile: React.FC = () => {
   const stats = creatorData.data.stats;
 
   return (
-    <div className="min-h-screen py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
+    <div className="py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         {/* Cover Image & Profile */}
-        <div className="relative bg-gradient-to-br from-brand-pink to-brand-purple rounded-2xl overflow-hidden mb-8">
+        <div className="relative bg-gradient-primary rounded-card overflow-hidden mb-8">
           {creator.coverImageUrl ? (
             <img
               src={creator.coverImageUrl}
@@ -245,7 +244,7 @@ const CreatorProfile: React.FC = () => {
           
           <div className="absolute bottom-6 left-6 right-6">
             <div className="flex items-end space-x-6">
-              <div className="w-24 h-24 rounded-full bg-white p-1 shadow-lg">
+              <div className="w-24 h-24 rounded-full bg-background-primary p-1 shadow-elevated">
                 {creator.profilePictureUrl ? (
                   <img
                     src={creator.profilePictureUrl}
@@ -253,16 +252,16 @@ const CreatorProfile: React.FC = () => {
                     className="w-full h-full rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full rounded-full bg-gradient-to-br from-brand-pink to-brand-purple flex items-center justify-center">
-                    <span className="text-white text-2xl font-bold">
+                  <div className="w-full h-full rounded-full bg-gradient-primary flex items-center justify-center">
+                    <span className="text-text-on-dark text-2xl font-bold">
                       {creator.displayName.charAt(0).toUpperCase()}
                     </span>
                   </div>
                 )}
               </div>
               
-              <div className="flex-1 text-white">
-                <h1 className="text-3xl font-bold mb-2">{creator.displayName}</h1>
+              <div className="flex-1 text-text-on-dark">
+                <h1 className="text-display text-text-on-dark mb-2">{creator.displayName}</h1>
                 <div className="flex items-center space-x-4 text-sm">
                   <div className="flex items-center">
                     <Users className="h-4 w-4 mr-1" />
@@ -273,8 +272,10 @@ const CreatorProfile: React.FC = () => {
                     {creator.subscriberCount} subscribers
                   </div>
                   <div className="flex items-center">
-                    <Star className="h-4 w-4 mr-1" />
-                    {creator.rating.toFixed(1)} ({creator.ratingCount} reviews)
+                    <CreatorLikeButton 
+                      creatorId={Number(creator.id)} 
+                      className="flex-1"
+                    />
                   </div>
                   {creator.location && (
                     <div className="flex items-center">
@@ -292,15 +293,15 @@ const CreatorProfile: React.FC = () => {
           {/* Main Content */}
           <div className="lg:col-span-2">
             {/* About Section */}
-            <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">About</h2>
-              <p className="text-gray-600 leading-relaxed mb-6">{creator.bio}</p>
+            <div className="card mb-8">
+              <h2 className="text-display-sm text-text-primary mb-4">About</h2>
+              <p className="text-text-secondary leading-relaxed mb-6">{creator.bio}</p>
               
               <div className="flex flex-wrap gap-2 mb-6">
                 {creator.categories.map((category) => (
                   <span
                     key={category}
-                    className="px-3 py-1 bg-brand-pink/10 text-brand-pink rounded-full text-sm"
+                    className="category-tag"
                   >
                     {category}
                   </span>
@@ -310,14 +311,14 @@ const CreatorProfile: React.FC = () => {
               {/* Social Links */}
               {Object.keys(creator.socialLinks).length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Connect</h3>
+                  <h3 className="text-lg font-semibold text-text-primary mb-3">Connect</h3>
                   <div className="flex space-x-4">
                     {creator.socialLinks.instagram && (
                       <a
                         href={`https://instagram.com/${creator.socialLinks.instagram}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-center w-10 h-10 bg-pink-100 text-pink-600 rounded-full hover:bg-pink-200 transition-colors"
+                        className="flex items-center justify-center w-10 h-10 bg-void-accent/10 text-void-accent rounded-full hover:bg-void-accent/20 transition-colors"
                       >
                         <Instagram className="h-5 w-5" />
                       </a>
@@ -327,7 +328,7 @@ const CreatorProfile: React.FC = () => {
                         href={`https://twitter.com/${creator.socialLinks.twitter}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-center w-10 h-10 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 transition-colors"
+                        className="flex items-center justify-center w-10 h-10 bg-info/10 text-info rounded-full hover:bg-info/20 transition-colors"
                       >
                         <Twitter className="h-5 w-5" />
                       </a>
@@ -337,7 +338,7 @@ const CreatorProfile: React.FC = () => {
                         href={`https://tiktok.com/@${creator.socialLinks.tiktok}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-center w-10 h-10 bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 transition-colors"
+                        className="flex items-center justify-center w-10 h-10 bg-text-tertiary/10 text-text-tertiary rounded-full hover:bg-text-tertiary/20 transition-colors"
                       >
                         <Globe className="h-5 w-5" />
                       </a>
@@ -348,16 +349,16 @@ const CreatorProfile: React.FC = () => {
             </div>
 
             {/* Content Section */}
-            <div className="bg-white rounded-2xl shadow-lg p-6">
+            <div className="card">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Content</h2>
+                <h2 className="text-display-sm text-text-primary">Content</h2>
                 
                 <div className="flex items-center space-x-4">
                   {/* Tier Filter */}
                   <select
                     value={selectedTier}
                     onChange={(e) => setSelectedTier(e.target.value)}
-                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-pink focus:border-transparent"
+                    className="form-select"
                   >
                     {tierOptions.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -367,13 +368,13 @@ const CreatorProfile: React.FC = () => {
                   </select>
 
                   {/* View Mode Toggle */}
-                  <div className="flex bg-gray-100 rounded-lg p-1">
+                  <div className="flex bg-background-secondary rounded-lg p-1">
                     <button
                       onClick={() => setViewMode('grid')}
                       className={`p-2 rounded transition-colors ${
                         viewMode === 'grid'
-                          ? 'bg-white text-brand-pink shadow-sm'
-                          : 'text-gray-500 hover:text-gray-700'
+                          ? 'bg-background-primary text-void-accent shadow-sm'
+                          : 'text-text-tertiary hover:text-text-secondary'
                       }`}
                     >
                       <Grid className="h-4 w-4" />
@@ -382,8 +383,8 @@ const CreatorProfile: React.FC = () => {
                       onClick={() => setViewMode('list')}
                       className={`p-2 rounded transition-colors ${
                         viewMode === 'list'
-                          ? 'bg-white text-brand-pink shadow-sm'
-                          : 'text-gray-500 hover:text-gray-700'
+                          ? 'bg-background-primary text-void-accent shadow-sm'
+                          : 'text-text-tertiary hover:text-text-secondary'
                       }`}
                     >
                       <List className="h-4 w-4" />
@@ -394,17 +395,17 @@ const CreatorProfile: React.FC = () => {
 
               {/* Content Stats */}
               <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="text-center p-4 bg-gray-50 rounded-xl">
-                  <div className="text-2xl font-bold text-brand-pink">{stats.totalContent}</div>
-                  <div className="text-sm text-gray-600">Total Items</div>
+                <div className="text-center p-4 bg-background-secondary rounded-xl">
+                  <div className="text-2xl font-bold text-void-accent">{stats.totalContent}</div>
+                  <div className="text-sm text-text-tertiary">Total Items</div>
                 </div>
-                <div className="text-center p-4 bg-gray-50 rounded-xl">
-                  <div className="text-2xl font-bold text-brand-pink">{stats.totalImages}</div>
-                  <div className="text-sm text-gray-600">Pictures</div>
+                <div className="text-center p-4 bg-background-secondary rounded-xl">
+                  <div className="text-2xl font-bold text-void-accent">{stats.totalImages}</div>
+                  <div className="text-sm text-text-tertiary">Pictures</div>
                 </div>
-                <div className="text-center p-4 bg-gray-50 rounded-xl">
-                  <div className="text-2xl font-bold text-brand-pink">{stats.totalVideos}</div>
-                  <div className="text-sm text-gray-600">Videos</div>
+                <div className="text-center p-4 bg-background-secondary rounded-xl">
+                  <div className="text-2xl font-bold text-void-accent">{stats.totalVideos}</div>
+                  <div className="text-sm text-text-tertiary">Videos</div>
                 </div>
               </div>
 
@@ -412,8 +413,8 @@ const CreatorProfile: React.FC = () => {
               {filteredMedia.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="text-6xl mb-4">📷</div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No content yet</h3>
-                  <p className="text-gray-600">
+                  <h3 className="text-xl font-semibold text-text-primary mb-2">No content yet</h3>
+                  <p className="text-text-secondary">
                     This creator hasn't uploaded any content in this category yet.
                   </p>
                 </div>
@@ -438,24 +439,24 @@ const CreatorProfile: React.FC = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Subscription Card */}
-            <div className="bg-white rounded-2xl shadow-lg p-6">
+            <div className="card">
               <div className="text-center mb-6">
-                <div className="text-3xl font-bold text-brand-pink mb-2">
+                <div className="text-3xl font-bold text-void-accent mb-2">
                   {formatPrice(creator.subscriptionPrice)}
-                  <span className="text-lg font-normal text-gray-600">/month</span>
+                  <span className="text-lg font-normal text-text-secondary">/month</span>
                 </div>
-                <p className="text-gray-600">Get exclusive access to all content</p>
+                <p className="text-text-secondary">Get exclusive access to all content</p>
               </div>
 
               <div className="space-y-3">
                 {creator.isSubscribed ? (
-                  <div className="w-full bg-green-100 text-green-800 border border-green-200 rounded-xl py-3 px-4 text-center font-medium">
+                  <div className="w-full bg-success/10 text-success border border-success/20 rounded-xl py-3 px-4 text-center font-medium">
                     ✓ Subscribed
                   </div>
                 ) : (
                   <button
                     onClick={handleSubscribe}
-                    className="w-full btn-primary"
+                    className="btn-primary w-full"
                   >
                     Subscribe Now
                   </button>
@@ -466,7 +467,7 @@ const CreatorProfile: React.FC = () => {
                   disabled={creator.isFollowing || followMutation.isPending}
                   className={`w-full btn ${
                     creator.isFollowing
-                      ? 'bg-gray-100 text-gray-700 border border-gray-200'
+                      ? 'bg-background-secondary text-text-secondary border border-border-secondary'
                       : 'btn-secondary'
                   }`}
                 >
@@ -485,7 +486,7 @@ const CreatorProfile: React.FC = () => {
 
                 <button
                   onClick={handleTip}
-                  className="w-full btn-outline"
+                  className="btn-outline w-full"
                 >
                   💝 Send a Tip
                 </button>
@@ -493,23 +494,23 @@ const CreatorProfile: React.FC = () => {
             </div>
 
             {/* Creator Info */}
-            <div className="bg-white rounded-2xl shadow-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Creator Info</h3>
+            <div className="card">
+              <h3 className="text-lg font-semibold text-text-primary mb-4">Creator Info</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Member since</span>
+                  <span className="text-text-secondary">Member since</span>
                   <span className="font-medium">{formatDate(creator.createdAt)}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Content items</span>
+                  <span className="text-text-secondary">Content items</span>
                   <span className="font-medium">{stats.totalContent}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Followers</span>
+                  <span className="text-text-secondary">Followers</span>
                   <span className="font-medium">{creator.followerCount}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Subscribers</span>
+                  <span className="text-text-secondary">Subscribers</span>
                   <span className="font-medium">{creator.subscriberCount}</span>
                 </div>
               </div>
@@ -539,16 +540,16 @@ const MediaItemCard: React.FC<MediaItemCardProps> = ({ item, viewMode }) => {
 
   const getTierBadge = (tier: string) => {
     const badges = {
-      picture: { label: 'Picture', color: 'bg-blue-100 text-blue-800' },
-      solo_video: { label: 'Solo Video', color: 'bg-purple-100 text-purple-800' },
-      collab_video: { label: 'Collab Video', color: 'bg-pink-100 text-pink-800' },
+      picture: { label: 'Picture', color: 'badge-info' },
+      solo_video: { label: 'Solo Video', color: 'badge-void' },
+      collab_video: { label: 'Collab Video', color: 'badge-accent' },
     };
     return badges[tier as keyof typeof badges] || badges.picture;
   };
 
   if (viewMode === 'list') {
     return (
-      <div className="flex bg-gray-50 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+      <div className="flex bg-background-secondary rounded-xl overflow-hidden hover:shadow-md transition-shadow">
         <div className="relative w-32 h-24 flex-shrink-0">
           <img
             src={item.thumbnailUrl}
@@ -557,27 +558,27 @@ const MediaItemCard: React.FC<MediaItemCardProps> = ({ item, viewMode }) => {
           />
           {item.type === 'video' && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <Play className="h-8 w-8 text-white drop-shadow-lg" />
+              <Play className="h-8 w-8 text-text-on-dark drop-shadow-lg" />
             </div>
           )}
           {!item.hasAccess && (
             <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
-              <Lock className="h-6 w-6 text-white" />
+              <Lock className="h-6 w-6 text-text-on-dark" />
             </div>
           )}
         </div>
         
         <div className="flex-1 p-4 flex items-center justify-between">
           <div>
-            <h4 className="font-medium text-gray-900 mb-1">{item.title}</h4>
+            <h4 className="font-medium text-text-primary mb-1">{item.title}</h4>
             {item.description && (
-              <p className="text-sm text-gray-600 line-clamp-1">{item.description}</p>
+              <p className="text-sm text-text-secondary line-clamp-1">{item.description}</p>
             )}
             <div className="flex items-center space-x-2 mt-2">
-              <span className={`px-2 py-1 rounded-full text-xs ${getTierBadge(item.tier).color}`}>
+              <span className={`${getTierBadge(item.tier).color}`}>
                 {getTierBadge(item.tier).label}
               </span>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-text-tertiary">
                 {new Date(item.createdAt).toLocaleDateString()}
               </span>
             </div>
@@ -607,7 +608,7 @@ const MediaItemCard: React.FC<MediaItemCardProps> = ({ item, viewMode }) => {
 
   return (
     <div className="relative group cursor-pointer" onClick={handleClick}>
-      <div className="aspect-square bg-gray-200 rounded-xl overflow-hidden">
+      <div className="aspect-square bg-background-secondary rounded-xl overflow-hidden">
         <img
           src={item.thumbnailUrl}
           alt={item.title}
@@ -617,13 +618,13 @@ const MediaItemCard: React.FC<MediaItemCardProps> = ({ item, viewMode }) => {
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
           <div className="absolute bottom-3 left-3 right-3">
-            <h4 className="text-white font-medium text-sm mb-1 line-clamp-1">{item.title}</h4>
+            <h4 className="text-text-on-dark font-medium text-sm mb-1 line-clamp-1">{item.title}</h4>
             <div className="flex items-center justify-between">
-              <span className={`px-2 py-1 rounded-full text-xs ${getTierBadge(item.tier).color}`}>
+              <span className={`${getTierBadge(item.tier).color}`}>
                 {getTierBadge(item.tier).label}
               </span>
               {item.type === 'video' && (
-                <Play className="h-4 w-4 text-white" />
+                <Play className="h-4 w-4 text-text-on-dark" />
               )}
             </div>
           </div>
@@ -632,7 +633,7 @@ const MediaItemCard: React.FC<MediaItemCardProps> = ({ item, viewMode }) => {
         {/* Lock overlay for non-subscribers */}
         {!item.hasAccess && (
           <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
-            <div className="text-center text-white">
+            <div className="text-center text-text-on-dark">
               <Lock className="h-8 w-8 mx-auto mb-2" />
               <p className="text-sm font-medium">Subscribe to view</p>
             </div>
@@ -643,11 +644,11 @@ const MediaItemCard: React.FC<MediaItemCardProps> = ({ item, viewMode }) => {
         <div className="absolute top-3 right-3">
           {item.type === 'video' ? (
             <div className="bg-black bg-opacity-60 rounded-full p-1">
-              <Play className="h-4 w-4 text-white fill-current" />
+              <Play className="h-4 w-4 text-text-on-dark fill-current" />
             </div>
           ) : (
             <div className="bg-black bg-opacity-60 rounded-full p-1">
-              <ImageIcon className="h-4 w-4 text-white" />
+              <ImageIcon className="h-4 w-4 text-text-on-dark" />
             </div>
           )}
         </div>

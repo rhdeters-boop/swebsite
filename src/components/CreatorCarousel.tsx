@@ -5,10 +5,12 @@ interface Creator {
   id: number;
   name: string;
   image: string;
-  rating: number;
+  likes: number;
   subscribers: string;
   isOnline: boolean;
   subscriptionType?: 'free' | 'basic' | 'premium';
+  totalViews?: number;
+  weeklyEngagement?: number;
 }
 
 interface CreatorCarouselProps {

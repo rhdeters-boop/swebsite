@@ -117,7 +117,7 @@ const ResetPassword: React.FC = () => {
   // Loading state while verifying token
   if (isVerifying) {
     return (
-      <div className="min-h-screen flex items-center justify-center py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
+      <div className="flex items-center justify-center py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8 text-center">
           <div className="flex justify-center mb-4">
             <Loader2 className="h-12 w-12 text-brand-pink animate-spin" />
@@ -133,7 +133,7 @@ const ResetPassword: React.FC = () => {
   // Success state
   if (isSuccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
+      <div className="flex items-center justify-center py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
             <div className="flex justify-center mb-4">
@@ -176,7 +176,7 @@ const ResetPassword: React.FC = () => {
   // Error state (invalid token)
   if (!isValidToken) {
     return (
-      <div className="min-h-screen flex items-center justify-center py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
+      <div className="flex items-center justify-center py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
             <div className="flex justify-center mb-4">
@@ -225,7 +225,7 @@ const ResetPassword: React.FC = () => {
 
   // Reset password form
   return (
-    <div className="min-h-screen flex items-center justify-center py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
+    <div className="flex items-center justify-center py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">

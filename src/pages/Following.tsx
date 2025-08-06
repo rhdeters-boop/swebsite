@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Star, TrendingUp, Crown, ChevronLeft, ChevronRight, ArrowRight, Users } from 'lucide-react';
+import { Star, TrendingUp, Crown, ChevronLeft, ChevronRight, ArrowRight, Users, Heart } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 // Carousel component with sliding functionality (reused from Explore)
 const CreatorCarousel: React.FC<{ 
@@ -196,6 +197,72 @@ const CreatorRow: React.FC<CreatorRowProps> = ({ title, creators, icon }) => {
 };
 
 const Following: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+
+  // Show call-to-action for non-authenticated users
+  if (!isAuthenticated) {
+    return (
+      <div className="bg-abyss-black h-screen overflow-hidden">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 h-full pt-[5%] pb-[5%]">
+          <div className="text-center">
+            <div className="mb-8">
+              <h1 className="text-4xl font-bold text-white mb-4 font-serif">
+                Join the <span className="text-gradient">Void</span>
+              </h1>
+              <p className="text-xl text-abyss-light-gray mb-2">
+                Create your account to access your personalized feed
+              </p>
+              <p className="text-abyss-light-gray">
+                Follow your favorite creators and never miss their latest content
+              </p>
+            </div>
+
+            <div className="bg-abyss-dark-900 border border-void-500/30 rounded-2xl p-8 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="text-center">
+                  <Heart className="h-12 w-12 text-seductive mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-white mb-2">Follow Creators</h3>
+                  <p className="text-abyss-light-gray text-sm">Get updates from your favorite content creators</p>
+                </div>
+                <div className="text-center">
+                  <Star className="h-12 w-12 text-yellow-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-white mb-2">Premium Content</h3>
+                  <p className="text-abyss-light-gray text-sm">Access exclusive photos and videos</p>
+                </div>
+                <div className="text-center">
+                  <TrendingUp className="h-12 w-12 text-lust-violet mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-white mb-2">Personalized Feed</h3>
+                  <p className="text-abyss-light-gray text-sm">Content tailored just for you</p>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <Link
+                  to="/login"
+                  className="bg-gradient-to-r from-lust-violet to-seductive text-white px-8 py-3 rounded-lg font-semibold hover:shadow-glow-primary transition-all duration-300 transform hover:scale-[1.02]"
+                >
+                  Login/Register
+                </Link>
+                <Link
+                  to="/become-creator"
+                  className="bg-transparent border-2 border-seductive text-seductive hover:bg-seductive hover:text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300"
+                >
+                  Become a Creator
+                </Link>
+              </div>
+            </div>
+
+            <div className="text-abyss-light-gray">
+              <p className="text-sm">
+                Already have an account? <Link to="/login" className="text-seductive hover:text-seductive-light">Sign in here</Link>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-abyss-black min-h-screen">
       {/* Creator Rows */}

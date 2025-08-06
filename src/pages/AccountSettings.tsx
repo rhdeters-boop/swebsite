@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { 
   Shield, 
   Bell, 
@@ -12,299 +11,111 @@ import {
   Plus,
   Trash2
 } from 'lucide-react';
-
-interface NotificationSettings {
-  emailNotifications: boolean;
-  marketingEmails: boolean;
-  securityAlerts: boolean;
-}
-
-interface SecuritySettings {
-  currentPassword: string;
-  newPassword: string;
-  confirmPassword: string;
-  newEmail: string;
-}
-
-interface AccountData {
-  createdAt: string;
-  lastLoginAt: string;
-  isEmailVerified: boolean;
-  totalSessions: number;
-  subscription?: {
-    tier: string;
-    status: string;
-    nextBilling: string;
-  };
-}
-
-interface Subscription {
-  id: string;
-  tier: string;
-  status: 'active' | 'cancelled' | 'past_due';
-  price: number;
-  nextBilling: string;
-  startDate: string;
-}
-
-interface PaymentMethod {
-  id: string;
-  type: 'card' | 'paypal';
-  last4?: string;
-  brand?: string;
-  expiryMonth?: number;
-  expiryYear?: number;
-  email?: string; // for PayPal
-  isDefault: boolean;
-}
+import { useAccountData } from '../hooks/useAccountData';
+import { useSecuritySettings } from '../hooks/useSecuritySettings';
+import { useUIState } from '../hooks/useUIState';
 
 const AccountSettings: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [activeTab, setActiveTab] = useState<'security' | 'notifications' | 'billing' | 'danger'>('security');
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showPasswordForm, setShowPasswordForm] = useState(false);
-  const [showEmailForm, setShowEmailForm] = useState(false);
-  const [deletePassword, setDeletePassword] = useState('');
+  
+  // Custom hooks for state management
+  const {
+    accountData,
+    notificationSettings,
+    subscriptions,
+    paymentMethods,
+    isLoading: accountLoading,
+    error: accountError,
+    success: accountSuccess,
+    updateNotificationSettings,
+    cancelSubscription,
+    deletePaymentMethod,
+    setDefaultPaymentMethod,
+  } = useAccountData();
 
-  const [notificationSettings, setNotificationSettings] = useState<NotificationSettings>({
-    emailNotifications: true,
-    marketingEmails: false,
-    securityAlerts: true,
-  });
+  const {
+    securitySettings,
+    isLoading: securityLoading,
+    error: securityError,
+    success: securitySuccess,
+    updateField: updateSecurityField,
+    resetPasswordFields,
+    resetEmailFields,
+    changePassword,
+    changeEmail,
+    logoutAllSessions,
+    deleteAccount,
+  } = useSecuritySettings();
 
-  const [securitySettings, setSecuritySettings] = useState<SecuritySettings>({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
-    newEmail: '',
-  });
+  const {
+    uiState: {
+      activeTab,
+      showDeleteConfirm,
+      showPasswordForm,
+      showEmailForm,
+      deletePassword,
+    },
+    setActiveTab,
+    toggleDeleteConfirm,
+    togglePasswordForm,
+    toggleEmailForm,
+    setDeletePassword,
+    hideAllForms,
+    resetDeleteState,
+  } = useUIState();
 
-  const [accountData, setAccountData] = useState<AccountData>({
-    createdAt: '',
-    lastLoginAt: '',
-    isEmailVerified: false,
-    totalSessions: 0,
-  });
+  // Combine loading states
+  const isLoading = accountLoading || securityLoading;
+  
+  // Combine error and success states
+  const error = accountError || securityError;
+  const success = accountSuccess || securitySuccess;
 
-  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
-  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
-
-  // Load account data
-  useEffect(() => {
-    const loadAccountData = async () => {
-      try {
-        const response = await axios.get('/auth/account-info');
-        setAccountData(response.data.account);
-        setNotificationSettings(response.data.notifications || notificationSettings);
-        // Load billing data
-        setSubscriptions(response.data.subscriptions || []);
-        setPaymentMethods(response.data.paymentMethods || []);
-        // Security settings are now form fields, no need to load from server
-      } catch (err) {
-        console.error('Failed to load account data:', err);
-      }
-    };
-    loadAccountData();
-  }, []);
-
-  const handleNotificationChange = async (setting: keyof NotificationSettings, value: boolean) => {
-    setIsLoading(true);
-    setError('');
-    setSuccess('');
-
-    try {
-      const newSettings = { ...notificationSettings, [setting]: value };
-      await axios.put('/auth/notification-settings', newSettings);
-      setNotificationSettings(newSettings);
-      setSuccess('Notification settings updated successfully!');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to update notification settings.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSecurityChange = (field: keyof SecuritySettings, value: string) => {
-    setSecuritySettings(prev => ({
-      ...prev,
-      [field]: value
-    }));
+  const handleNotificationChange = async (setting: keyof typeof notificationSettings, value: boolean) => {
+    const newSettings = { ...notificationSettings, [setting]: value };
+    await updateNotificationSettings(newSettings);
   };
 
   const handlePasswordReset = async () => {
-    if (!securitySettings.currentPassword || !securitySettings.newPassword || !securitySettings.confirmPassword) {
-      setError('All password fields are required.');
-      return;
-    }
-
-    if (securitySettings.newPassword !== securitySettings.confirmPassword) {
-      setError('New passwords do not match.');
-      return;
-    }
-
-    if (securitySettings.newPassword.length < 8) {
-      setError('New password must be at least 8 characters long.');
-      return;
-    }
-
-    setIsLoading(true);
-    setError('');
-    setSuccess('');
-
-    try {
-      await axios.put('/auth/change-password', {
-        currentPassword: securitySettings.currentPassword,
-        newPassword: securitySettings.newPassword
-      });
-      
-      setSuccess('Password changed successfully!');
-      setSecuritySettings(prev => ({
-        ...prev,
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      }));
-      setShowPasswordForm(false); // Hide the form after success
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to change password.');
-    } finally {
-      setIsLoading(false);
+    await changePassword();
+    if (securitySuccess) {
+      hideAllForms();
     }
   };
 
   const handleEmailChange = async () => {
-    if (!securitySettings.newEmail) {
-      setError('New email address is required.');
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(securitySettings.newEmail)) {
-      setError('Please enter a valid email address.');
-      return;
-    }
-
-    setIsLoading(true);
-    setError('');
-    setSuccess('');
-
-    try {
-      await axios.put('/auth/change-email', {
-        newEmail: securitySettings.newEmail
-      });
-      
-      setSuccess('Email change request sent! Please check your new email for verification.');
-      setSecuritySettings(prev => ({
-        ...prev,
-        newEmail: ''
-      }));
-      setShowEmailForm(false); // Hide the form after success
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to change email.');
-    } finally {
-      setIsLoading(false);
+    await changeEmail();
+    if (securitySuccess) {
+      hideAllForms();
     }
   };
 
   const handleDeleteAccount = async () => {
-    if (!deletePassword) {
-      setError('Please enter your password to confirm account deletion.');
-      return;
-    }
-
-    setIsLoading(true);
-    setError('');
-
-    try {
-      await axios.delete('/auth/delete-account', {
-        data: { password: deletePassword }
-      });
-      
+    await deleteAccount(deletePassword);
+    if (!securityError) {
       logout();
       navigate('/');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to delete account. Please check your password.');
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  const handleLogoutAllSessions = async () => {
-    setIsLoading(true);
-    setError('');
-    setSuccess('');
-
-    try {
-      await axios.post('/auth/logout-all-sessions');
-      setSuccess('All sessions have been logged out successfully!');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to logout all sessions.');
-    } finally {
-      setIsLoading(false);
-    }
+  const handleCancelPasswordForm = () => {
+    togglePasswordForm();
+    resetPasswordFields();
   };
 
-  const handleCancelSubscription = async (subscriptionId: string) => {
-    setIsLoading(true);
-    setError('');
-    setSuccess('');
-
-    try {
-      await axios.post(`/billing/cancel-subscription/${subscriptionId}`);
-      setSuccess('Subscription cancelled successfully!');
-      // Reload subscriptions
-      const response = await axios.get('/auth/account-info');
-      setSubscriptions(response.data.subscriptions || []);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to cancel subscription.');
-    } finally {
-      setIsLoading(false);
-    }
+  const handleCancelEmailForm = () => {
+    toggleEmailForm();
+    resetEmailFields();
   };
 
-  const handleDeletePaymentMethod = async (paymentMethodId: string) => {
-    setIsLoading(true);
-    setError('');
-    setSuccess('');
-
-    try {
-      await axios.delete(`/billing/payment-method/${paymentMethodId}`);
-      setSuccess('Payment method removed successfully!');
-      // Reload payment methods
-      const response = await axios.get('/auth/account-info');
-      setPaymentMethods(response.data.paymentMethods || []);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to remove payment method.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSetDefaultPaymentMethod = async (paymentMethodId: string) => {
-    setIsLoading(true);
-    setError('');
-    setSuccess('');
-
-    try {
-      await axios.put(`/billing/payment-method/${paymentMethodId}/default`);
-      setSuccess('Default payment method updated!');
-      // Reload payment methods
-      const response = await axios.get('/auth/account-info');
-      setPaymentMethods(response.data.paymentMethods || []);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to update default payment method.');
-    } finally {
-      setIsLoading(false);
-    }
+  const handleCancelDelete = () => {
+    resetDeleteState();
   };
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 flex items-center justify-center">
+      <div className="bg-gradient-to-br from-pink-50 to-purple-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-600">Loading...</p>
         </div>
@@ -313,7 +124,7 @@ const AccountSettings: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 py-2 sm:py-4">
+    <div className="bg-gradient-to-br from-pink-50 to-purple-50 py-2 sm:py-4">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           {/* Header */}
@@ -401,22 +212,14 @@ const AccountSettings: React.FC = () => {
                         </div>
                         {!showPasswordForm ? (
                           <button
-                            onClick={() => setShowPasswordForm(true)}
+                            onClick={togglePasswordForm}
                             className="btn-secondary-sm"
                           >
                             Change Password
                           </button>
                         ) : (
                           <button
-                            onClick={() => {
-                              setShowPasswordForm(false);
-                              setSecuritySettings(prev => ({
-                                ...prev,
-                                currentPassword: '',
-                                newPassword: '',
-                                confirmPassword: ''
-                              }));
-                            }}
+                            onClick={handleCancelPasswordForm}
                             className="text-gray-500 hover:text-gray-700"
                           >
                             Cancel
@@ -433,7 +236,7 @@ const AccountSettings: React.FC = () => {
                             <input
                               type="password"
                               value={securitySettings.currentPassword}
-                              onChange={(e) => handleSecurityChange('currentPassword', e.target.value)}
+                              onChange={(e) => updateSecurityField('currentPassword', e.target.value)}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                               placeholder="Enter current password"
                             />
@@ -445,7 +248,7 @@ const AccountSettings: React.FC = () => {
                             <input
                               type="password"
                               value={securitySettings.newPassword}
-                              onChange={(e) => handleSecurityChange('newPassword', e.target.value)}
+                              onChange={(e) => updateSecurityField('newPassword', e.target.value)}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                               placeholder="Enter new password (min 8 characters)"
                             />
@@ -457,7 +260,7 @@ const AccountSettings: React.FC = () => {
                             <input
                               type="password"
                               value={securitySettings.confirmPassword}
-                              onChange={(e) => handleSecurityChange('confirmPassword', e.target.value)}
+                              onChange={(e) => updateSecurityField('confirmPassword', e.target.value)}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                               placeholder="Confirm new password"
                             />
@@ -484,20 +287,14 @@ const AccountSettings: React.FC = () => {
                         </div>
                         {!showEmailForm ? (
                           <button
-                            onClick={() => setShowEmailForm(true)}
+                            onClick={toggleEmailForm}
                             className="btn-secondary-sm"
                           >
                             Change Email
                           </button>
                         ) : (
                           <button
-                            onClick={() => {
-                              setShowEmailForm(false);
-                              setSecuritySettings(prev => ({
-                                ...prev,
-                                newEmail: ''
-                              }));
-                            }}
+                            onClick={handleCancelEmailForm}
                             className="text-gray-500 hover:text-gray-700"
                           >
                             Cancel
@@ -514,7 +311,7 @@ const AccountSettings: React.FC = () => {
                             <input
                               type="email"
                               value={securitySettings.newEmail}
-                              onChange={(e) => handleSecurityChange('newEmail', e.target.value)}
+                              onChange={(e) => updateSecurityField('newEmail', e.target.value)}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                               placeholder="Enter new email address"
                             />
@@ -575,7 +372,7 @@ const AccountSettings: React.FC = () => {
 
                 <div>
                   <button
-                    onClick={handleLogoutAllSessions}
+                    onClick={logoutAllSessions}
                     disabled={isLoading}
                     className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 disabled:opacity-50"
                   >
@@ -687,7 +484,7 @@ const AccountSettings: React.FC = () => {
                             </div>
                             {subscription.status === 'active' && (
                               <button
-                                onClick={() => handleCancelSubscription(subscription.id)}
+                                onClick={() => cancelSubscription(subscription.id)}
                                 disabled={isLoading}
                                 className="text-red-600 hover:text-red-800 text-sm font-medium disabled:opacity-50"
                               >
@@ -768,7 +565,7 @@ const AccountSettings: React.FC = () => {
                             <div className="flex items-center space-x-2">
                               {!method.isDefault && (
                                 <button
-                                  onClick={() => handleSetDefaultPaymentMethod(method.id)}
+                                  onClick={() => setDefaultPaymentMethod(method.id)}
                                   disabled={isLoading}
                                   className="text-pink-600 hover:text-pink-800 text-sm font-medium disabled:opacity-50"
                                 >
@@ -776,7 +573,7 @@ const AccountSettings: React.FC = () => {
                                 </button>
                               )}
                               <button
-                                onClick={() => handleDeletePaymentMethod(method.id)}
+                                onClick={() => deletePaymentMethod(method.id)}
                                 disabled={isLoading}
                                 className="text-red-600 hover:text-red-800 disabled:opacity-50"
                                 title="Remove payment method"
@@ -817,7 +614,7 @@ const AccountSettings: React.FC = () => {
                       
                       {!showDeleteConfirm ? (
                         <button
-                          onClick={() => setShowDeleteConfirm(true)}
+                          onClick={toggleDeleteConfirm}
                           className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
                         >
                           Delete Account
@@ -845,10 +642,7 @@ const AccountSettings: React.FC = () => {
                               {isLoading ? 'Deleting...' : 'Confirm Delete'}
                             </button>
                             <button
-                              onClick={() => {
-                                setShowDeleteConfirm(false);
-                                setDeletePassword('');
-                              }}
+                              onClick={handleCancelDelete}
                               className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
                             >
                               Cancel

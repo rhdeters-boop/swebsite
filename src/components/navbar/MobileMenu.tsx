@@ -25,7 +25,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="md:hidden bg-void-dark-900 backdrop-blur-lg border-t border-void-500/30 absolute left-0 right-0 top-full shadow-2xl z-50">
+    <div className="nav:hidden bg-void-dark-900 backdrop-blur-lg border-t border-void-500/30 absolute left-0 right-0 top-full shadow-2xl z-50">
       <div className="px-4 pt-2 pb-8">
         <MobileNavigation isAuthenticated={isAuthenticated} onClose={onClose} />
         

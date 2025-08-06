@@ -43,9 +43,9 @@ const Landing: React.FC = () => {
   
 
   return (
-    <div className="min-h-screen text-abyss-light-gray bg-abyss-black font-sans">
+    <div className="text-abyss-light-gray bg-abyss-black font-sans">
       {/* Hero Section */}
-      <section className="relative min-h-screen py-20 px-4 sm:px-6 lg:px-8 bg-cover bg-center bg-hero">
+      <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-cover bg-center bg-hero">
         <div className="absolute inset-0 bg-abyss-black bg-opacity-70"></div> {/* Transparent overlay */}
         <div className="relative max-w-7xl mx-auto text-center z-10"> {/* Text content */}
           

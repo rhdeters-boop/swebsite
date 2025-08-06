@@ -25,19 +25,17 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className="bg-abyss-black/95 backdrop-blur-sm shadow-xl border-b border-void-500/20 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto pr-4 sm:pr-6 lg:pr-8">
-        <div className="flex justify-between h-32">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16 nav:h-24 py-4">
           <NavbarLogo />
           <DesktopNavigation isAuthenticated={isAuthenticated} />
           {/* Desktop Auth Section */}
-          <div className="hidden md:flex items-center space-x-6">
-            <div className="flex items-center space-x-3">
-              {isAuthenticated ? (
-                <AuthenticatedDesktopAuth user={user} onLogout={handleLogout} />
-              ) : (
-                <UnauthenticatedDesktopAuth />
-              )}
-            </div>
+          <div className="hidden nav:flex items-center space-x-6">
+            {isAuthenticated ? (
+              <AuthenticatedDesktopAuth user={user} onLogout={handleLogout} />
+            ) : (
+              <UnauthenticatedDesktopAuth />
+            )}
           </div>
 
           {/* Mobile menu button */}

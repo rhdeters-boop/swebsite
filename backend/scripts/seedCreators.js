@@ -12,8 +12,8 @@ const creatorData = [
     subscriptionPrice: 999, // $9.99
     followerCount: 12500,
     subscriberCount: 3200,
-    rating: 4.9,
-    ratingCount: 450,
+    likeCount: 890,
+    dislikeCount: 23,
     isVerified: true,
     socialLinks: {
       instagram: '@lunarose_official',
@@ -30,8 +30,8 @@ const creatorData = [
     subscriptionPrice: 1299, // $12.99
     followerCount: 8300,
     subscriberCount: 2100,
-    rating: 4.8,
-    ratingCount: 320,
+    likeCount: 670,
+    dislikeCount: 18,
     isVerified: true,
     socialLinks: {
       instagram: '@ariamoon_fit',
@@ -47,8 +47,8 @@ const creatorData = [
     subscriptionPrice: 1599, // $15.99
     followerCount: 15200,
     subscriberCount: 4800,
-    rating: 4.9,
-    ratingCount: 680,
+    likeCount: 890,
+    dislikeCount: 23,
     isVerified: true,
     socialLinks: {
       instagram: '@zaranoir_art',
@@ -65,8 +65,8 @@ const creatorData = [
     subscriptionPrice: 899, // $8.99
     followerCount: 6800,
     subscriberCount: 1950,
-    rating: 4.7,
-    ratingCount: 280,
+    likeCount: 670,
+    dislikeCount: 18,
     isVerified: false,
     socialLinks: {
       instagram: '@ivysterling_style',
@@ -82,8 +82,8 @@ const creatorData = [
     subscriptionPrice: 1199, // $11.99
     followerCount: 11100,
     subscriberCount: 2800,
-    rating: 4.8,
-    ratingCount: 390,
+    likeCount: 720,
+    dislikeCount: 15,
     isVerified: true,
     socialLinks: {
       instagram: '@novablake_tech',
@@ -100,8 +100,8 @@ const creatorData = [
     subscriptionPrice: 1799, // $17.99
     followerCount: 18700,
     subscriberCount: 5200,
-    rating: 4.9,
-    ratingCount: 720,
+    likeCount: 890,
+    dislikeCount: 31,
     isVerified: true,
     socialLinks: {
       instagram: '@stelladivine_spirit',
@@ -117,7 +117,7 @@ const creatorData = [
     subscriptionPrice: 1399, // $13.99
     followerCount: 9200,
     subscriberCount: 2600,
-    rating: 4.6,
+    likeCount: 520,
     ratingCount: 340,
     isVerified: false,
     socialLinks: {
@@ -135,8 +135,8 @@ const creatorData = [
     subscriptionPrice: 1099, // $10.99
     followerCount: 13500,
     subscriberCount: 3600,
-    rating: 4.8,
-    ratingCount: 480,
+    likeCount: 720,
+    dislikeCount: 19,
     isVerified: true,
     socialLinks: {
       instagram: '@crystalmoon_yoga',
@@ -152,7 +152,7 @@ const creatorData = [
     subscriptionPrice: 799, // $7.99
     followerCount: 7900,
     subscriberCount: 2200,
-    rating: 4.7,
+    likeCount: 670,
     ratingCount: 310,
     isVerified: false,
     socialLinks: {
@@ -170,8 +170,8 @@ const creatorData = [
     subscriptionPrice: 1299, // $12.99
     followerCount: 16300,
     subscriberCount: 4500,
-    rating: 4.9,
-    ratingCount: 610,
+    likeCount: 890,
+    dislikeCount: 25,
     isVerified: true,
     socialLinks: {
       instagram: '@ravenstar_chef',
@@ -219,8 +219,9 @@ export async function seedCreators() {
         subscriptionPrice: creatorInfo.subscriptionPrice,
         followerCount: creatorInfo.followerCount,
         subscriberCount: creatorInfo.subscriberCount,
-        rating: creatorInfo.rating,
-        ratingCount: creatorInfo.ratingCount,
+        likeCount: creatorInfo.likeCount,
+        dislikeCount: creatorInfo.dislikeCount,
+        totalEarnings: 0,
         isVerified: creatorInfo.isVerified,
         socialLinks: creatorInfo.socialLinks,
         isActive: true,
@@ -245,7 +246,7 @@ export async function seedCreators() {
       console.log(`   👤 Username: ${user.username}`);
       console.log(`   💰 Price: $${creator.subscriptionPrice / 100}`);
       console.log(`   👥 Followers: ${creator.followerCount.toLocaleString()}`);
-      console.log(`   ⭐ Rating: ${creator.rating}/5.0`);
+      console.log(`   ❤️  Likes: ${creator.likeCount}`);
       console.log(`   ✅ Verified: ${creator.isVerified ? 'Yes' : 'No'}`);
       console.log('');
     });
