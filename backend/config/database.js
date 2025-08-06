@@ -11,7 +11,8 @@ const sequelize = new Sequelize(
     host: process.env.DB_HOST || 'localhost',
     port: process.env.DB_PORT || 5432,
     dialect: 'postgres',
-    logging: process.env.NODE_ENV === 'development' ? console.log : false,
+    // Only log SQL queries if DB_LOGGING is explicitly set to true
+    logging: process.env.DB_LOGGING === 'true' ? console.log : false,
     pool: {
       max: 5,
       min: 0,
@@ -28,15 +29,18 @@ const sequelize = new Sequelize(
 export const connectDB = async () => {
   try {
     await sequelize.authenticate();
-    console.log('✅ Database connection has been established successfully.');
+    console.log('✅ Database connection established');
     
-    // Sync database in development
+    // Sync database in development (less verbose)
     if (process.env.NODE_ENV === 'development') {
-      await sequelize.sync({ alter: true });
-      console.log('📊 Database synced successfully.');
+      await sequelize.sync({ 
+        alter: true,
+        logging: process.env.DB_LOGGING === 'true' ? console.log : false
+      });
+      console.log('📊 Database synced');
     }
   } catch (error) {
-    console.error('❌ Unable to connect to the database:', error);
+    console.error('❌ Database connection failed:', error.message);
     process.exit(1);
   }
 };

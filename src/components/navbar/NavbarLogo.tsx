@@ -3,8 +3,11 @@ import { Link } from 'react-router-dom';
 
 const NavbarLogo: React.FC = () => {
   return (
-    <Link to="/" className="flex group h-full py-2">
-        <img src="/logo-transparent.png" alt="Void of Desire Logo" className="h-full w-auto object-contain" />
+    <Link 
+      to="/" 
+      className="flex h-full w-64 bg-cover bg-no-repeat bg-left" 
+      style={{ backgroundImage: 'url(/logo-transparent.png)' }}
+    >
     </Link>
   );
 };

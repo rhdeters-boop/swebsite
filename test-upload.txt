@@ -1,0 +1,9 @@
+This is a test file for MinIO upload functionality.
+Created on: 2025-08-06
+Purpose: Testing S3-compatible storage with MinIO
+
+The file upload system should be able to:
+1. Upload files to MinIO
+2. Generate signed URLs for secure access
+3. Organize files by creator and subscription tier
+4. Provide metadata and tagging

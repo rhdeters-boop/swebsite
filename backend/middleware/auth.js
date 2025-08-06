@@ -121,3 +121,6 @@ export const requireSubscription = (requiredTier) => {
     }
   };
 };
+
+// Alias for authenticateToken to match common naming conventions
+export const requireAuth = authenticateToken;

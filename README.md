@@ -48,7 +48,9 @@ A full-stack creator platform for hosting and selling access to premium pictures
 
 ### Prerequisites
 - Node.js 18+ 
-- PostgreSQL database
+- Docker and Docker Compose
+- PostgreSQL database (provided via Docker)
+- MinIO for S3-compatible storage (provided via Docker)
 - Stripe account
 - AWS S3 bucket (for media hosting)
 - Auth0 account (optional)
@@ -61,25 +63,68 @@ A full-stack creator platform for hosting and selling access to premium pictures
    cd swebsite
    ```
 
-2. **Install frontend dependencies**
+2. **Install dependencies**
    ```bash
    npm install
+   cd backend && npm install && cd ..
    ```
 
-3. **Install backend dependencies**
+3. **Start development services (PostgreSQL, MinIO, Redis)**
    ```bash
-   cd backend
-   npm install
+   # Quick setup with script
+   ./scripts/setup-minio.sh
+   
+   # Or manually
+   npm run dev:services
    ```
 
 4. **Environment Setup**
+   ```bash
+   cp backend/.env.example backend/.env
+   ```
+
+5. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+### Quick Development Setup
+
+For a complete local development environment:
+
+```bash
+# Clone and setup
+git clone <repository-url>
+cd swebsite
+npm install
+
+# Start all services and development servers
+npm run dev:full
+```
+
+This will start:
+- PostgreSQL database (localhost:5432)
+- MinIO S3-compatible storage (localhost:9000)
+- Redis cache (localhost:6379)
+- Backend API server (localhost:5000)
+- Frontend development server (localhost:5173)
+
+### Manual Setup
+
+If you prefer to set up services individually:
+
+1. **Install dependencies**
+   ```bash
+   npm install
+   cd backend && npm install && cd ..
+   ```
+
+2. **Set up environment variables**
    
    **Frontend (.env)**
    ```env
    VITE_API_URL=http://localhost:5000/api
    VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key
-   VITE_AUTH0_DOMAIN=your-domain.auth0.com
-   VITE_AUTH0_CLIENT_ID=your_auth0_client_id
    ```
 
    **Backend (backend/.env)**
@@ -90,9 +135,9 @@ A full-stack creator platform for hosting and selling access to premium pictures
    # Database
    DB_HOST=localhost
    DB_PORT=5432
-   DB_NAME=premium_media_db
-   DB_USER=your_db_user
-   DB_PASSWORD=your_db_password
+   DB_NAME=swebsite_dev
+   DB_USER=postgres
+   DB_PASSWORD=password
    
    # JWT Secret
    JWT_SECRET=your_super_secret_jwt_key
@@ -119,16 +164,41 @@ A full-stack creator platform for hosting and selling access to premium pictures
 
 6. **Start Development Servers**
    
-   **Frontend** (runs on port 5173)
+   **All services and servers** (recommended)
+   ```bash
+   npm run dev:full
+   ```
+   
+   **Just application servers**
    ```bash
    npm run dev
    ```
    
-   **Backend** (runs on port 5000)
+   **Individual services**
    ```bash
-   cd backend
-   npm run dev
+   # Start MinIO, PostgreSQL, Redis
+   npm run dev:services
+   
+   # Start frontend only (port 5173)
+   npm run dev:frontend
+   
+   # Start backend only (port 5000)  
+   npm run dev:backend
+   
+   # Stop all services
+   npm run stop:services
    ```
+
+## 🗄️ Local Development Services
+
+- **MinIO Console:** http://localhost:9001 (minioadmin/minioadmin123)
+- **MinIO API:** http://localhost:9000
+- **PostgreSQL:** localhost:5432 (postgres/password)
+- **Redis:** localhost:6379
+- **Backend API:** http://localhost:5000
+- **Frontend:** http://localhost:5173
+
+See [MinIO Setup Guide](./docs/MINIO_SETUP.md) for detailed information.
 
 ## 📁 Project Structure
 

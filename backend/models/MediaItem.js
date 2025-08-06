@@ -34,14 +34,27 @@ const MediaItem = sequelize.define('MediaItem', {
     type: DataTypes.ENUM('picture', 'solo_video', 'collab_video'),
     allowNull: false,
   },
+  fileType: {
+    type: DataTypes.STRING, // Keep for backward compatibility
+    allowNull: true,
+  },
+  mimeType: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   s3Key: {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true,
   },
+  s3Url: {
+    type: DataTypes.STRING,
+    allowNull: true, // Store the original upload URL
+  },
   s3Bucket: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
+    defaultValue: process.env.S3_BUCKET_NAME || 'void-media',
   },
   thumbnailS3Key: {
     type: DataTypes.STRING,
@@ -49,10 +62,6 @@ const MediaItem = sequelize.define('MediaItem', {
   },
   fileSize: {
     type: DataTypes.BIGINT,
-    allowNull: false,
-  },
-  mimeType: {
-    type: DataTypes.STRING,
     allowNull: false,
   },
   duration: {

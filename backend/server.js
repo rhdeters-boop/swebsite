@@ -11,10 +11,11 @@ import { dirname, join } from 'path';
 // Import routes
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
+import creatorRoutes from './routes/creators.js';
 import subscriptionRoutes from './routes/subscriptions.js';
 import mediaRoutes from './routes/media.js';
 import paymentRoutes from './routes/payments.js';
-import creatorRoutes from './routes/creators.js';
+import healthRoutes from './routes/health.js';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler.js';
@@ -22,6 +23,9 @@ import { authenticateToken } from './middleware/auth.js';
 
 // Import database connection
 import { connectDB } from './config/database.js';
+
+// Import services
+import S3Service from './services/S3Service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -67,6 +71,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // API Routes
+app.use('/api/health', healthRoutes); // Health checks (public)
 app.use('/api/auth', authRoutes);
 app.use('/api/users', authenticateToken, userRoutes);
 app.use('/api/subscriptions', authenticateToken, subscriptionRoutes);
@@ -95,10 +100,18 @@ app.use('*', (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📱 Environment: ${process.env.NODE_ENV}`);
   console.log(`🌐 CORS enabled for: ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
+  
+  // Initialize S3 service with retry logic for development
+  try {
+    await S3Service.initWithRetry();
+    console.log(`📦 S3 Service ready with bucket: ${process.env.S3_BUCKET_NAME || 'void-media'}`);
+  } catch (error) {
+    console.log('⚠️  S3 service will be available when MinIO starts');
+  }
 });
 
 export default app;
