@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # PostgreSQL Database
+  # PostgreSQL Database (for user data, subscriptions, etc.)
   postgres:
     image: postgres:15-alpine
     container_name: swebsite-postgres
@@ -16,7 +16,8 @@ services:
     networks:
       - swebsite-network
 
-  # MinIO (S3-compatible storage)
+  # MinIO (S3-compatible storage for local development)
+  # In production, this will be replaced with Azure Blob Storage
   minio:
     image: minio/minio:latest
     container_name: swebsite-minio
@@ -56,3 +57,11 @@ volumes:
 networks:
   swebsite-network:
     driver: bridge
+
+# For production with Azure Blob Storage, add these environment variables to your backend:
+# STORAGE_PROVIDER=azure
+# AZURE_STORAGE_ACCOUNT_NAME=your_storage_account_name
+# AZURE_STORAGE_ACCOUNT_KEY=your_storage_account_key
+# AZURE_CONTAINER_NAME=void-media
+#
+# PostgreSQL will remain the same for user data, while media files will be stored in Azure Blob Storage

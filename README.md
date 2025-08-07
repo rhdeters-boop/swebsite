@@ -18,7 +18,8 @@ A full-stack creator platform for hosting and selling access to premium pictures
 3. **Collab Video Tier** ($29.99/month) - All content including collaborative videos
 
 ### Technical Features
-- **Secure Media Hosting** - AWS S3 with signed URLs for content protection
+- **Flexible Media Storage** - Azure Blob Storage (production) or MinIO (development)
+- **Secure Media Hosting** - Signed URLs with automatic expiration for content protection
 - **Authentication** - JWT tokens with secure session management
 - **Payment Processing** - Stripe for recurring subscriptions and creator payouts
 - **Real-time Updates** - TanStack Query for efficient server state management
@@ -37,10 +38,10 @@ A full-stack creator platform for hosting and selling access to premium pictures
 
 ### Backend
 - **Node.js** with Express.js
-- **PostgreSQL** database with Sequelize ORM
+- **PostgreSQL** database with Sequelize ORM (user data)
+- **Azure Blob Storage** or **MinIO/S3** for media files
 - **JWT** for authentication
 - **Stripe** for payment processing
-- **AWS S3** for media storage
 - **bcryptjs** for password hashing
 - **Express Rate Limiting** for security
 
@@ -197,6 +198,53 @@ If you prefer to set up services individually:
 - **Redis:** localhost:6379
 - **Backend API:** http://localhost:5000
 - **Frontend:** http://localhost:5173
+
+## 📦 Storage Configuration
+
+The application supports both **Azure Blob Storage** (for production) and **MinIO** (for local development).
+
+### Development Setup (MinIO)
+MinIO provides S3-compatible storage that runs locally with Docker:
+
+```bash
+# Check current storage configuration
+cd backend && ./scripts/switch-storage.sh status
+
+# Switch to MinIO (default for development)
+./scripts/switch-storage.sh minio
+
+# Test the configuration
+npm run test:storage
+```
+
+### Production Setup (Azure Blob Storage)
+
+1. **Set up Azure Storage Account** (see [docs/AZURE_SETUP.md](docs/AZURE_SETUP.md))
+2. **Configure environment variables:**
+   ```env
+   STORAGE_PROVIDER=azure
+   AZURE_STORAGE_ACCOUNT_NAME=your_storage_account
+   AZURE_STORAGE_ACCOUNT_KEY=your_account_key
+   AZURE_CONTAINER_NAME=void-media
+   ```
+3. **Switch to Azure storage:**
+   ```bash
+   cd backend && ./scripts/switch-storage.sh azure
+   ```
+4. **Run migration:**
+   ```bash
+   npm run migrate:azure
+   ```
+5. **Test configuration:**
+   ```bash
+   npm run test:storage
+   ```
+
+### Storage Architecture
+- **PostgreSQL**: All user data, subscriptions, payments, and media metadata
+- **Azure Blob Storage / MinIO**: Actual media files (images and videos)
+- **Access Control**: Secure signed URLs with automatic expiration
+- **Organization**: Files organized by creator and subscription tier
 
 See [MinIO Setup Guide](./docs/MINIO_SETUP.md) for detailed information.
 

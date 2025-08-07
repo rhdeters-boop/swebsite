@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/database.js';
+import StorageService from '../services/StorageService.js';
 
 const MediaItem = sequelize.define('MediaItem', {
   id: {
@@ -46,15 +47,24 @@ const MediaItem = sequelize.define('MediaItem', {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true,
+    comment: 'Storage key/path for the file (works for both Azure blob names and S3 keys)',
   },
   s3Url: {
     type: DataTypes.STRING,
     allowNull: true, // Store the original upload URL
+    comment: 'Original upload URL (may be used for direct access)',
   },
   s3Bucket: {
     type: DataTypes.STRING,
     allowNull: true,
-    defaultValue: process.env.S3_BUCKET_NAME || 'void-media',
+    defaultValue: process.env.S3_BUCKET_NAME || process.env.AZURE_CONTAINER_NAME || 'void-media',
+    comment: 'Storage container name (S3 bucket or Azure container)',
+  },
+  storageProvider: {
+    type: DataTypes.ENUM('azure', 'minio', 's3'),
+    allowNull: false,
+    defaultValue: process.env.STORAGE_PROVIDER || 'minio',
+    comment: 'Storage provider used for this file',
   },
   thumbnailS3Key: {
     type: DataTypes.STRING,
@@ -103,10 +113,14 @@ const MediaItem = sequelize.define('MediaItem', {
 });
 
 // Instance method to generate signed URL
-MediaItem.prototype.getSignedUrl = function(expiresIn = 3600) {
-  // This will be implemented with AWS SDK
-  // For now, return a placeholder
-  return `https://${this.s3Bucket}.s3.amazonaws.com/${this.s3Key}`;
+MediaItem.prototype.getSignedUrl = async function(expiresIn = 3600) {
+  try {
+    return await StorageService.getSignedUrl(this.s3Key, expiresIn);
+  } catch (error) {
+    console.error('Error generating signed URL:', error.message);
+    // Fallback to direct URL if available
+    return this.s3Url || null;
+  }
 };
 
 export default MediaItem;

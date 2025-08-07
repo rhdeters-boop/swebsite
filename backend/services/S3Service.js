@@ -67,7 +67,7 @@ class S3Service {
       try {
         await this.init();
         return;
-      } catch (error) {
+      } catch (_error) {
         console.log(`🔄 S3 connection attempt ${attempt}/${maxRetries} failed`);
         
         if (attempt === maxRetries) {

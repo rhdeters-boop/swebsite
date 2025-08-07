@@ -28,7 +28,7 @@ import { authenticateToken } from './middleware/auth.js';
 import { connectDB } from './config/database.js';
 
 // Import services
-import S3Service from './services/S3Service.js';
+import StorageService from './services/StorageService.js';
 import LogRotator from './utils/LogRotator.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -145,12 +145,12 @@ app.listen(PORT, async () => {
   console.log(`📱 Environment: ${process.env.NODE_ENV}`);
   console.log(`🌐 CORS enabled for: ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
   
-  // Initialize S3 service with retry logic for development
+  // Initialize storage service with retry logic for development
   try {
-    await S3Service.initWithRetry();
-    console.log(`📦 S3 Service ready with bucket: ${process.env.S3_BUCKET_NAME || 'void-media'}`);
-  } catch (error) {
-    console.log('⚠️  S3 service will be available when MinIO starts');
+    await StorageService.initWithRetry();
+    console.log(`📦 Storage Service ready (${StorageService.getProvider().toUpperCase()})`);
+  } catch (_error) {
+    console.log('⚠️  Storage service will be available when configured');
   }
 });
 

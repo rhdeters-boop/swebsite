@@ -1,5 +1,5 @@
-import { MediaItem, Creator, User } from '../models/index.js';
-import S3Service from './S3Service.js';
+import { MediaItem } from '../models/index.js';
+import StorageService from './StorageService.js';
 import AnalyticsService from './AnalyticsService.js';
 
 class MediaService {
@@ -89,7 +89,7 @@ class MediaService {
 
     // Generate signed URL
     const signedUrl = mediaItem.s3Key 
-      ? await S3Service.getSignedUrl(mediaItem.s3Key, 3600)
+      ? await StorageService.getSignedUrl(mediaItem.s3Key, 3600)
       : null;
 
     // Record view analytics (async, don't wait for completion)
@@ -115,8 +115,8 @@ class MediaService {
       throw new Error('Valid tier is required (picture, solo_video, collab_video)');
     }
 
-    // Upload file to S3
-    const uploadResult = await S3Service.uploadFile(
+    // Upload file to storage
+    const uploadResult = await StorageService.uploadFile(
       file.buffer,
       file.originalname,
       file.mimetype,
@@ -129,10 +129,13 @@ class MediaService {
       title: title || file.originalname,
       description: description || '',
       tier,
-      fileType: file.mimetype,
+      type: file.mimetype.startsWith('image/') ? 'image' : 'video',
+      mimeType: file.mimetype,
       fileSize: file.size,
       s3Key: uploadResult.key,
       s3Url: uploadResult.url,
+      s3Bucket: process.env.AZURE_CONTAINER_NAME || process.env.S3_BUCKET_NAME || 'void-media',
+      storageProvider: StorageService.getProvider(),
       creatorId,
       isPublished: false, // Require manual publishing
       publishedAt: null,
@@ -157,7 +160,7 @@ class MediaService {
       throw new Error('Content type is required');
     }
 
-    const presignedPost = await S3Service.getPresignedPost(
+    const presignedPost = await StorageService.getPresignedUploadUrl(
       tier,
       creatorId,
       contentType,
@@ -182,9 +185,9 @@ class MediaService {
       throw new Error('You can only delete your own media');
     }
 
-    // Delete from S3
+    // Delete from storage
     if (mediaItem.s3Key) {
-      await S3Service.deleteFile(mediaItem.s3Key);
+      await StorageService.deleteFile(mediaItem.s3Key);
     }
 
     // Delete from database
@@ -255,7 +258,7 @@ class MediaService {
       mediaItems.map(async (item) => {
         let signedUrl = null;
         if (item.isPublished && item.s3Key) {
-          signedUrl = await S3Service.getSignedUrl(item.s3Key, 3600);
+          signedUrl = await StorageService.getSignedUrl(item.s3Key, 3600);
         }
         
         return {
@@ -298,7 +301,7 @@ class MediaService {
     return await Promise.all(
       mediaItems.map(async (item) => {
         const signedUrl = item.s3Key 
-          ? await S3Service.getSignedUrl(item.s3Key, 3600) // 1 hour expiry
+          ? await StorageService.getSignedUrl(item.s3Key, 3600) // 1 hour expiry
           : null;
         
         return {

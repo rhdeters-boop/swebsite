@@ -1,5 +1,6 @@
 import Stripe from 'stripe';
 import { Payment, Subscription, User, Creator } from '../models/index.js';
+import { Op } from 'sequelize';
 
 class PaymentService {
   constructor() {
@@ -9,7 +10,7 @@ class PaymentService {
   /**
    * Create payment intent for tips
    */
-  async createTipPaymentIntent(userId, { amount, currency = 'usd', creatorId, message }) {
+    async createPaymentIntent(userId, amount, currency = 'usd', _paymentMethodId) {
     if (!amount || amount < 50) { // Minimum $0.50
       throw new Error('Minimum tip amount is $0.50');
     }
