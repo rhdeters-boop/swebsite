@@ -22,7 +22,7 @@ import CreatorDashboard from './pages/CreatorDashboard';
 import BecomeCreator from './pages/BecomeCreator';
 import CreatorSearch from './pages/CreatorSearch';
 import CreatorProfile from './pages/CreatorProfile';
-import UserProfile from './pages/UserProfile';
+import UnifiedProfile from './pages/UnifiedProfile';
 import CreatorApplicationSuccess from './pages/CreatorApplicationSuccess';
 import HelpCenter from './pages/HelpCenter';
 import Contact from './pages/Contact';
@@ -83,7 +83,7 @@ const AppContent = () => {
           <Route path="/become-creator" element={<BecomeCreator />} />
           <Route path="/creators" element={<CreatorSearch />} />
           <Route path="/creator/:creatorId" element={<CreatorProfile />} />
-          <Route path="/user/:userId" element={<UserProfile />} />
+          <Route path="/user/:username" element={<UnifiedProfile />} />
           <Route path="/help" element={<HelpCenter />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/terms" element={<TermsOfService />} />

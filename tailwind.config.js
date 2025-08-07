@@ -245,7 +245,10 @@ export default {
         '.container-wide': {
           '@apply max-w-9xl mx-auto px-4 sm:px-6 lg:px-8': {},
         },
-        
+        '.container-profile': {
+          '@apply max-w-full max-h-full': {},
+        },
+
         // ===== CARD COMPONENTS =====
         '.card': {
           '@apply bg-background-card/80 backdrop-blur-sm rounded-xl shadow-card p-6 border border-border-secondary': {},
@@ -265,7 +268,7 @@ export default {
           '@apply bg-background-card/80 backdrop-blur-sm rounded-xl shadow-card p-6 sm:p-8 lg:p-10 border border-border-secondary': {},
         },
         '.page-section': {
-          '@apply bg-background-primary py-12 px-4 sm:px-6 lg:px-8': {},
+          '@apply bg-background-primary': {},
         },
         '.hero-section': {
           '@apply bg-background-primary text-text-primary': {},

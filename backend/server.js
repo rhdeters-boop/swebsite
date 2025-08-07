@@ -111,7 +111,7 @@ app.get('/api/health', (req, res) => {
 // API Routes
 app.use('/api/health', healthRoutes); // Health checks (public)
 app.use('/api/auth', authRoutes);
-app.use('/api/users', authenticateToken, userRoutes);
+app.use('/api/users', userRoutes); // Changed: Remove auth middleware to allow public routes
 app.use('/api/subscriptions', authenticateToken, subscriptionRoutes);
 app.use('/api/media', authenticateToken, mediaRoutes);
 app.use('/api/analytics', analyticsRoutes); // Mixed public and protected routes
