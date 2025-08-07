@@ -70,14 +70,14 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ onClose }) => {
       return (
         <button
           onClick={toggleDropdown}
-          className="flex items-center space-x-2 text-abyss-light-gray hover:text-seductive transition-colors duration-300 group px-2 py-3 h-12 rounded-md hover:bg-seductive/10"
+          className="flex items-center space-x-2 text-text-secondary hover:text-seductive transition-colors duration-300 group px-2 py-3 h-12 rounded-md hover:bg-seductive/10"
         >
           <User className="h-5 w-5 group-hover:text-seductive transition-colors duration-300" />
           {/* Show name and chevron on larger screens, hide on mobile */}
           <span className="hidden sm:inline font-medium">
             {user?.displayName}
           </span>
-          <ChevronDown className={`h-4 w-4 transition-transform duration-200 hidden sm:inline ${isDropdownOpen ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`h-4 w-4 transition-all duration-200 hidden sm:inline ${isDropdownOpen ? 'rotate-180 text-seductive' : 'rotate-0'}`} />
         </button>
       );
     }
@@ -88,10 +88,10 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ onClose }) => {
         {/* Mobile and Medium dropdown trigger */}
         <button
           onClick={toggleDropdown}
-          className="lg:hidden flex items-center space-x-2 text-abyss-light-gray hover:text-seductive transition-colors duration-300 group px-2 py-3 h-12 rounded-md hover:bg-seductive/10"
+          className="lg:hidden flex items-center space-x-2 text-text-secondary hover:text-seductive transition-colors duration-300 group px-2 py-3 h-12 rounded-md hover:bg-seductive/10"
         >
           <User className="h-8 w-8 group-hover:text-seductive transition-colors duration-300" />
-          <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`h-4 w-4 transition-all duration-200 ${isDropdownOpen ? 'rotate-180 text-seductive' : 'rotate-0'}`} />
         </button>
         
         {/* Desktop buttons */}
@@ -99,14 +99,14 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ onClose }) => {
           <Link
             to="/login"
             onClick={() => onClose?.()}
-            className="text-abyss-light-gray hover:text-white transition-all duration-300 font-medium px-2 py-3 h-12 flex items-center rounded-md border border-seductive/40 hover:border-seductive/60 hover:bg-seductive/10"
+            className="text-text-secondary hover:text-text-primary transition-all duration-300 font-medium px-2 py-3 h-12 flex items-center rounded-md border border-seductive/40 hover:border-seductive/60 hover:bg-seductive/10"
           >
             Login/Register
           </Link>
           <Link
             to="/become-creator"
             onClick={() => onClose?.()}
-            className="bg-gradient-to-r from-lust-violet to-seductive text-white px-2 py-3 h-12 flex items-center rounded-md font-medium hover:shadow-glow-primary transition-all duration-300 transform hover:scale-[1.02] border border-seductive/30"
+            className="btn-primary px-2 py-3 h-12 flex items-center rounded-md font-medium"
           >
             Become a Creator
           </Link>
@@ -117,17 +117,19 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ onClose }) => {
 
   // Render dropdown content
   const renderDropdownContent = () => {
-    if (!isDropdownOpen) return null;
-
     // Authenticated user dropdown
     if (isAuthenticated) {
       return (
-        <div className="absolute right-0 mt-2 w-56 max-w-[calc(100vw-2rem)] bg-background-primary border border-void-500/20 rounded-xl shadow-elevated z-50">
+        <div className={`absolute right-0 mt-2 w-56 max-w-[calc(100vw-2rem)] bg-background-card border border-border-primary rounded-xl shadow-elevated z-50 transition-all duration-200 ease-out origin-top-right ${
+          isDropdownOpen 
+            ? 'opacity-100 scale-100 translate-y-0' 
+            : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
+        }`}>
           <div className="py-2">
             <Link
               to="/profile"
               onClick={handleLinkClick}
-              className="flex items-center space-x-3 px-4 py-3 text-text-secondary hover:text-text-primary hover:bg-void-500/10 transition-colors duration-200"
+              className="flex items-center space-x-3 px-4 py-3 text-text-secondary hover:text-text-primary hover:bg-background-secondary transition-colors duration-200"
             >
               <User className="h-4 w-4" />
               <span>Profile</span>
@@ -136,7 +138,7 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ onClose }) => {
             <Link
               to="/notifications"
               onClick={handleLinkClick}
-              className="flex items-center space-x-3 px-4 py-3 text-text-secondary hover:text-text-primary hover:bg-void-500/10 transition-colors duration-200"
+              className="flex items-center space-x-3 px-4 py-3 text-text-secondary hover:text-text-primary hover:bg-background-secondary transition-colors duration-200"
             >
               <Bell className="h-4 w-4" />
               <span>Notifications</span>
@@ -145,7 +147,7 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ onClose }) => {
             <Link
               to="/security"
               onClick={handleLinkClick}
-              className="flex items-center space-x-3 px-4 py-3 text-text-secondary hover:text-text-primary hover:bg-void-500/10 transition-colors duration-200"
+              className="flex items-center space-x-3 px-4 py-3 text-text-secondary hover:text-text-primary hover:bg-background-secondary transition-colors duration-200"
             >
               <Shield className="h-4 w-4" />
               <span>Security & Privacy</span>
@@ -154,17 +156,17 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ onClose }) => {
             <Link
               to="/billing"
               onClick={handleLinkClick}
-              className="flex items-center space-x-3 px-4 py-3 text-text-secondary hover:text-text-primary hover:bg-void-500/10 transition-colors duration-200"
+              className="flex items-center space-x-3 px-4 py-3 text-text-secondary hover:text-text-primary hover:bg-background-secondary transition-colors duration-200"
             >
               <CreditCard className="h-4 w-4" />
               <span>Billing</span>
             </Link>
             
-            <hr className="my-2 border-void-500/20" />
+            <hr className="my-2 border-border-secondary" />
             
             <button
               onClick={handleLogout}
-              className="flex items-center space-x-3 px-4 py-3 text-text-secondary hover:text-red-400 hover:bg-red-400/10 transition-colors duration-200 w-full text-left"
+              className="flex items-center space-x-3 px-4 py-3 text-text-secondary hover:text-error hover:bg-error/10 transition-colors duration-200 w-full text-left"
             >
               <LogOut className="h-4 w-4" />
               <span>Logout</span>
@@ -176,12 +178,16 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ onClose }) => {
 
     // Unauthenticated user dropdown (mobile and medium screens)
     return (
-      <div className="absolute right-0 mt-2 w-56 max-w-[calc(100vw-2rem)] bg-background-primary border border-void-500/20 rounded-xl shadow-elevated z-50 lg:hidden">
+      <div className={`absolute right-0 mt-2 w-56 max-w-[calc(100vw-2rem)] bg-background-card border border-border-primary rounded-xl shadow-elevated z-50 lg:hidden transition-all duration-200 ease-out origin-top-right ${
+        isDropdownOpen 
+          ? 'opacity-100 scale-100 translate-y-0' 
+          : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
+      }`}>
         <div className="py-2">
           <Link
             to="/login"
             onClick={handleLinkClick}
-            className="flex items-center space-x-3 px-4 py-3 text-text-secondary hover:text-text-primary hover:bg-void-500/10 transition-colors duration-200"
+            className="flex items-center space-x-3 px-4 py-3 text-text-secondary hover:text-text-primary hover:bg-background-secondary transition-colors duration-200"
           >
             <User className="h-4 w-4" />
             <span>Login/Register</span>
@@ -190,7 +196,7 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ onClose }) => {
           <Link
             to="/become-creator"
             onClick={handleLinkClick}
-            className="flex items-center space-x-3 px-4 py-3 text-seductive hover:text-white hover:bg-seductive/20 transition-colors duration-200 font-medium"
+            className="flex items-center space-x-3 px-4 py-3 text-seductive hover:text-text-primary hover:bg-seductive/20 transition-colors duration-200 font-medium"
           >
             <Shield className="h-4 w-4" />
             <span>Become a Creator</span>
@@ -207,7 +213,9 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ onClose }) => {
 
     const overlayContent = (
       <div 
-        className="fixed inset-0 z-40 cursor-pointer"
+        className={`fixed inset-0 z-40 cursor-pointer transition-opacity duration-200 ${
+          isDropdownOpen ? 'opacity-100' : 'opacity-0'
+        }`}
         style={{ 
           position: 'fixed',
           top: 0,
@@ -235,7 +243,7 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ onClose }) => {
 
   return (
     <>
-      <InvisibleOverlay />
+      {isDropdownOpen && <InvisibleOverlay />}
       <div className="relative" ref={dropdownRef}>
         {renderTrigger()}
         {renderDropdownContent()}

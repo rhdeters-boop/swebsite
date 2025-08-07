@@ -18,6 +18,7 @@ import ResetPassword from './pages/ResetPassword';
 import Profile from './pages/Profile';
 import AccountSettings from './pages/AccountSettings';
 import Dashboard from './pages/Dashboard';
+import CreatorDashboard from './pages/CreatorDashboard';
 import BecomeCreator from './pages/BecomeCreator';
 import CreatorSearch from './pages/CreatorSearch';
 import CreatorProfile from './pages/CreatorProfile';
@@ -36,6 +37,9 @@ import CreateProfile from './pages/CreateProfile';
 import RegisterAsCreator from './pages/RegisterAsCreator';
 import CreateCreatorProfile from './pages/CreateCreatorProfile';
 
+// Hooks
+import { useNavigationTracking } from './hooks/useNavigationTracking';
+
 // Initialize Stripe
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_...');
 
@@ -52,6 +56,9 @@ const queryClient = new QueryClient({
 // Create a component that conditionally renders navbar
 const AppContent = () => {
   const location = useLocation();
+  
+  // Track navigation for login redirect
+  useNavigationTracking();
   
   // Routes where navbar should be hidden
   const authRoutes = ['/login', '/register', '/register-creator', '/forgot-password', '/reset-password'];
@@ -94,6 +101,14 @@ const AppContent = () => {
             }
           />
           <Route
+            path="/creator-dashboard"
+            element={
+              <ProtectedRoute>
+                <CreatorDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/profile"
             element={
               <ProtectedRoute>
@@ -106,14 +121,6 @@ const AppContent = () => {
             element={
               <ProtectedRoute>
                 <AccountSettings />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
               </ProtectedRoute>
             }
           />

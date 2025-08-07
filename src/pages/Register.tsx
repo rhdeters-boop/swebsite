@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Loader2 } from 'lucide-react';
 import AuthSection from '../components/auth/AuthSection';
@@ -10,6 +10,7 @@ import BackButton from '../components/BackButton';
 import { useUsernameValidation } from '../hooks/useUsernameValidation';
 import { usePasswordValidation } from '../hooks/usePasswordValidation';
 import { getUsernameStatusIcon, getUsernameError, getPasswordError } from '../utils/registerHelpers';
+import { getLastVisitedPage } from '../hooks/useNavigationTracking';
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -23,6 +24,7 @@ const Register: React.FC = () => {
 
   const { register, error, clearError } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   
   // Custom hooks
   const usernameStatus = useUsernameValidation(formData.username);
@@ -64,12 +66,25 @@ const Register: React.FC = () => {
         email: formData.email,
         password: formData.password,
       });
-      navigate('/create-profile');
+      
+      // Check if we should redirect to the last visited page or create profile
+      const lastPage = getLastVisitedPage();
+      const shouldGoToCreateProfile = lastPage === '/dashboard' || !lastPage;
+      
+      if (shouldGoToCreateProfile) {
+        navigate('/create-profile');
+      } else {
+        navigate(lastPage, { replace: true });
+      }
     } catch (err) {
       // Error is handled by the auth context
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const onSubmit = (e: React.FormEvent) => {
+    handleSubmit(e).catch(console.error);
   };
 
   return (
@@ -86,24 +101,24 @@ const Register: React.FC = () => {
         icon={<VoidLogo className="h-12 w-12" />}
         footer={
           <>
-            <p className="text-sm text-gray-400">
-              Already have an account?{' '}
-              <Link 
-                to="/login" 
-                className="text-void-accent-light hover:text-seductive-light font-medium transition-colors duration-200"
-              >
-                Sign in here
-              </Link>
-            </p>
-            <div className="mt-4 text-sm text-gray-400">
+                      <p className="text-text-secondary">
+            Already have an account?{' '}
+            <Link
+              to="/login"
+              className="font-semibold text-void-accent-light hover:text-seductive-light transition-colors duration-200"
+            >
+              Sign in
+            </Link>
+          </p>
+            <div className="mt-4 text-caption">
               <p>🎉 Join creators • 💳 Secure payments • 🔒 Private & protected</p>
             </div>
           </>
         }
       >
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={onSubmit} className="space-y-6">
         {error && (
-          <div className="bg-red-900/20 border border-red-500/30 text-red-300 px-4 py-3 rounded-lg">
+          <div className="alert-error">
             {error}
           </div>
         )}
@@ -118,14 +133,14 @@ const Register: React.FC = () => {
             placeholder="Your unique username"
             pattern="^[a-zA-Z0-9_]+$"
             title="Username can only contain letters, numbers, and underscores"
-            className={usernameStatus === 'taken' ? 'border-red-500/50' : 
-                     usernameStatus === 'available' ? 'border-green-500/50' : ''}
+            className={usernameStatus === 'taken' ? 'form-input-error' : 
+                     usernameStatus === 'available' ? 'form-input-success' : ''}
             error={getUsernameError(usernameStatus)}
             rightElement={getUsernameStatusIcon(usernameStatus)}
             required
           />
           {usernameStatus === 'available' && (
-            <p className="mt-1 text-sm text-green-400">Username is available</p>
+            <p className="form-success">Username is available</p>
           )}
         </div>
 
@@ -161,13 +176,13 @@ const Register: React.FC = () => {
           value={formData.confirmPassword}
           onChange={handleChange}
           placeholder="Confirm your password"
-          className={formData.confirmPassword && !passwordsMatch ? 'border-red-500/50' : ''}
+          className={formData.confirmPassword && !passwordsMatch ? 'form-input-error' : ''}
           showPassword={showPassword}
           onTogglePassword={() => { setShowPassword(!showPassword); }}
           required
         />
         {getPasswordError(formData.password, formData.confirmPassword) && (
-          <p className="mt-1 text-sm text-red-400">{getPasswordError(formData.password, formData.confirmPassword)}</p>
+          <p className="form-error">{getPasswordError(formData.password, formData.confirmPassword)}</p>
         )}
 
         <div className="flex items-center">
@@ -176,9 +191,9 @@ const Register: React.FC = () => {
             name="terms"
             type="checkbox"
             required
-            className="h-4 w-4 text-void-accent focus:ring-void-accent border-void-500/30 rounded bg-void-dark-900"
+            className="h-4 w-4 text-void-accent focus:ring-void-accent border-border-muted rounded bg-background-secondary"
           />
-          <label htmlFor="terms" className="ml-2 block text-sm text-gray-300">
+          <label htmlFor="terms" className="ml-2 block text-sm text-text-secondary">
             I agree to the{' '}
             <Link to="/terms" className="text-void-accent-light hover:text-seductive-light transition-colors duration-200">
               Terms of Service

@@ -19,7 +19,7 @@ const Login: React.FC = () => {
         icon={<VoidLogo className="h-12 w-12" />}
         footer={
           <>
-            <div className="mt-4 text-sm text-gray-400">
+            <div className="mt-4 text-caption">
               <p>🔒 Secure login • 💎 Premium content • ✨ Exclusive access</p>
             </div>
           </>

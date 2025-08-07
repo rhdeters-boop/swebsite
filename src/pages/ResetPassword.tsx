@@ -104,7 +104,7 @@ const ResetPassword: React.FC = () => {
   };
 
   const ValidationItem: React.FC<{ isValid: boolean; text: string }> = ({ isValid, text }) => (
-    <div className={`flex items-center text-sm ${isValid ? 'text-green-600' : 'text-gray-400'}`}>
+    <div className={`flex items-center text-sm ${isValid ? 'text-success' : 'text-text-muted'}`}>
       {isValid ? (
         <Check className="h-4 w-4 mr-2" />
       ) : (
@@ -120,9 +120,9 @@ const ResetPassword: React.FC = () => {
       <div className="flex items-center justify-center py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8 text-center">
           <div className="flex justify-center mb-4">
-            <Loader2 className="h-12 w-12 text-brand-pink animate-spin" />
+            <Loader2 className="h-12 w-12 text-void-accent animate-spin" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-text-primary">
             Verifying reset link...
           </h2>
         </div>
@@ -141,17 +141,17 @@ const ResetPassword: React.FC = () => {
                 <CheckCircle className="h-12 w-12 text-green-600" />
               </div>
             </div>
-            <h2 className="text-3xl font-bold text-gray-900">
+            <h2 className="text-3xl font-bold text-text-primary">
               Password Reset Successful!
             </h2>
-            <p className="mt-4 text-gray-600">
+            <p className="mt-4 text-text-secondary">
               Your password has been updated successfully. You can now log in with your new password.
             </p>
           </div>
 
-          <div className="card">
+          <div className="card-elevated">
             <div className="space-y-4">
-              <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+              <div className="alert-success">
                 <h3 className="font-medium">What's next?</h3>
                 <ul className="mt-2 text-sm space-y-1">
                   <li>• Log in with your new password</li>
@@ -180,19 +180,19 @@ const ResetPassword: React.FC = () => {
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
             <div className="flex justify-center mb-4">
-              <Heart className="h-12 w-12 text-brand-pink" fill="currentColor" />
+              <Heart className="h-12 w-12 text-void-accent" fill="currentColor" />
             </div>
-            <h2 className="text-3xl font-bold text-gray-900">
+            <h2 className="text-3xl font-bold text-text-primary">
               Invalid Reset Link
             </h2>
-            <p className="mt-4 text-gray-600">
+            <p className="mt-4 text-text-secondary">
               {error}
             </p>
           </div>
 
-          <div className="card">
+          <div className="card-elevated">
             <div className="space-y-4">
-              <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg">
+              <div className="alert-warning">
                 <h3 className="font-medium">What happened?</h3>
                 <ul className="mt-2 text-sm space-y-1">
                   <li>• The reset link may have expired (links expire after 1 hour)</li>
@@ -211,7 +211,7 @@ const ResetPassword: React.FC = () => {
               <div className="text-center">
                 <Link
                   to="/login"
-                  className="text-sm text-gray-600 hover:text-brand-pink transition-colors"
+                  className="text-text-secondary hover:text-void-accent-light transition-colors duration-200"
                 >
                   Back to login
                 </Link>
@@ -230,27 +230,27 @@ const ResetPassword: React.FC = () => {
         {/* Header */}
         <div className="text-center">
           <div className="flex justify-center mb-4">
-            <Heart className="h-12 w-12 text-brand-pink" fill="currentColor" />
+            <Heart className="h-12 w-12 text-void-accent" fill="currentColor" />
           </div>
           <h2 className="text-3xl font-bold gradient-text">
             Reset Your Password
           </h2>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-text-secondary">
             Enter your new password below.
           </p>
         </div>
 
         {/* Form */}
-        <div className="card">
+        <div className="card-elevated">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+              <div className="alert-error">
                 {error}
               </div>
             )}
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="form-label">
                 New Password
               </label>
               <div className="relative">
@@ -261,7 +261,7 @@ const ResetPassword: React.FC = () => {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-pink focus:border-transparent transition-colors duration-200"
+                  className="form-input pr-10"
                   placeholder="Enter new password"
                   disabled={isLoading}
                 />
@@ -272,9 +272,9 @@ const ResetPassword: React.FC = () => {
                   disabled={isLoading}
                 >
                   {showPassword ? (
-                    <EyeOff className="h-4 w-4 text-gray-400" />
+                    <EyeOff className="h-4 w-4 text-text-muted" />
                   ) : (
-                    <Eye className="h-4 w-4 text-gray-400" />
+                    <Eye className="h-4 w-4 text-text-muted" />
                   )}
                 </button>
               </div>
@@ -291,7 +291,7 @@ const ResetPassword: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="confirmPassword" className="form-label">
                 Confirm New Password
               </label>
               <div className="relative">
@@ -302,7 +302,7 @@ const ResetPassword: React.FC = () => {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-pink focus:border-transparent transition-colors duration-200"
+                  className="form-input pr-10"
                   placeholder="Confirm new password"
                   disabled={isLoading}
                 />
@@ -313,9 +313,9 @@ const ResetPassword: React.FC = () => {
                   disabled={isLoading}
                 >
                   {showConfirmPassword ? (
-                    <EyeOff className="h-4 w-4 text-gray-400" />
+                    <EyeOff className="h-4 w-4 text-text-muted" />
                   ) : (
-                    <Eye className="h-4 w-4 text-gray-400" />
+                    <Eye className="h-4 w-4 text-text-muted" />
                   )}
                 </button>
               </div>
@@ -323,12 +323,12 @@ const ResetPassword: React.FC = () => {
               {formData.confirmPassword && (
                 <div className="mt-2">
                   {passwordsMatch ? (
-                    <div className="flex items-center text-sm text-green-600">
+                    <div className="flex items-center text-sm text-success">
                       <Check className="h-4 w-4 mr-2" />
                       Passwords match
                     </div>
                   ) : (
-                    <div className="flex items-center text-sm text-red-600">
+                    <div className="flex items-center text-sm text-error">
                       <X className="h-4 w-4 mr-2" />
                       Passwords do not match
                     </div>

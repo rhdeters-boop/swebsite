@@ -34,20 +34,20 @@ const ForgotPassword: React.FC = () => {
                 <Mail className="h-12 w-12 text-green-600" />
               </div>
             </div>
-            <h2 className="text-3xl font-bold text-gray-900">
+            <h2 className="text-3xl font-bold text-text-primary">
               Check your email
             </h2>
-            <p className="mt-4 text-gray-600">
+            <p className="mt-4 text-text-secondary">
               If an account with <strong>{email}</strong> exists, we've sent a password reset link to your email.
             </p>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-caption">
               Check your spam folder if you don't see it in your inbox.
             </p>
           </div>
 
-          <div className="card">
+          <div className="card-elevated">
             <div className="space-y-4">
-              <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg">
+              <div className="alert-info">
                 <h3 className="font-medium">What's next?</h3>
                 <ul className="mt-2 text-sm space-y-1">
                   <li>• Click the link in your email</li>
@@ -57,14 +57,14 @@ const ForgotPassword: React.FC = () => {
               </div>
 
               <div className="text-center">
-                <p className="text-sm text-gray-600">
+                <p className="text-text-secondary">
                   Didn't receive the email?{' '}
                   <button
                     onClick={() => {
                       setIsSubmitted(false);
                       setEmail('');
                     }}
-                    className="text-brand-pink hover:text-brand-pink-dark font-medium"
+                    className="text-void-accent-light hover:text-seductive-light font-medium transition-colors duration-200"
                   >
                     Try again
                   </button>
@@ -74,7 +74,7 @@ const ForgotPassword: React.FC = () => {
               <div className="text-center">
                 <Link
                   to="/login"
-                  className="inline-flex items-center text-sm text-gray-600 hover:text-brand-pink transition-colors"
+                  className="inline-flex items-center text-text-secondary hover:text-void-accent-light transition-colors duration-200"
                 >
                   <ArrowLeft className="h-4 w-4 mr-1" />
                   Back to login
@@ -93,27 +93,27 @@ const ForgotPassword: React.FC = () => {
         {/* Header */}
         <div className="text-center">
           <div className="flex justify-center mb-4">
-            <Heart className="h-12 w-12 text-brand-pink" fill="currentColor" />
+            <Heart className="h-12 w-12 text-void-accent" fill="currentColor" />
           </div>
           <h2 className="text-3xl font-bold gradient-text">
             Forgot your password?
           </h2>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-text-secondary">
             No worries! Enter your email and we'll send you a reset link.
           </p>
         </div>
 
         {/* Form */}
-        <div className="card">
+        <div className="card-elevated">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+              <div className="alert-error">
                 {error}
               </div>
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="form-label">
                 Email Address
               </label>
               <input
@@ -123,7 +123,7 @@ const ForgotPassword: React.FC = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-pink focus:border-transparent transition-colors duration-200"
+                className="form-input"
                 placeholder="Enter your email address"
                 disabled={isLoading}
               />
@@ -150,7 +150,7 @@ const ForgotPassword: React.FC = () => {
             <div className="text-center">
               <Link
                 to="/login"
-                className="inline-flex items-center text-sm text-gray-600 hover:text-brand-pink transition-colors"
+                className="inline-flex items-center text-text-secondary hover:text-void-accent-light transition-colors duration-200"
               >
                 <ArrowLeft className="h-4 w-4 mr-1" />
                 Back to login
@@ -161,9 +161,9 @@ const ForgotPassword: React.FC = () => {
 
         {/* Additional help */}
         <div className="text-center">
-          <p className="text-sm text-gray-500">
+          <p className="text-caption">
             Don't have an account?{' '}
-            <Link to="/register" className="text-brand-pink hover:text-brand-pink-dark font-medium">
+            <Link to="/register" className="text-void-accent-light hover:text-seductive-light font-medium transition-colors duration-200">
               Sign up
             </Link>
           </p>

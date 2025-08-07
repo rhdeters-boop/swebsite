@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Loader2 } from 'lucide-react';
 import FormInput from '../form/FormInput';
 import PasswordInput from '../form/PasswordInput';
+import { getLastVisitedPage } from '../../hooks/useNavigationTracking';
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -27,7 +28,11 @@ const LoginForm: React.FC<LoginFormProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = redirectTo || (location.state as any)?.from?.pathname || '/dashboard';
+  // Priority order: redirectTo prop > location state > last visited page > default dashboard
+  const from = redirectTo || 
+               (location.state as any)?.from?.pathname || 
+               getLastVisitedPage() || 
+               '/dashboard';
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -59,7 +64,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="bg-red-900/20 border border-red-500/30 text-red-300 px-4 py-3 rounded-lg">
+        <div className="alert-error">
           {error}
         </div>
       )}
@@ -93,9 +98,9 @@ const LoginForm: React.FC<LoginFormProps> = ({
             id="remember-me"
             name="remember-me"
             type="checkbox"
-            className="h-4 w-4 text-void-accent focus:ring-void-accent border-void-500/30 rounded bg-void-dark-900"
+            className="h-4 w-4 text-void-accent focus:ring-void-accent border-border-muted rounded bg-background-secondary"
           />
-          <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-300">
+          <label htmlFor="remember-me" className="ml-2 block text-sm text-text-secondary">
             Remember me
           </label>
         </div>
@@ -129,7 +134,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
 
       {showLinks && (
         <div className="text-center">
-          <p className="text-sm text-gray-400">
+          <p className="text-text-secondary">
             Don't have an account?{' '}
             <Link 
               to="/register" 

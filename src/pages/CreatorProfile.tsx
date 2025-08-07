@@ -87,10 +87,10 @@ const CreatorProfile: React.FC = () => {
       <div className="py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl mx-auto text-center">
           <div className="text-6xl mb-6">😢</div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
+          <h1 className="text-3xl font-bold text-text-primary mb-4">
             Creator Not Found
           </h1>
-          <p className="text-gray-600 mb-8">
+          <p className="text-text-secondary mb-8">
             {error instanceof Error ? error.message : 'This creator profile could not be found.'}
           </p>
           <button
@@ -120,8 +120,8 @@ const CreatorProfile: React.FC = () => {
     return (
       <div className="py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Creator not found</h1>
-          <p className="text-abyss-light-gray">The creator you're looking for doesn't exist or has been removed.</p>
+          <h1 className="text-2xl font-bold text-text-primary mb-4">Creator not found</h1>
+          <p className="text-text-secondary">The creator you're looking for doesn't exist or has been removed.</p>
         </div>
       </div>
     );
@@ -142,7 +142,7 @@ const CreatorProfile: React.FC = () => {
             <div className="w-full h-64"></div>
           )}
           
-          <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+          <div className="absolute inset-0 bg-background-overlay/20"></div>
           
           <div className="absolute bottom-6 left-6 right-6">
             <div className="flex items-end space-x-6">
@@ -240,7 +240,7 @@ const CreatorProfile: React.FC = () => {
                         href={`https://tiktok.com/@${creator.socialLinks.tiktok}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-center w-10 h-10 bg-text-tertiary/10 text-text-tertiary rounded-full hover:bg-text-tertiary/20 transition-colors"
+                        className="flex items-center justify-center w-10 h-10 bg-text-muted/10 text-text-muted rounded-full hover:bg-text-muted/20 transition-colors"
                       >
                         <Globe className="h-5 w-5" />
                       </a>

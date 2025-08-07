@@ -61,7 +61,7 @@ const CreateProfile: React.FC = () => {
       subtitle="Tell the community a bit about yourself"
       icon={<User className="h-12 w-12 text-void-accent" />}
       footer={
-        <div className="text-sm text-gray-400">
+        <div className="text-sm text-text-muted">
           <p>You can always update your profile later</p>
         </div>
       }
@@ -78,7 +78,7 @@ const CreateProfile: React.FC = () => {
                   className="w-full h-full rounded-full object-cover"
                 />
               ) : (
-                <Camera className="h-8 w-8 text-gray-400" />
+                <Camera className="h-8 w-8 text-text-muted" />
               )}
             </div>
             <input
@@ -89,7 +89,7 @@ const CreateProfile: React.FC = () => {
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             />
           </div>
-          <p className="text-sm text-gray-400">Click to upload profile picture</p>
+          <p className="text-sm text-text-muted">Click to upload profile picture</p>
         </div>
 
         <FormInput
@@ -103,8 +103,8 @@ const CreateProfile: React.FC = () => {
         />
 
         <div className="space-y-2">
-          <label htmlFor="bio" className="block text-sm font-medium text-abyss-light-gray">
-            Bio <span className="text-gray-500">(optional)</span>
+          <label htmlFor="bio" className="form-label">
+            Bio <span className="text-text-muted">(optional)</span>
           </label>
           <textarea
             id="bio"
@@ -116,7 +116,7 @@ const CreateProfile: React.FC = () => {
             className="form-input resize-none"
             maxLength={500}
           />
-          <p className="text-xs text-gray-500">
+          <p className="form-help">
             {formData.bio.length}/500 characters
           </p>
         </div>
@@ -125,7 +125,7 @@ const CreateProfile: React.FC = () => {
           <button
             type="button"
             onClick={handleSkip}
-            className="flex-1 px-4 py-2 border border-void-500/30 text-gray-300 rounded-lg hover:bg-void-dark-900/50 transition-colors duration-200"
+            className="btn-outline"
           >
             Skip for now
           </button>

@@ -254,6 +254,62 @@ router.put('/me/profile', authenticateToken, [
   }
 });
 
+// Get creator profile by user ID
+router.get('/user/:userId', async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const creator = await CreatorService.getCreatorByUserId(userId);
+
+    res.json(creator);
+  } catch (error) {
+    if (error.message === 'Creator profile not found') {
+      return res.status(404).json({
+        success: false,
+        message: error.message
+      });
+    }
+    next(error);
+  }
+});
+
+// Update creator profile (use PUT /creators/profile instead of /creators/me/profile)
+router.put('/profile', authenticateToken, [
+  body('displayName').optional().trim().isLength({ min: 2, max: 50 }),
+  body('bio').optional().trim().isLength({ max: 1000 }),
+  body('categories').optional().isArray({ min: 0, max: 5 }),
+  body('subscriptionPrice').optional().isInt({ min: 299, max: 9999 }),
+  body('socialLinks').optional().isObject(),
+  body('profileImage').optional().isURL(),
+  body('coverImage').optional().isURL(),
+], async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const updatedCreator = await CreatorService.updateCreator(req.user.id, req.body);
+
+    res.json({
+      success: true,
+      message: 'Creator profile updated successfully',
+      creator: updatedCreator
+    });
+  } catch (error) {
+    if (error.message === 'Creator profile not found') {
+      return res.status(404).json({
+        success: false,
+        message: error.message
+      });
+    }
+    next(error);
+  }
+});
+
 // Follow/Unfollow creator
 router.post('/:id/follow', authenticateToken, async (req, res, next) => {
   try {
