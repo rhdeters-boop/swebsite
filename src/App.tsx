@@ -15,7 +15,6 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
-import Profile from './pages/Profile';
 import AccountSettings from './pages/AccountSettings';
 import Dashboard from './pages/Dashboard';
 import CreatorDashboard from './pages/CreatorDashboard';
@@ -105,14 +104,6 @@ const AppContent = () => {
             element={
               <ProtectedRoute>
                 <CreatorDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <Profile />
               </ProtectedRoute>
             }
           />

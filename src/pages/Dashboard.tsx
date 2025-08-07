@@ -22,7 +22,7 @@ const Dashboard: React.FC = () => {
             <h3 className="text-lg font-semibold mb-2 text-white">Profile Settings</h3>
             <p className="text-gray-400 text-sm mb-4">Update your creator profile and bio</p>
             <Link 
-              to="/profile" 
+              to={user?.username ? `/user/${user.username}` : '/creators'} 
               className="bg-void-accent hover:bg-void-accent-light text-white w-full py-2 rounded-lg block transition-colors duration-200"
             >
               Manage Profile

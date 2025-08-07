@@ -126,6 +126,52 @@ router.post('/upload', requireAuth, upload.single('file'), [
   }
 });
 
+// Get presigned POST URL for profile uploads (profile picture, banner)
+router.post('/profile/upload-url', authenticateToken, [
+  body('type').isIn(['profile', 'banner']),
+  body('contentType').notEmpty(),
+  body('maxFileSize').optional().isInt({ min: 1024, max: 10 * 1024 * 1024 }), // 10MB limit for profile images
+], async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const { type, contentType, maxFileSize = 10 * 1024 * 1024 } = req.body;
+
+    // Validate content type for images
+    if (!contentType.startsWith('image/')) {
+      return res.status(400).json({
+        success: false,
+        message: 'Only image files are allowed for profile uploads'
+      });
+    }
+
+    const presignedPost = await MediaService.getPresignedProfileUploadUrl(
+      { type, contentType, maxFileSize },
+      req.user.id
+    );
+
+    res.json({
+      success: true,
+      uploadData: presignedPost
+    });
+  } catch (error) {
+    if (error.message.includes('Content type')) {
+      return res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+    next(error);
+  }
+});
+
 // Get presigned POST URL for direct browser uploads
 router.post('/upload-url', requireAuth, [
   body('tier').isIn(['picture', 'solo_video', 'collab_video']),
@@ -332,6 +378,118 @@ router.get('/analytics/:creatorId', authenticateToken, [
       success: true,
       analytics
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Test endpoint for S3 storage (no auth required for testing)
+router.get('/test-s3', async (req, res, next) => {
+  try {
+    console.log('🧪 Testing S3 storage...');
+    
+    // Import S3Service directly for testing
+    const { default: S3Service } = await import('../services/S3Service.js');
+    
+    // Initialize S3 service
+    await S3Service.initWithRetry(3, 1000);
+    
+    // Test file upload with a small buffer
+    const testBuffer = Buffer.from('This is a test file for S3 storage', 'utf8');
+    const result = await S3Service.uploadFile(
+      testBuffer,
+      'test-file.txt',
+      'text/plain',
+      'picture',
+      'test-creator-' + Date.now()
+    );
+    
+    // Test signed URL generation
+    const signedUrl = await S3Service.getSignedUrl(result.key, 300); // 5 minutes
+    
+    // Test file deletion
+    const deleteResult = await S3Service.deleteFile(result.key);
+    
+    res.json({
+      success: true,
+      message: 'S3 storage test completed successfully',
+      results: {
+        upload: {
+          key: result.key,
+          size: result.size,
+          url: result.url
+        },
+        signedUrl: signedUrl.substring(0, 80) + '...',
+        deleteResult
+      }
+    });
+    
+  } catch (error) {
+    console.error('❌ S3 test failed:', error);
+    res.status(500).json({
+      success: false,
+      message: 'S3 storage test failed',
+      error: error.message
+    });
+  }
+});
+
+// Create media record after S3 upload (for presigned POST flow)
+router.post('/create-record', authenticateToken, [
+  body('s3Key').notEmpty(),
+  body('tier').isIn(['picture', 'solo_video', 'collab_video']),
+  body('title').notEmpty().trim().isLength({ min: 1, max: 100 }),
+  body('mimeType').notEmpty(),
+  body('fileSize').isInt({ min: 1 }),
+  body('type').isIn(['image', 'video']),
+], async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const { s3Key, tier, title, description, mimeType, fileSize, type } = req.body;
+
+    // Check if user is a creator
+    if (!req.user.isCreator) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only creators can upload media'
+      });
+    }
+
+    // Create MediaItem record
+    const { MediaItem } = await import('../models/index.js');
+    const mediaItem = await MediaItem.create({
+      creatorId: req.user.id,
+      title,
+      description: description || '',
+      type,
+      tier,
+      mimeType,
+      s3Key,
+      fileSize,
+      isPublished: false, // Require manual publishing
+      publishedAt: null,
+      sortOrder: 0,
+      s3Bucket: process.env.S3_BUCKET_NAME || 'void-media',
+      storageProvider: 'minio'
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Media record created successfully',
+      mediaItem: {
+        ...mediaItem.toJSON(),
+        s3Key: undefined // Don't expose S3 key
+      }
+    });
+
   } catch (error) {
     next(error);
   }

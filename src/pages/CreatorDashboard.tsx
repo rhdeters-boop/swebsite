@@ -55,8 +55,12 @@ const CreatorDashboard: React.FC = () => {
         setCreator(response.data);
       } catch (err: any) {
         if (err.response?.status === 404) {
-          // User is not a creator, redirect to regular profile
-          navigate('/profile', { replace: true });
+          // User is not a creator, redirect to user profile
+          if (user?.username) {
+            navigate(`/user/${user.username}`, { replace: true });
+          } else {
+            navigate('/creators', { replace: true });
+          }
           return;
         }
         setError('Failed to load creator data');
@@ -91,7 +95,7 @@ const CreatorDashboard: React.FC = () => {
   }
 
   if (!creator && !isLoading) {
-    return null; // Will redirect to /profile
+    return null; // Will redirect to user profile
   }
 
   const renderTabContent = () => {

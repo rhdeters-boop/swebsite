@@ -96,7 +96,6 @@ const Creator = sequelize.define('Creator', {
     },
     {
       fields: ['categories'],
-      using: 'gin',
     },
     {
       fields: ['like_count'],

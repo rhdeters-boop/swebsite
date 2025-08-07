@@ -220,7 +220,7 @@ class AuthService {
   /**
    * Update user profile
    */
-  async updateProfile(userId, { firstName, lastName, username, displayName, profilePicture }) {
+  async updateProfile(userId, { firstName, lastName, username, displayName, profilePicture, bannerImage, bio }) {
     // Check if username is already taken by another user
     if (username) {
       const existingUser = await User.findOne({
@@ -243,6 +243,8 @@ class AuthService {
         username,
         displayName,
         profilePicture,
+        bannerImage,
+        bio
       },
       {
         where: { id: userId }

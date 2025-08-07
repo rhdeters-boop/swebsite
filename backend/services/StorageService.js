@@ -142,6 +142,29 @@ class StorageService {
   }
 
   /**
+   * Generate presigned upload URL for profile uploads (profile picture, banner)
+   * @param {string} type - Upload type (profile or banner)
+   * @param {string} userId - User ID
+   * @param {string} contentType - File MIME type
+   * @param {number} maxFileSize - Maximum file size in bytes
+   * @returns {Promise<object>} Upload URL data
+   */
+  async getPresignedProfileUploadUrl(type, userId, contentType, maxFileSize = 10 * 1024 * 1024) {
+    if (!this.service) {
+      throw new Error('Storage service not initialized');
+    }
+
+    if (this.provider === 'azure' && this.service.getPresignedProfileUploadUrl) {
+      return await this.service.getPresignedProfileUploadUrl(type, userId, contentType, maxFileSize);
+    } else if (this.provider === 'minio' && this.service.getPresignedPost) {
+      // Use the existing S3 presigned POST method but with profile path
+      return await this.service.getPresignedPost('profile', userId, contentType, type);
+    } else {
+      throw new Error('Presigned profile uploads not supported by current storage provider');
+    }
+  }
+
+  /**
    * Generate presigned upload URL (if supported by provider)
    * @param {string} tier - Subscription tier
    * @param {string} creatorId - Creator ID

@@ -55,4 +55,52 @@ router.get('/s3', async (req, res) => {
   }
 });
 
+// Test S3 storage functionality
+router.get('/test-s3', async (req, res) => {
+  try {
+    console.log('🧪 Testing S3 storage...');
+    
+    // Initialize S3 service
+    await S3Service.initWithRetry(3, 1000);
+    
+    // Test file upload with a small buffer
+    const testBuffer = Buffer.from('This is a test file for S3 storage', 'utf8');
+    const result = await S3Service.uploadFile(
+      testBuffer,
+      'test-file.txt',
+      'text/plain',
+      'picture',
+      'test-creator-' + Date.now()
+    );
+    
+    // Test signed URL generation
+    const signedUrl = await S3Service.getSignedUrl(result.key, 300); // 5 minutes
+    
+    // Test file deletion
+    const deleteResult = await S3Service.deleteFile(result.key);
+    
+    res.json({
+      success: true,
+      message: 'S3 storage test completed successfully',
+      results: {
+        upload: {
+          key: result.key,
+          size: result.size,
+          url: result.url
+        },
+        signedUrl: signedUrl.substring(0, 80) + '...',
+        deleteResult
+      }
+    });
+    
+  } catch (error) {
+    console.error('❌ S3 test failed:', error);
+    res.status(500).json({
+      success: false,
+      message: 'S3 storage test failed',
+      error: error.message
+    });
+  }
+});
+
 export default router;

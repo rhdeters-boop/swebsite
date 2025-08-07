@@ -46,25 +46,20 @@ const MediaItem = sequelize.define('MediaItem', {
   s3Key: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true,
-    comment: 'Storage key/path for the file (works for both Azure blob names and S3 keys)',
   },
   s3Url: {
     type: DataTypes.STRING,
-    allowNull: true, // Store the original upload URL
-    comment: 'Original upload URL (may be used for direct access)',
+    allowNull: true,
   },
   s3Bucket: {
     type: DataTypes.STRING,
     allowNull: true,
-    defaultValue: process.env.S3_BUCKET_NAME || process.env.AZURE_CONTAINER_NAME || 'void-media',
-    comment: 'Storage container name (S3 bucket or Azure container)',
+    defaultValue: 'void-media',
   },
   storageProvider: {
     type: DataTypes.ENUM('azure', 'minio', 's3'),
     allowNull: false,
-    defaultValue: process.env.STORAGE_PROVIDER || 'minio',
-    comment: 'Storage provider used for this file',
+    defaultValue: 'minio',
   },
   thumbnailS3Key: {
     type: DataTypes.STRING,
@@ -110,6 +105,26 @@ const MediaItem = sequelize.define('MediaItem', {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
+}, {
+  tableName: 'media_items',
+  indexes: [
+    {
+      unique: true,
+      fields: ['s3_key']
+    },
+    {
+      fields: ['creator_id']
+    },
+    {
+      fields: ['type']
+    },
+    {
+      fields: ['tier']
+    },
+    {
+      fields: ['is_published']
+    }
+  ]
 });
 
 // Instance method to generate signed URL

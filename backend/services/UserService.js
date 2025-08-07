@@ -2,6 +2,20 @@ import { User } from '../models/index.js';
 
 class UserService {
   /**
+   * Get all users (admin function)
+   */
+  async getAllUsers() {
+    const users = await User.findAll({
+      attributes: { 
+        exclude: ['password'] // Always exclude password from responses
+      },
+      order: [['createdAt', 'DESC']] // Most recent first
+    });
+
+    return users;
+  }
+
+  /**
    * Get user profile by ID
    */
   async getUserProfile(userId) {

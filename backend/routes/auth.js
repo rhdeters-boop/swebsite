@@ -198,11 +198,25 @@ router.get('/verify-reset-token/:token', async (req, res, next) => {
 
 // Update user profile
 router.put('/profile', authenticateToken, [
-  body('firstName').optional().trim().isLength({ min: 1, max: 50 }),
-  body('lastName').optional().trim().isLength({ min: 1, max: 50 }),
+  body('firstName').optional().trim().custom((value) => {
+    if (!value || value === '') return true; // Allow empty strings
+    return value.length >= 1 && value.length <= 50; // Validate length if not empty
+  }),
+  body('lastName').optional().trim().custom((value) => {
+    if (!value || value === '') return true; // Allow empty strings
+    return value.length >= 1 && value.length <= 50; // Validate length if not empty
+  }),
   body('username').optional().trim().isLength({ min: 3, max: 30 }).matches(/^[a-zA-Z0-9_]+$/),
   body('displayName').optional().trim().isLength({ min: 1, max: 100 }),
-  body('profilePicture').optional().isURL(),
+  body('profilePicture').optional().custom((value) => {
+    if (!value || value === '') return true; // Allow empty strings
+    return /^https?:\/\/.+/.test(value); // Validate URL format
+  }),
+  body('bannerImage').optional().custom((value) => {
+    if (!value || value === '') return true; // Allow empty strings
+    return /^https?:\/\/.+/.test(value); // Validate URL format
+  }),
+  body('bio').optional().trim().isLength({ max: 1000 }),
 ], async (req, res, next) => {
   try {
     const errors = validationResult(req);
@@ -214,14 +228,16 @@ router.put('/profile', authenticateToken, [
       });
     }
 
-    const { firstName, lastName, username, displayName, profilePicture } = req.body;
+    const { firstName, lastName, username, displayName, profilePicture, bannerImage, bio } = req.body;
 
     const updatedUser = await AuthService.updateProfile(req.user.id, {
       firstName,
       lastName,
       username,
       displayName,
-      profilePicture
+      profilePicture,
+      bannerImage,
+      bio
     });
 
     res.json({

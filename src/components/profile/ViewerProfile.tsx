@@ -3,7 +3,7 @@ import { User, Edit, Save, X, Camera } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import FormInput from '../form/FormInput';
-import ImageUploadModal from '../modals/ImageUploadModal';
+import ProfileImageUpload from './ProfileImageUpload';
 
 interface ProfileFormData {
   displayName: string;
@@ -24,8 +24,8 @@ const ViewerProfile: React.FC<ViewerProfileProps> = ({ username }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  const [showBannerModal, setShowBannerModal] = useState(false);
-  const [showProfilePictureModal, setShowProfilePictureModal] = useState(false);
+  const [showProfileUpload, setShowProfileUpload] = useState(false);
+  const [showBannerUpload, setShowBannerUpload] = useState(false);
 
   // Determine if current user can edit this profile
   const canEdit = currentUser && currentUser.username === username;
@@ -88,21 +88,27 @@ const ViewerProfile: React.FC<ViewerProfileProps> = ({ username }) => {
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
       
-      const response = await axios.put('/auth/profile', {
+      const requestData = {
         firstName,
         lastName,
         username: profileData.username,
         displayName: profileData.displayName,
         bio: profileData.bio,
-        profilePicture: profileData.profilePicture,
-        bannerImage: profileData.bannerImage,
-      });
+        // Only include URLs if they're not empty
+        ...(profileData.profilePicture && { profilePicture: profileData.profilePicture }),
+        ...(profileData.bannerImage && { bannerImage: profileData.bannerImage }),
+      };
+      
+      console.log('Sending profile update request:', requestData);
+      
+      const response = await axios.put('/auth/profile', requestData);
 
       // Update the user context with new data
       updateUser(response.data.user);
       setSuccess('Profile updated successfully!');
       setIsEditing(false); // Exit edit mode after successful update
     } catch (err: any) {
+      console.error('Profile update error:', err.response?.data);
       setError(err.response?.data?.message || 'Failed to update profile. Please try again.');
     } finally {
       setIsLoading(false);
@@ -125,10 +131,12 @@ const ViewerProfile: React.FC<ViewerProfileProps> = ({ username }) => {
 
   const handleBannerImageSave = (imageUrl: string) => {
     setProfileData(prev => ({ ...prev, bannerImage: imageUrl }));
+    setSuccess('Banner image uploaded successfully!');
   };
 
   const handleProfilePictureSave = (imageUrl: string) => {
     setProfileData(prev => ({ ...prev, profilePicture: imageUrl }));
+    setSuccess('Profile picture uploaded successfully!');
   };
 
   // Loading state
@@ -165,13 +173,13 @@ const ViewerProfile: React.FC<ViewerProfileProps> = ({ username }) => {
              style={{
                backgroundImage: `url('${isEditing ? profileData.bannerImage || '/background2.jpg' : profileUser?.bannerImage || '/background2.jpg'}')`
              }}
-             onClick={isEditing && canEdit ? () => setShowBannerModal(true) : undefined}>
+             onClick={isEditing && canEdit ? () => setShowBannerUpload(true) : undefined}>
         </div>
         
         {/* Banner edit overlay */}
         {isEditing && canEdit && (
           <div className="absolute inset-0 bg-background-overlay/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
-               onClick={() => setShowBannerModal(true)}>
+               onClick={() => setShowBannerUpload(true)}>
             <div className="text-center text-white">
               <Camera className="h-8 w-8 mx-auto mb-2" />
               <p className="text-sm font-medium">Click to change banner</p>
@@ -201,7 +209,7 @@ const ViewerProfile: React.FC<ViewerProfileProps> = ({ username }) => {
             </div>
             {isEditing && canEdit && (
               <div className="absolute inset-0 bg-background-overlay/80 rounded-full flex items-center justify-center cursor-pointer hover:bg-background-overlay/90 transition-all duration-200"
-                   onClick={() => setShowProfilePictureModal(true)}>
+                   onClick={() => setShowProfileUpload(true)}>
                 <Camera className="h-6 w-6 text-text-on-dark" />
               </div>
             )}
@@ -419,23 +427,29 @@ const ViewerProfile: React.FC<ViewerProfileProps> = ({ username }) => {
         </div>
       </div>
 
-      {/* Image Upload Modals */}
-      <ImageUploadModal
-        isOpen={showBannerModal}
-        onClose={() => setShowBannerModal(false)}
-        onSave={handleBannerImageSave}
+      {/* S3 Image Upload Modals */}
+      <ProfileImageUpload
+        isOpen={showBannerUpload}
+        onClose={() => setShowBannerUpload(false)}
+        onImageUploaded={(url: string) => {
+          handleBannerImageSave(url);
+          setShowBannerUpload(false);
+        }}
         title="Change Banner Image"
         currentImage={profileData.bannerImage}
-        placeholder="https://example.com/banner.jpg"
+        type="banner"
       />
 
-      <ImageUploadModal
-        isOpen={showProfilePictureModal}
-        onClose={() => setShowProfilePictureModal(false)}
-        onSave={handleProfilePictureSave}
+      <ProfileImageUpload
+        isOpen={showProfileUpload}
+        onClose={() => setShowProfileUpload(false)}
+        onImageUploaded={(url: string) => {
+          handleProfilePictureSave(url);
+          setShowProfileUpload(false);
+        }}
         title="Change Profile Picture"
         currentImage={profileData.profilePicture}
-        placeholder="https://example.com/profile.jpg"
+        type="profile"
       />
     </div>
   );

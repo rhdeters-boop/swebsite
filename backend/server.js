@@ -113,6 +113,41 @@ app.use('/api/health', healthRoutes); // Health checks (public)
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes); // Changed: Remove auth middleware to allow public routes
 app.use('/api/subscriptions', authenticateToken, subscriptionRoutes);
+// Public profile image serving (must come before protected media routes)
+app.get('/api/media/profile/:userId/:type/:filename', async (req, res, next) => {
+  try {
+    const { userId, type, filename } = req.params;
+    
+    // Validate type
+    if (!['profile', 'banner'].includes(type)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid profile image type'
+      });
+    }
+
+    // Import MediaService dynamically
+    const { default: MediaService } = await import('./services/MediaService.js');
+    
+    // Construct the S3 key
+    const s3Key = `profiles/${userId}/${type}/${filename}`;
+    
+    // Get signed URL from storage service
+    const signedUrl = await MediaService.getProfileImageUrl(s3Key);
+    
+    // Redirect to the signed URL
+    res.redirect(signedUrl);
+    
+  } catch (error) {
+    if (error.message && error.message.includes('not found')) {
+      return res.status(404).json({
+        success: false,
+        message: 'Profile image not found'
+      });
+    }
+    next(error);
+  }
+});
 app.use('/api/media', authenticateToken, mediaRoutes);
 app.use('/api/analytics', analyticsRoutes); // Mixed public and protected routes
 app.use('/api/payments', paymentRoutes); // Some payment routes need to be public for webhooks

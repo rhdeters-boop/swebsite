@@ -224,18 +224,43 @@ class S3Service {
     }
   }
 
-  /**
-   * Generate a presigned POST URL for direct browser uploads
-   * @param {string} tier - Subscription tier
-   * @param {string} creatorId - Creator ID
+    /**
+   * Generate presigned POST URL for browser uploads
+   * @param {string} tier - Subscription tier (picture, solo_video, collab_video) OR 'profile'
+   * @param {string} creatorId - Creator ID OR User ID for profiles
    * @param {string} contentType - File MIME type
-   * @param {number} maxFileSize - Maximum file size in bytes
-   * @returns {Promise<{url: string, fields: object}>}
+   * @param {number|string} maxFileSize - Maximum file size in bytes OR profile type (profile, banner)
+   * @returns {Promise<object>} Presigned POST data
    */
   async getPresignedPost(tier, creatorId, contentType, maxFileSize = 100 * 1024 * 1024) {
     await this.init();
 
-    const key = `media/${creatorId}/${tier}/${uuidv4()}`;
+    let key;
+    let tags;
+    let conditions;
+    
+    // Handle profile uploads differently
+    if (tier === 'profile') {
+      const profileType = typeof maxFileSize === 'string' ? maxFileSize : 'profile';
+      const actualMaxSize = typeof maxFileSize === 'string' ? 10 * 1024 * 1024 : maxFileSize;
+      
+      key = `profiles/${creatorId}/${profileType}/${uuidv4()}`;
+      tags = `Access=Public&Type=Profile&UserId=${creatorId}`;
+      conditions = [
+        ['content-length-range', 0, actualMaxSize],
+        ['starts-with', '$Content-Type', 'image/'], // Only allow images for profiles
+        ['eq', '$x-amz-meta-user-id', creatorId]
+      ];
+    } else {
+      // Regular media uploads
+      key = `media/${creatorId}/${tier}/${uuidv4()}`;
+      tags = `Access=Premium&Tier=${tier}&CreatorId=${creatorId}`;
+      conditions = [
+        ['content-length-range', 0, maxFileSize],
+        ['starts-with', '$Content-Type', contentType.split('/')[0]],
+        ['eq', '$x-amz-meta-tier', tier]
+      ];
+    }
     
     const params = {
       Bucket: this.bucketName,
@@ -243,14 +268,11 @@ class S3Service {
       Fields: {
         'Content-Type': contentType,
         'x-amz-meta-creator-id': creatorId,
+        'x-amz-meta-user-id': creatorId,
         'x-amz-meta-tier': tier,
-        'x-amz-tagging': `Access=Premium&Tier=${tier}&CreatorId=${creatorId}`
+        'x-amz-tagging': tags
       },
-      Conditions: [
-        ['content-length-range', 0, maxFileSize],
-        ['starts-with', '$Content-Type', contentType.split('/')[0]],
-        ['eq', '$x-amz-meta-tier', tier]
-      ],
+      Conditions: conditions,
       Expires: 3600 // 1 hour
     };
 

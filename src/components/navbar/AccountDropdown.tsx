@@ -127,7 +127,7 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ onClose }) => {
         }`}>
           <div className="py-2">
             <Link
-              to="/profile"
+              to={user?.username ? `/user/${user.username}` : '/creators'}
               onClick={handleLinkClick}
               className="flex items-center space-x-3 px-4 py-3 text-text-secondary hover:text-text-primary hover:bg-background-secondary transition-colors duration-200"
             >

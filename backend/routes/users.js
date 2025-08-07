@@ -4,6 +4,20 @@ import { authenticateToken } from '../middleware/auth.js';
 import UserService from '../services/UserService.js';
 
 const router = express.Router();
+// Get all users (admin endpoint - for now, no auth required for testing)
+router.get('/', async (req, res, next) => {
+  try {
+    const users = await UserService.getAllUsers();
+    
+    res.json({
+      success: true,
+      users,
+      count: users.length
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
 // Get user profile
 router.get('/profile', authenticateToken, async (req, res, next) => {

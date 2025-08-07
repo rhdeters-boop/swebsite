@@ -34,7 +34,7 @@ export const connectDB = async () => {
     // Sync database in development (less verbose)
     if (process.env.NODE_ENV === 'development') {
       await sequelize.sync({ 
-        alter: true,
+        alter: true, // Use alter for safer updates
         logging: process.env.DB_LOGGING === 'true' ? console.log : false
       });
       console.log('📊 Database synced');

@@ -149,6 +149,36 @@ class MediaService {
   }
 
   /**
+   * Get signed URL for profile image
+   */
+  async getProfileImageUrl(s3Key) {
+    const signedUrl = await StorageService.getSignedUrl(s3Key, 3600); // 1 hour expiry
+    return signedUrl;
+  }
+
+  /**
+   * Get presigned POST URL for profile uploads (profile picture, banner)
+   */
+  async getPresignedProfileUploadUrl({ type, contentType, maxFileSize }, userId) {
+    if (!type || !['profile', 'banner'].includes(type)) {
+      throw new Error('Valid type is required (profile, banner)');
+    }
+
+    if (!contentType || !contentType.startsWith('image/')) {
+      throw new Error('Content type must be an image');
+    }
+
+    const presignedPost = await StorageService.getPresignedProfileUploadUrl(
+      type,
+      userId,
+      contentType,
+      maxFileSize || 10 * 1024 * 1024 // 10MB default for profile images
+    );
+
+    return presignedPost;
+  }
+
+  /**
    * Get presigned POST URL for direct browser uploads
    */
   async getPresignedUploadUrl({ tier, contentType, maxFileSize }, creatorId) {
