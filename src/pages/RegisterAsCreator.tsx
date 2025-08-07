@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Star } from 'lucide-react';
 import AuthSection from '../components/auth/AuthSection';
 import FormInput from '../components/form/FormInput';
 import PasswordInput from '../components/form/PasswordInput';
@@ -9,14 +9,15 @@ import VoidLogo from '../components/VoidLogo';
 import BackButton from '../components/BackButton';
 import { useUsernameValidation } from '../hooks/useUsernameValidation';
 import { usePasswordValidation } from '../hooks/usePasswordValidation';
-import { getUsernameStatusIcon, getUsernameError, getPasswordError } from '../utils/registerHelpers';
+import { getUsernameStatusIcon, getUsernameError } from '../utils/registerHelpers';
 
-const Register: React.FC = () => {
+const RegisterAsCreator: React.FC = () => {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
     confirmPassword: '',
+    wantsToBecomeCreator: true, // This flag indicates creator registration
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -63,8 +64,10 @@ const Register: React.FC = () => {
         username: formData.username,
         email: formData.email,
         password: formData.password,
+        wantsToBecomeCreator: true, // Flag for creator registration
       });
-      navigate('/create-profile');
+      // For creators, navigate to creator profile creation instead of regular profile
+            navigate('/create-creator-profile');
     } catch (err) {
       // Error is handled by the auth context
     } finally {
@@ -73,16 +76,16 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
+    <div className=" min-h-screen flex flex-col items-center justify-center px-4 py-2">
       <BackButton />
 
       <AuthSection
         title={
-          <>
-            Enter the <span className="text-lust-violet text-shadow-void-glow">Void</span>
-          </>
+          <div className="flex items-center justify-center space-x-2">
+            <span>Join as a <span className="text-seductive-dark text-shadow-void-glow">Creator</span></span>
+          </div>
         }
-        subtitle="Create your account - we'll set up your profile next"
+        subtitle="First create an account"
         icon={<VoidLogo className="h-12 w-12" />}
         footer={
           <>
@@ -96,12 +99,13 @@ const Register: React.FC = () => {
               </Link>
             </p>
             <div className="mt-4 text-sm text-gray-400">
-              <p>🎉 Join creators • 💳 Secure payments • 🔒 Private & protected</p>
+              <p>🎨 Create content • 💰 Earn money • 🌟 Build your brand</p>
             </div>
           </>
         }
       >
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Display error message */}
         {error && (
           <div className="bg-red-900/20 border border-red-500/30 text-red-300 px-4 py-3 rounded-lg">
             {error}
@@ -132,11 +136,11 @@ const Register: React.FC = () => {
         <FormInput
           id="email"
           name="email"
-          type="email"
           label="Email Address"
+          type="email"
           value={formData.email}
           onChange={handleChange}
-          placeholder="Enter your email"
+          placeholder="creator@example.com"
           required
         />
 
@@ -146,11 +150,10 @@ const Register: React.FC = () => {
           label="Password"
           value={formData.password}
           onChange={handleChange}
-          placeholder="Create a password"
-          showValidation={true}
-          validation={passwordValidation}
           showPassword={showPassword}
-          onTogglePassword={() => { setShowPassword(!showPassword); }}
+          onTogglePassword={() => setShowPassword(!showPassword)}
+          validation={passwordValidation}
+          showValidation={true}
           required
         />
 
@@ -160,35 +163,15 @@ const Register: React.FC = () => {
           label="Confirm Password"
           value={formData.confirmPassword}
           onChange={handleChange}
-          placeholder="Confirm your password"
-          className={formData.confirmPassword && !passwordsMatch ? 'border-red-500/50' : ''}
           showPassword={showPassword}
-          onTogglePassword={() => { setShowPassword(!showPassword); }}
+          onTogglePassword={() => setShowPassword(!showPassword)}
           required
         />
-        {getPasswordError(formData.password, formData.confirmPassword) && (
-          <p className="mt-1 text-sm text-red-400">{getPasswordError(formData.password, formData.confirmPassword)}</p>
-        )}
 
-        <div className="flex items-center">
-          <input
-            id="terms"
-            name="terms"
-            type="checkbox"
-            required
-            className="h-4 w-4 text-void-accent focus:ring-void-accent border-void-500/30 rounded bg-void-dark-900"
-          />
-          <label htmlFor="terms" className="ml-2 block text-sm text-gray-300">
-            I agree to the{' '}
-            <Link to="/terms" className="text-void-accent-light hover:text-seductive-light transition-colors duration-200">
-              Terms of Service
-            </Link>{' '}
-            and{' '}
-            <Link to="/privacy" className="text-void-accent-light hover:text-seductive-light transition-colors duration-200">
-              Privacy Policy
-            </Link>
-          </label>
-        </div>
+        {/* Password match validation message */}
+        {formData.confirmPassword && !passwordsMatch && (
+          <p className="text-sm text-red-400 -mt-2">Passwords do not match</p>
+        )}
 
         <button
           type="submit"
@@ -198,10 +181,13 @@ const Register: React.FC = () => {
           {isLoading ? (
             <>
               <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-              Creating Account...
+              Creating Creator Account...
             </>
           ) : (
-            'Create Account'
+            <>
+              <Star className="h-5 w-5 mr-2" />
+              Become a Creator
+            </>
           )}
         </button>
       </form>
@@ -210,4 +196,4 @@ const Register: React.FC = () => {
   );
 };
 
-export default Register;
+export default RegisterAsCreator;

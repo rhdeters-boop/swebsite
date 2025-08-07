@@ -80,8 +80,31 @@ export const useSubscriptions = (): UseSubscriptionsReturn => {
 };
 
 // Separate hook for grouped subscriptions used in Following page
-export const useFollowedCreators = () => {
-  const { subscriptions, loading, error, refetch } = useSubscriptions();
+export const useFollowedCreators = (enabled: boolean = true) => {
+  const [subscriptions, setSubscriptions] = useState<SubscriptionData[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchSubscriptions = async () => {
+    if (!enabled) return;
+    
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await subscriptionsApi.getUserCreatorSubscriptions();
+      setSubscriptions(response.subscriptions);
+    } catch (err) {
+      console.error('Error fetching subscriptions:', err);
+      setError('Failed to load subscriptions. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSubscriptions();
+  }, [enabled]);
 
   const followedCreators = subscriptions.map(convertSubscriptionToCreator);
 
@@ -92,6 +115,6 @@ export const useFollowedCreators = () => {
     basic: followedCreators.filter(c => c.subscriptionType === 'basic'),
     loading,
     error,
-    refetch,
+    refetch: fetchSubscriptions,
   };
 };

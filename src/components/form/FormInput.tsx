@@ -15,6 +15,7 @@ interface FormInputProps {
   pattern?: string;
   title?: string;
   rightElement?: React.ReactNode;
+  autoComplete?: string;
 }
 
 const FormInput: React.FC<FormInputProps> = ({
@@ -30,7 +31,8 @@ const FormInput: React.FC<FormInputProps> = ({
   error,
   pattern,
   title,
-  rightElement
+  rightElement,
+  autoComplete
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   
@@ -45,9 +47,9 @@ const FormInput: React.FC<FormInputProps> = ({
           type={type}
           required={required}
           value={value}
-          onChange={onChange}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          onChange={(e) => { onChange(e); }}
+          onFocus={() => { setIsFocused(true); }}
+          onBlur={() => { setIsFocused(false); }}
           disabled={disabled}
           className={`form-input pt-6 ${rightElement ? 'pr-10' : ''} ${
             error ? 'border-red-500/50' : ''
@@ -55,12 +57,13 @@ const FormInput: React.FC<FormInputProps> = ({
           placeholder={isLabelFloating ? "" : ""}
           pattern={pattern}
           title={title}
+          autoComplete={autoComplete}
         />
         <label 
           htmlFor={id} 
           className={`absolute left-3 px-2 text-sm font-medium text-gray-300 transition-all duration-200 pointer-events-none ${
             isLabelFloating 
-              ? '-top-2.5 bg-void-dark-900 text-gray-300' 
+              ? '-top-2.5 bg-background-secondary text-gray-300' 
               : 'top-1/2 -translate-y-1/2 text-gray-400'
           }`}
         >

@@ -10,6 +10,7 @@ import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
 import Landing from './pages/Landing';
 import Explore from './pages/Explore';
+import MyFeed from './pages/MyFeed';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
@@ -17,7 +18,6 @@ import ResetPassword from './pages/ResetPassword';
 import Profile from './pages/Profile';
 import AccountSettings from './pages/AccountSettings';
 import Dashboard from './pages/Dashboard';
-import MediaGallery from './pages/MediaGallery';
 import BecomeCreator from './pages/BecomeCreator';
 import CreatorSearch from './pages/CreatorSearch';
 import CreatorProfile from './pages/CreatorProfile';
@@ -33,6 +33,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 // Context
 import { AuthProvider } from './context/AuthContext';
 import CreateProfile from './pages/CreateProfile';
+import RegisterAsCreator from './pages/RegisterAsCreator';
+import CreateCreatorProfile from './pages/CreateCreatorProfile';
 
 // Initialize Stripe
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_...');
@@ -52,7 +54,7 @@ const AppContent = () => {
   const location = useLocation();
   
   // Routes where navbar should be hidden
-  const authRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
+  const authRoutes = ['/login', '/register', '/register-creator', '/forgot-password', '/reset-password'];
   const hideNavbar = authRoutes.includes(location.pathname);
 
   return (
@@ -62,10 +64,13 @@ const AppContent = () => {
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Explore />} />
+          <Route path="/my-feed" element={<MyFeed />} />
           <Route path="/landing" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/register-creator" element={<RegisterAsCreator />} />
           <Route path="/create-profile" element={<CreateProfile />} />
+          <Route path="/create-creator-profile" element={<CreateCreatorProfile />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/become-creator" element={<BecomeCreator />} />
@@ -109,22 +114,6 @@ const AppContent = () => {
             element={
               <ProtectedRoute>
                 <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/gallery/:tier"
-            element={
-              <ProtectedRoute>
-                <MediaGallery />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/gallery"
-            element={
-              <ProtectedRoute>
-                <MediaGallery />
               </ProtectedRoute>
             }
           />

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Camera } from 'lucide-react';
-import AuthCard from '../components/auth/AuthCard';
+import AuthSection from '../components/auth/AuthSection';
 import FormInput from '../components/form/FormInput';
 
 const CreateProfile: React.FC = () => {
@@ -55,7 +55,8 @@ const CreateProfile: React.FC = () => {
   };
 
   return (
-    <AuthCard
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
+    <AuthSection
       title="Create Your Profile"
       subtitle="Tell the community a bit about yourself"
       icon={<User className="h-12 w-12 text-void-accent" />}
@@ -137,7 +138,8 @@ const CreateProfile: React.FC = () => {
           </button>
         </div>
       </form>
-    </AuthCard>
+    </AuthSection>
+    </div>
   );
 };
 

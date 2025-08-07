@@ -1,5 +1,40 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Lato:wght@400;700&display=swap');
 
+.auth-section {
+  @apply bg-background-card backdrop-blur-sm rounded-xl shadow-card p-6 border border-border-secondary;
+}
+
+/* === FORM COMPONENTS === */
+.form-input {
+  @apply w-full px-4 py-3 border border-border-muted bg-background-secondary text-text-primary rounded-xl focus:ring-2 focus:ring-void-accent focus:border-border-primary transition-all duration-200 placeholder-text-muted;
+}
+
+/* Fix autofill styles to maintain dark theme */
+.form-input:-webkit-autofill,
+.form-input:-webkit-autofill:hover,
+.form-input:-webkit-autofill:focus,
+.form-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #1a1a2e inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  border-color: rgba(107, 114, 128, 0.2) !important;
+  transition: background-color 5000s ease-in-out 0s;
+  caret-color: #ffffff !important; /* Ensure cursor is visible */
+}
+
+/* Ensure cursor is visible when focused after autofill */
+.form-input:-webkit-autofill:focus {
+  caret-color: #ffffff !important;
+  outline: none !important;
+}
+
+.form-input-error {
+  @apply w-full px-4 py-3 border border-border-error bg-background-secondary text-text-primary rounded-xl focus:ring-2 focus:ring-error focus:border-border-error transition-all duration-200 placeholder-text-muted;
+}
+
+.form-input-success {
+  @apply w-full px-4 py-3 border border-border-success bg-background-secondary text-text-primary rounded-xl focus:ring-2 focus:ring-success focus:border-border-success transition-all duration-200 placeholder-text-muted;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -101,17 +136,21 @@ html, body {
   @apply bg-background-card rounded-xl shadow-modal p-8 border border-border-primary;
 }
 
+.auth-section {
+  @apply bg-background-section backdrop-blur-sm rounded-xl shadow-card p-6 sm:p-8 lg:p-10 border border-border-secondary;
+}
+
 /* === FORM COMPONENTS === */
 .form-input {
-  @apply w-full px-4 py-3 border border-border-muted bg-background-secondary/50 text-text-primary rounded-xl focus:ring-2 focus:ring-void-accent focus:border-border-primary transition-all duration-200 placeholder-text-muted;
+  @apply w-full px-4 py-3 border border-border-muted bg-background-secondary/50 text-text-primary rounded-xl focus:ring-2 focus:ring-void-accent/30 focus:border-border-primary focus:bg-background-secondary/70 transition-all duration-200 placeholder-text-muted;
 }
 
 .form-input-error {
-  @apply w-full px-4 py-3 border border-border-error bg-background-secondary/50 text-text-primary rounded-xl focus:ring-2 focus:ring-error focus:border-border-error transition-all duration-200 placeholder-text-muted;
+  @apply w-full px-4 py-3 border border-border-error bg-background-secondary/50 text-text-primary rounded-xl focus:ring-2 focus:ring-error/30 focus:border-border-error focus:bg-background-secondary/70 transition-all duration-200 placeholder-text-muted;
 }
 
 .form-input-success {
-  @apply w-full px-4 py-3 border border-border-success bg-background-secondary/50 text-text-primary rounded-xl focus:ring-2 focus:ring-success focus:border-border-success transition-all duration-200 placeholder-text-muted;
+  @apply w-full px-4 py-3 border border-border-success bg-background-secondary/50 text-text-primary rounded-xl focus:ring-2 focus:ring-success/30 focus:border-border-success focus:bg-background-secondary/70 transition-all duration-200 placeholder-text-muted;
 }
 
 .form-textarea {

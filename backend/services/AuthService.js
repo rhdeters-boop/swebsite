@@ -2,14 +2,14 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { Op } from 'sequelize';
-import { User, PasswordResetToken } from '../models/index.js';
+import { User, PasswordResetToken, Creator } from '../models/index.js';
 import EmailService from './EmailService.js';
 
 class AuthService {
   /**
    * Register a new user
    */
-  async registerUser({ email, password, displayName, username }) {
+  async registerUser({ email, password, displayName, username, wantsToBecomeCreator = false }) {
     // Check if user already exists
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
@@ -35,12 +35,27 @@ class AuthService {
       username
     });
 
+    // If user wants to become a creator, create basic creator profile
+    if (wantsToBecomeCreator) {
+      await Creator.create({
+        userId: user.id,
+        displayName: finalDisplayName || 'New Creator',
+        bio: 'Welcome to my page! 🌟',
+        categories: ['lifestyle'],
+        subscriptionPrice: 9.99, // Default price
+        socialLinks: {},
+        isActive: true,
+        isApproved: true // Auto-approve for now
+      });
+    }
+
     // Generate JWT token
     const token = this._generateToken(user.id);
 
     return {
       token,
-      user: user.toJSON()
+      user: user.toJSON(),
+      isCreator: wantsToBecomeCreator
     };
   }
 

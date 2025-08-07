@@ -67,7 +67,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
           htmlFor={id} 
           className={`absolute left-3 px-2 text-sm font-medium text-gray-300 transition-all duration-200 pointer-events-none ${
             isLabelFloating 
-              ? '-top-2.5 bg-void-dark-900 text-gray-300' 
+              ? '-top-2.5 bg-background-secondary text-gray-300' 
               : 'top-1/2 -translate-y-1/2 text-gray-400'
           }`}
         >

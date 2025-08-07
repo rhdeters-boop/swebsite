@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
@@ -18,6 +18,18 @@ import {
 const BecomeCreator: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  
+  // Redirect based on authentication status  
+  useEffect(() => {
+    if (isAuthenticated) {
+      // User is authenticated, redirect to creator profile creation
+      navigate('/create-creator-profile', { replace: true });
+    } else {
+      // User is not authenticated, redirect to creator registration
+      navigate('/register-creator', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     displayName: '',

@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 import plugin from 'tailwindcss/plugin';
+import forms from '@tailwindcss/forms';
 
 export default {
   content: [
@@ -136,6 +137,7 @@ export default {
           secondary: '#1a1a2e',
           tertiary: '#16213e',
           card: '#2a1a3e',
+          section: '#2a1a3e',
           overlay: 'rgba(0, 0, 0, 0.8)',
           'glass': 'rgba(26, 26, 46, 0.8)',
         },
@@ -281,7 +283,7 @@ export default {
     },
   },
   plugins: [
-    require('@tailwindcss/forms'),
+    forms,
     plugin(function ({ matchUtilities, theme }) {
       matchUtilities(
         {

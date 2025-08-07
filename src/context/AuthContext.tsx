@@ -32,6 +32,7 @@ interface RegisterData {
   password: string;
   displayName?: string;
   username?: string;
+  wantsToBecomeCreator?: boolean;
 }
 
 // Action types
