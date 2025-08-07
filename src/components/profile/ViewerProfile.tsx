@@ -49,7 +49,7 @@ const ViewerProfile: React.FC<ViewerProfileProps> = ({ username }) => {
         
         // Initialize form data
         setProfileData({
-          displayName: userData?.displayName || `${userData?.firstName || ''} ${userData?.lastName || ''}`.trim(),
+          displayName: userData?.displayName || '',
           username: userData?.username || '',
           bio: userData?.bio || '',
           profilePicture: userData?.profilePicture || '',
@@ -83,14 +83,7 @@ const ViewerProfile: React.FC<ViewerProfileProps> = ({ username }) => {
     setSuccess('');
 
     try {
-      // Split name into first and last name for the API
-      const nameParts = profileData.displayName.trim().split(' ');
-      const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || '';
-      
       const requestData = {
-        firstName,
-        lastName,
         username: profileData.username,
         displayName: profileData.displayName,
         bio: profileData.bio,
@@ -102,9 +95,23 @@ const ViewerProfile: React.FC<ViewerProfileProps> = ({ username }) => {
       console.log('Sending profile update request:', requestData);
       
       const response = await axios.put('/auth/profile', requestData);
+      const updatedUser = response.data.user;
 
       // Update the user context with new data
-      updateUser(response.data.user);
+      updateUser(updatedUser);
+      
+      // Update local profile user state
+      setProfileUser(updatedUser);
+      
+      // Update form data to match the response
+      setProfileData({
+        displayName: updatedUser?.displayName || '',
+        username: updatedUser?.username || '',
+        bio: updatedUser?.bio || '',
+        profilePicture: updatedUser?.profilePicture || '',
+        bannerImage: updatedUser?.bannerImage || '',
+      });
+      
       setSuccess('Profile updated successfully!');
       setIsEditing(false); // Exit edit mode after successful update
     } catch (err: any) {
@@ -118,7 +125,7 @@ const ViewerProfile: React.FC<ViewerProfileProps> = ({ username }) => {
   const handleCancelEdit = () => {
     // Reset form data to original user data
     setProfileData({
-      displayName: profileUser?.displayName || `${profileUser?.firstName || ''} ${profileUser?.lastName || ''}`.trim(),
+      displayName: profileUser?.displayName || '',
       username: profileUser?.username || '',
       bio: profileUser?.bio || '',
       profilePicture: profileUser?.profilePicture || '',
@@ -131,11 +138,27 @@ const ViewerProfile: React.FC<ViewerProfileProps> = ({ username }) => {
 
   const handleBannerImageSave = (imageUrl: string) => {
     setProfileData(prev => ({ ...prev, bannerImage: imageUrl }));
+    // Also update the profile user state so the UI immediately reflects the change
+    setProfileUser((prev: any) => prev ? { ...prev, bannerImage: imageUrl } : prev);
+    
+    // Update global auth context if this is the current user's profile
+    if (canEdit && currentUser) {
+      updateUser({ ...currentUser, bannerImage: imageUrl });
+    }
+    
     setSuccess('Banner image uploaded successfully!');
   };
 
   const handleProfilePictureSave = (imageUrl: string) => {
     setProfileData(prev => ({ ...prev, profilePicture: imageUrl }));
+    // Also update the profile user state so the UI immediately reflects the change
+    setProfileUser((prev: any) => prev ? { ...prev, profilePicture: imageUrl } : prev);
+    
+    // Update global auth context if this is the current user's profile
+    if (canEdit && currentUser) {
+      updateUser({ ...currentUser, profilePicture: imageUrl });
+    }
+    
     setSuccess('Profile picture uploaded successfully!');
   };
 
@@ -171,7 +194,7 @@ const ViewerProfile: React.FC<ViewerProfileProps> = ({ username }) => {
         {/* Banner Background Image Container */}
         <div className={`absolute inset-0 bg-center bg-cover bg-no-repeat ${isEditing && canEdit ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}`}
              style={{
-               backgroundImage: `url('${isEditing ? profileData.bannerImage || '/background2.jpg' : profileUser?.bannerImage || '/background2.jpg'}')`
+               backgroundImage: `url('${profileData.bannerImage || profileUser?.bannerImage || '/background2.jpg'}')`
              }}
              onClick={isEditing && canEdit ? () => setShowBannerUpload(true) : undefined}>
         </div>
@@ -197,9 +220,9 @@ const ViewerProfile: React.FC<ViewerProfileProps> = ({ username }) => {
         <div className="absolute bottom-4 left-8">
           <div className="relative">
             <div className="w-32 h-32 bg-background-tertiary rounded-full flex items-center justify-center border-4 border-background-primary shadow-2xl">
-              {(isEditing ? profileData.profilePicture : profileUser?.profilePicture) ? (
+              {(profileData.profilePicture || profileUser?.profilePicture) ? (
                 <img
-                  src={isEditing ? profileData.profilePicture : profileUser.profilePicture}
+                  src={profileData.profilePicture || profileUser?.profilePicture || ''}
                   alt="Profile"
                   className="w-32 h-32 rounded-full object-cover"
                 />

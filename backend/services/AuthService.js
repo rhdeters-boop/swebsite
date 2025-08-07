@@ -137,7 +137,7 @@ class AuthService {
       
       // Send password reset email
       try {
-        await EmailService.sendPasswordResetEmail(email, resetToken, user.firstName);
+        await EmailService.sendPasswordResetEmail(email, resetToken, user.displayName || 'User');
       } catch (emailError) {
         console.error('Failed to send password reset email:', emailError);
         // Don't reveal email sending failure to user
@@ -183,7 +183,7 @@ class AuthService {
     try {
       await EmailService.sendPasswordResetConfirmation(
         resetToken.user.email,
-        resetToken.user.firstName
+        resetToken.user.displayName || 'User'
       );
     } catch (emailError) {
       console.error('Failed to send password reset confirmation email:', emailError);
@@ -220,7 +220,7 @@ class AuthService {
   /**
    * Update user profile
    */
-  async updateProfile(userId, { firstName, lastName, username, displayName, profilePicture, bannerImage, bio }) {
+  async updateProfile(userId, { username, displayName, profilePicture, bannerImage, bio }) {
     // Check if username is already taken by another user
     if (username) {
       const existingUser = await User.findOne({
@@ -238,8 +238,6 @@ class AuthService {
     // Update user
     await User.update(
       {
-        firstName,
-        lastName,
         username,
         displayName,
         profilePicture,
@@ -253,7 +251,7 @@ class AuthService {
 
     // Fetch updated user
     const updatedUser = await User.findByPk(userId, {
-      attributes: ['id', 'email', 'firstName', 'lastName', 'username', 'displayName', 'profilePicture', 'isEmailVerified', 'lastLoginAt', 'createdAt', 'updatedAt']
+      attributes: ['id', 'email', 'username', 'displayName', 'profilePicture', 'bannerImage', 'bio', 'isEmailVerified', 'lastLoginAt', 'createdAt', 'updatedAt']
     });
 
     return updatedUser;

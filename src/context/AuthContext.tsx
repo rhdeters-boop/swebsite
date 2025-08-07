@@ -8,6 +8,8 @@ interface User {
   displayName?: string;
   username?: string;
   profilePicture?: string;
+  bannerImage?: string;
+  bio?: string;
   isEmailVerified: boolean;
   lastLoginAt?: string;
 }

@@ -37,7 +37,7 @@ const CreatorProfile: React.FC<CreatorProfileProps> = ({ user, creator }) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const [profileData, setProfileData] = useState<CreatorProfileData>({
-    displayName: user?.displayName || `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
+    displayName: user?.displayName || '',
     username: user?.username || '',
     bio: user?.bio || '',
     profilePicture: user?.profilePicture || '',
@@ -84,13 +84,7 @@ const CreatorProfile: React.FC<CreatorProfileProps> = ({ user, creator }) => {
 
     try {
       // Update user profile first
-      const nameParts = profileData.displayName.trim().split(' ');
-      const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || '';
-      
       await axios.put('/auth/profile', {
-        firstName,
-        lastName,
         username: profileData.username,
         displayName: profileData.displayName,
         bio: profileData.bio,
@@ -119,7 +113,7 @@ const CreatorProfile: React.FC<CreatorProfileProps> = ({ user, creator }) => {
 
   const handleCancelEdit = () => {
     setProfileData({
-      displayName: user?.displayName || `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
+      displayName: user?.displayName || '',
       username: user?.username || '',
       bio: user?.bio || '',
       profilePicture: user?.profilePicture || '',
