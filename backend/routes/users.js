@@ -41,8 +41,6 @@ router.get('/profile', authenticateToken, async (req, res, next) => {
 
 // Update user profile
 router.put('/profile', authenticateToken, [
-  body('firstName').optional().trim().isLength({ min: 1, max: 50 }),
-  body('lastName').optional().trim().isLength({ min: 1, max: 50 }),
   body('displayName').optional().trim().isLength({ min: 1, max: 100 }),
   body('profilePicture').optional().isURL(),
 ], async (req, res, next) => {
@@ -56,11 +54,9 @@ router.put('/profile', authenticateToken, [
       });
     }
 
-    const { firstName, lastName, displayName, profilePicture } = req.body;
+    const { displayName, profilePicture } = req.body;
 
     const user = await UserService.updateUserProfile(req.user.id, {
-      firstName,
-      lastName,
       displayName,
       profilePicture
     });

@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import Alert, { AlertProps } from '../components/Alert';
+import React, { createContext, useContext, useState } from 'react';
+import type { ReactNode } from 'react';
+import Alert from '../components/Alert';
 
 interface AlertItem {
   id: string;

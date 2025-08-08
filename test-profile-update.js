@@ -26,7 +26,7 @@ async function testProfileUpdate() {
     const updateData = {
       username: 'rhdeters',
       displayName: 'R.H. Deters',
-      bio: 'Test bio update - firstName/lastName removed!',
+      bio: 'Test bio update - /lastName removed!',
       profilePicture: '',
       bannerImage: ''
     };

@@ -19,7 +19,7 @@ export default tseslint.config([
   
   // Frontend TypeScript configuration
   {
-    files: ['src/**/*.{ts,tsx}'],
+    files: ['src/**/*.{ts,tsx,js}'],
     extends: [
       js.configs.recommended,
       ...tseslint.configs.recommended,

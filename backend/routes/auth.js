@@ -222,7 +222,7 @@ router.put('/profile', authenticateToken, [
 
     const { username, displayName, profilePicture, bannerImage, bio } = req.body;
 
-    const updatedUser = await AuthService.updateProfile(req.user.id, {
+    const result = await AuthService.updateProfile(req.user.id, {
       username,
       displayName,
       profilePicture,
@@ -233,10 +233,11 @@ router.put('/profile', authenticateToken, [
     res.json({
       success: true,
       message: 'Profile updated successfully',
-      user: updatedUser
+      user: result.user,
+      usernameChanged: result.usernameChanged
     });
   } catch (error) {
-    if (error.message === 'Username is already taken') {
+    if (error.message === 'Username is already taken' || error.message.includes('Username can only be changed once per month')) {
       return res.status(400).json({
         success: false,
         message: error.message

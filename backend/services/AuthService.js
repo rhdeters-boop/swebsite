@@ -221,8 +221,19 @@ class AuthService {
    * Update user profile
    */
   async updateProfile(userId, { username, displayName, profilePicture, bannerImage, bio }) {
-    // Check if username is already taken by another user
-    if (username) {
+    // First, get the current user to check for username changes
+    const currentUser = await User.findByPk(userId);
+    if (!currentUser) {
+      throw new Error('User not found');
+    }
+
+    let usernameChanged = false;
+
+    // Check if username is being changed
+    if (username && username !== currentUser.username) {
+      usernameChanged = true;
+
+      // Check if username is already taken by another user
       const existingUser = await User.findOne({
         where: {
           username,
@@ -233,28 +244,46 @@ class AuthService {
       if (existingUser) {
         throw new Error('Username is already taken');
       }
+
+      // Check if user can change username (30-day restriction)
+      if (currentUser.lastUsernameChangeAt) {
+        const daysSinceLastChange = (Date.now() - new Date(currentUser.lastUsernameChangeAt).getTime()) / (1000 * 60 * 60 * 24);
+        if (daysSinceLastChange < 30) {
+          const daysRemaining = Math.ceil(30 - daysSinceLastChange);
+          throw new Error(`Username can only be changed once per month. Please wait ${daysRemaining} more day${daysRemaining === 1 ? '' : 's'}.`);
+        }
+      }
+    }
+
+    // Prepare update data
+    const updateData = {
+      displayName,
+      profilePicture,
+      bannerImage,
+      bio
+    };
+
+    // Only update username and timestamp if username is actually changing
+    if (usernameChanged) {
+      updateData.username = username;
+      updateData.lastUsernameChangeAt = new Date();
     }
 
     // Update user
-    await User.update(
-      {
-        username,
-        displayName,
-        profilePicture,
-        bannerImage,
-        bio
-      },
-      {
-        where: { id: userId }
-      }
-    );
-
-    // Fetch updated user
-    const updatedUser = await User.findByPk(userId, {
-      attributes: ['id', 'email', 'username', 'displayName', 'profilePicture', 'bannerImage', 'bio', 'isEmailVerified', 'lastLoginAt', 'createdAt', 'updatedAt']
+    await User.update(updateData, {
+      where: { id: userId }
     });
 
-    return updatedUser;
+    // Fetch updated user with all necessary fields including the new tracking field
+    const updatedUser = await User.findByPk(userId, {
+      attributes: ['id', 'email', 'username', 'displayName', 'profilePicture', 'bannerImage', 'bio', 'isEmailVerified', 'lastLoginAt', 'lastUsernameChangeAt', 'createdAt', 'updatedAt']
+    });
+
+    // Return user data with flag indicating if username was changed
+    return {
+      user: updatedUser,
+      usernameChanged
+    };
   }
 
   /**

@@ -16,6 +16,7 @@ import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import AccountSettings from './pages/AccountSettings';
+import Security from './pages/Security';
 import Dashboard from './pages/Dashboard';
 import CreatorDashboard from './pages/CreatorDashboard';
 import BecomeCreator from './pages/BecomeCreator';
@@ -113,6 +114,14 @@ const AppContent = () => {
             element={
               <ProtectedRoute>
                 <AccountSettings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/security"
+            element={
+              <ProtectedRoute>
+                <Security />
               </ProtectedRoute>
             }
           />

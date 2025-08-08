@@ -33,15 +33,13 @@ class UserService {
   /**
    * Update user profile
    */
-  async updateUserProfile(userId, { firstName, lastName, displayName, profilePicture }) {
+  async updateUserProfile(userId, { displayName, profilePicture }) {
     const user = await User.findByPk(userId);
     if (!user) {
       throw new Error('User not found');
     }
 
     const updateData = {
-      firstName: firstName || user.firstName,
-      lastName: lastName || user.lastName,
       displayName: displayName || user.displayName,
       profilePicture: profilePicture || user.profilePicture
     };

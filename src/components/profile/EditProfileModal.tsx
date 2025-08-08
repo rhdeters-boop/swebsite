@@ -25,6 +25,7 @@ interface EditProfileModalProps {
   profileImageUrl: string;
   onBannerImageChange: (url: string) => void;
   onProfileImageChange: (url: string) => void;
+  originalUsername?: string; // For username change validation
 }
 
 const EditProfileModal: React.FC<EditProfileModalProps> = ({
@@ -38,6 +39,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   profileImageUrl,
   onBannerImageChange,
   onProfileImageChange,
+  originalUsername,
 }) => {
   const [isCropping, setIsCropping] = useState(false);
   const [cropType, setCropType] = useState<'profile' | 'banner' | null>(null);
@@ -48,7 +50,31 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   const [crop, setCrop] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState<number>(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+  const [showUsernameConfirmation, setShowUsernameConfirmation] = useState(false);
   const { uploadProfileImage, isUploading, isSuccess, data, reset: resetUpload, error: uploadError } = useProfileImageUpload();
+
+  // Check if username is being changed
+  const isUsernameChanged = originalUsername && profileData.username !== originalUsername;
+
+  // Handle save with username change confirmation
+  const handleSave = () => {
+    if (isUsernameChanged && !showUsernameConfirmation) {
+      setShowUsernameConfirmation(true);
+      return;
+    }
+    setShowUsernameConfirmation(false);
+    onSave();
+  };
+
+  // Handle confirmation dialog
+  const handleConfirmUsernameChange = () => {
+    setShowUsernameConfirmation(false);
+    onSave();
+  };
+
+  const handleCancelUsernameChange = () => {
+    setShowUsernameConfirmation(false);
+  };
 
   if (!isOpen) return null;
 
@@ -117,7 +143,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               {isUploading ? 'Uploading…' : 'Apply'}
             </button>
           ) : (
-            <button onClick={onSave} disabled={isSaving} className="px-4 py-1.5 rounded-full bg-void-accent text-white text-sm font-semibold disabled:opacity-50 min-w-[90px] text-center">
+            <button onClick={handleSave} disabled={isSaving} className="px-4 py-1.5 rounded-full bg-void-accent text-white text-sm font-semibold disabled:opacity-50 min-w-[90px] text-center">
               {isSaving ? 'Saving…' : 'Save'}
             </button>
           )}
@@ -183,12 +209,19 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               </div>
 
               <div className="p-5 pt-16 sm:pt-20 md:pt-24">
-                <form onSubmit={(e) => { e.preventDefault(); onSave(); }} className="space-y-4">
+                <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-4">
                   {/* Basic Information Section */}
                   <div className="space-y-3">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <FormInput id="displayName" name="displayName" label="Display Name" value={profileData.displayName} onChange={onProfileChange} placeholder="Your display name" required />
-                      <FormInput id="username" name="username" label="Username" value={profileData.username} onChange={onProfileChange} placeholder="Your unique username" required />
+                      <div>
+                        <FormInput id="username" name="username" label="Username" value={profileData.username} onChange={onProfileChange} placeholder="Your unique username" required />
+                        {isUsernameChanged && (
+                          <p className="text-warning text-xs mt-1">
+                            ⚠️ Username can only be changed once per month. This will update your profile URL.
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -220,6 +253,39 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
           )}
         </div>
       </div>
+
+      {/* Username Change Confirmation Dialog */}
+      {showUsernameConfirmation && (
+        <div className="fixed inset-0 bg-background-overlay/90 z-[70] flex items-center justify-center p-4">
+          <div className="bg-background-secondary rounded-xl border border-border-muted max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-text-primary mb-3">
+              Confirm Username Change
+            </h3>
+            <p className="text-text-secondary text-sm mb-4">
+              You're about to change your username from <span className="font-medium text-text-primary">@{originalUsername}</span> to <span className="font-medium text-text-primary">@{profileData.username}</span>.
+            </p>
+            <div className="space-y-2 text-sm text-text-muted mb-6">
+              <p>• Usernames can only be changed once per month</p>
+              <p>• Your profile URL will change to /user/{profileData.username}</p>
+              <p>• Old links to your profile may not work</p>
+            </div>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={handleCancelUsernameChange}
+                className="px-4 py-2 text-text-secondary hover:text-text-primary transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmUsernameChange}
+                className="px-4 py-2 bg-void-accent hover:bg-void-accent/90 text-white rounded-lg font-medium transition-colors"
+              >
+                Change Username
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -11,8 +11,6 @@ interface UserHeaderProps {
     location?: string;
     website?: string;
     isVerified?: boolean;
-    firstName?: string;
-    lastName?: string;
     followersCount?: number;
     followingCount?: number;
   } | null;

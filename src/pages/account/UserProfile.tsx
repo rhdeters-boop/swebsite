@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { User, BadgeCheck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { useAlert } from '../../context/AlertContext';
@@ -29,8 +30,6 @@ interface UserProfileData {
   website?: string;
   createdAt?: string;
   isVerified?: boolean;
-  firstName?: string;
-  lastName?: string;
   followersCount?: number;
   followingCount?: number;
 }
@@ -54,6 +53,7 @@ interface UserProfileProps {
 const UserProfile: React.FC<UserProfileProps> = ({ username }) => {
   const { user: currentUser, updateUser } = useAuth();
   const { showSuccess, showError } = useAlert();
+  const navigate = useNavigate();
   const [profileUser, setProfileUser] = useState<UserProfileData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -132,6 +132,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ username }) => {
 
       const response = await axios.put('/auth/profile', requestData);
       const updatedUser: UserProfileData = response.data.user;
+      const usernameChanged: boolean = response.data.usernameChanged;
 
       updateUser(updatedUser);
       setProfileUser(updatedUser);
@@ -141,6 +142,11 @@ const UserProfile: React.FC<UserProfileProps> = ({ username }) => {
 
       showSuccess('Profile updated successfully!');
       setIsEditing(false);
+
+      // Redirect to new profile URL if username was changed
+      if (usernameChanged && updatedUser.username) {
+        navigate(`/user/${updatedUser.username}`, { replace: true });
+      }
     } catch (err: any) {
       console.error('Profile update error:', err.response?.data);
       showError(err.response?.data?.message || 'Failed to update profile. Please try again.');
@@ -306,6 +312,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ username }) => {
           profileImageUrl={profileData.profilePicture || profileUser?.profilePicture || ''}
           onBannerImageChange={handleBannerImageSave}
           onProfileImageChange={handleProfilePictureSave}
+          originalUsername={profileUser?.username}
         />
       )}
     </div>

@@ -68,7 +68,18 @@ const User = sequelize.define('User', {
     type: DataTypes.BOOLEAN,
     defaultValue: true,
   },
+  lastUsernameChangeAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    comment: 'Tracks when username was last changed for 30-day restriction',
+  },
 }, {
+  indexes: [
+    {
+      fields: ['last_username_change_at'],
+      name: 'idx_user_last_username_change',
+    },
+  ],
   hooks: {
     beforeCreate: async (user) => {
       if (user.password) {

@@ -17,6 +17,7 @@ import {
 interface Creator {
   id: string;
   displayName: string;
+  username: string;
   bio: string;
   profilePictureUrl?: string;
   categories: string[];
@@ -29,10 +30,6 @@ interface Creator {
   createdAt: string;
   isFollowing?: boolean;
   isSubscribed?: boolean;
-  user: {
-    firstName: string;
-    lastName: string;
-  };
 }
 
 interface CreatorSearchResponse {

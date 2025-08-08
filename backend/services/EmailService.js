@@ -20,7 +20,7 @@ class EmailService {
     }
   }
 
-  async sendPasswordResetEmail(email, resetToken, firstName) {
+  async sendPasswordResetEmail(email, resetToken, displayName) {
     const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}`;
     
     const mailOptions = {
@@ -49,7 +49,7 @@ class EmailService {
               <h1>🔒 Password Reset Request</h1>
             </div>
             <div class="content">
-              <h2>Hi ${firstName}!</h2>
+              <h2>Hi ${displayName}!</h2>
               <p>We received a request to reset your password for your Void of Desire account.</p>
               
               <p>Click the button below to reset your password:</p>
@@ -83,7 +83,7 @@ class EmailService {
         </html>
       `,
       text: `
-        Hi ${firstName}!
+        Hi ${displayName}!
         
         We received a request to reset your password for your Void of Desire account.
         
@@ -137,7 +137,7 @@ class EmailService {
     }
   }
 
-  async sendPasswordResetConfirmation(email, firstName) {
+  async sendPasswordResetConfirmation(email, displayName) {
     const mailOptions = {
       from: process.env.FROM_EMAIL || 'noreply@voidofdesire.com',
       to: email,
@@ -163,7 +163,7 @@ class EmailService {
               <h1>✅ Password Reset Successful</h1>
             </div>
             <div class="content">
-              <h2>Hi ${firstName}!</h2>
+              <h2>Hi ${displayName}!</h2>
               
               <div class="success">
                 <strong>✅ Success!</strong> Your password has been successfully reset.
@@ -191,7 +191,7 @@ class EmailService {
         </html>
       `,
       text: `
-        Hi ${firstName}!
+        Hi ${displayName}!
         
         ✅ Success! Your password has been successfully reset.
         
@@ -218,7 +218,7 @@ class EmailService {
         // In development, just log the email details
         console.log('📧 [DEVELOPMENT] Password reset confirmation would be sent to:', email);
         console.log('📧 [DEVELOPMENT] Email subject: Password Successfully Reset - Void of Desire');
-        console.log('📧 [DEVELOPMENT] Confirmation that password was reset for user:', firstName);
+        console.log('📧 [DEVELOPMENT] Confirmation that password was reset for user:', displayName);
         
         return { 
           success: true, 
