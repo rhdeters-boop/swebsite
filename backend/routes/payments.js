@@ -210,7 +210,7 @@ router.delete('/payment-methods/:paymentMethodId', authenticateToken, async (req
   }
 });
 
-// Stripe webhook endpoint (public)
+/* Stripe webhook endpoint (public) */
 router.post('/webhooks/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
   const sig = req.headers['stripe-signature'];
   const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -233,6 +233,12 @@ router.post('/webhooks/stripe', express.raw({ type: 'application/json' }), async
         break;
       case 'invoice.payment_succeeded':
         await PaymentService.handleSubscriptionPayment(event.data.object);
+        break;
+      case 'invoice.payment_failed':
+        await PaymentService.handleInvoicePaymentFailed(event.data.object);
+        break;
+      case 'invoice.upcoming':
+        await PaymentService.handleInvoiceUpcoming(event.data.object);
         break;
       case 'customer.subscription.created':
       case 'customer.subscription.updated':

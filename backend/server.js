@@ -9,7 +9,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
-// Import routes
+ // Import routes
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
 import creatorRoutes from './routes/creators.js';
@@ -19,6 +19,8 @@ import paymentRoutes from './routes/payments.js';
 import healthRoutes from './routes/health.js';
 import analyticsRoutes from './routes/analytics.js';
 import likesRoutes from './routes/likes.js';
+import notificationsRoutes from './routes/notifications.js';
+import billingRoutes from './routes/billing.js';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler.js';
@@ -27,9 +29,10 @@ import { authenticateToken } from './middleware/auth.js';
 // Import database connection
 import { connectDB } from './config/database.js';
 
-// Import services
+ // Import services
 import StorageService from './services/StorageService.js';
 import LogRotator from './utils/LogRotator.js';
+import PaymentService from './services/PaymentService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -96,6 +99,11 @@ app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:5173',
   credentials: true,
 }));
+
+// Important: Stripe webhook requires raw body for signature verification.
+// Mount raw body parser ONLY for the Stripe webhook path BEFORE json/urlencoded parsers.
+app.use('/api/payments/webhooks/stripe', express.raw({ type: 'application/json' }));
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -153,6 +161,8 @@ app.use('/api/analytics', analyticsRoutes); // Mixed public and protected routes
 app.use('/api/payments', paymentRoutes); // Some payment routes need to be public for webhooks
 app.use('/api/creators', creatorRoutes); // Mixed public and protected routes
 app.use('/api/likes', likesRoutes); // Like/dislike functionality
+app.use('/api/notifications', authenticateToken, notificationsRoutes); // Notifications
+app.use('/api/billing', authenticateToken, billingRoutes); // Billing
 
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {

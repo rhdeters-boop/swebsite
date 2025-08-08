@@ -8,6 +8,8 @@ import Follow from './Follow.js';
 import MediaAnalytics from './MediaAnalytics.js';
 import CreatorLike from './CreatorLike.js';
 import { PasswordResetToken } from './PasswordResetToken.js';
+import Notification from './Notification.js';
+import NotificationSetting from './NotificationSetting.js';
 
 // User associations
 User.hasMany(Subscription, {
@@ -50,6 +52,30 @@ User.hasMany(PasswordResetToken, {
   foreignKey: 'userId',
   as: 'passwordResetTokens',
   onDelete: 'CASCADE',
+});
+
+// Notifications associations
+User.hasMany(Notification, {
+  foreignKey: 'userId',
+  as: 'notifications',
+  onDelete: 'CASCADE',
+});
+
+Notification.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user',
+});
+
+// Notification Settings associations
+User.hasOne(NotificationSetting, {
+  foreignKey: 'userId',
+  as: 'notificationSettings',
+  onDelete: 'CASCADE',
+});
+
+NotificationSetting.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user',
 });
 
 // Creator associations
@@ -127,16 +153,25 @@ CreatorLike.belongsTo(Creator, {
   as: 'creator',
 });
 
-// Payment associations
-Payment.belongsTo(User, {
-  foreignKey: 'userId',
-  as: 'user',
-});
+ /**
+  * Payment associations
+  */
+ Payment.belongsTo(User, {
+   foreignKey: 'userId',
+   as: 'user',
+ });
+ 
+ Payment.belongsTo(Subscription, {
+   foreignKey: 'subscriptionId',
+   as: 'subscription',
+ });
+ 
+ // Link payments to creator when applicable (tips, subscription revenue attribution)
+ Payment.belongsTo(Creator, {
+   foreignKey: 'creatorId',
+   as: 'creator',
+ });
 
-Payment.belongsTo(Subscription, {
-  foreignKey: 'subscriptionId',
-  as: 'subscription',
-});
 
 // MediaItem associations - update to include creator
 MediaItem.belongsTo(Creator, {
@@ -174,6 +209,8 @@ export {
   MediaAnalytics,
   CreatorLike,
   PasswordResetToken,
+  Notification,
+  NotificationSetting,
 };
 
 // Export default for convenience
@@ -188,4 +225,6 @@ export default {
   MediaAnalytics,
   CreatorLike,
   PasswordResetToken,
+  Notification,
+  NotificationSetting,
 };

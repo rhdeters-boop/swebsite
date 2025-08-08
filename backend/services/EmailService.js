@@ -20,6 +20,54 @@ class EmailService {
     }
   }
 
+  // Generic notification email helper used by NotificationService
+  async sendNotificationEmail(email, subject, content) {
+    try {
+      if (this.isDevelopment) {
+        console.log('📧 [DEVELOPMENT] Notification email would be sent to:', email);
+        console.log('📧 [DEVELOPMENT] Subject:', subject);
+        console.log('📧 [DEVELOPMENT] Content:', content);
+        return {
+          success: true,
+          messageId: 'dev-notification-' + Date.now(),
+          isDevelopment: true,
+        };
+      }
+
+      if (!this.transporter) {
+        console.warn('Email transporter not configured. Skipping send.');
+        return { success: false, message: 'Email transporter not configured' };
+      }
+
+      const mailOptions = {
+        from: process.env.FROM_EMAIL || 'noreply@voidofdesire.com',
+        to: email,
+        subject,
+        html: `
+          <!DOCTYPE html>
+          <html>
+          <head><meta charset="utf-8"><title>${subject}</title></head>
+          <body style="font-family: Arial, sans-serif; background:#1a1a2e; color:#e5e7eb; padding:16px;">
+            <div style="max-width:600px;margin:0 auto;background:#16213e;border:1px solid #7c3aed;border-radius:10px;padding:24px;">
+              <h2 style="margin-top:0;margin-bottom:12px;color:#c084fc;">${subject}</h2>
+              <p style="margin:0;white-space:pre-line;color:#e5e7eb;">${content}</p>
+            </div>
+            <p style="text-align:center;color:#9ca3af;font-size:12px;margin-top:16px;">© ${new Date().getFullYear()} Void of Desire</p>
+          </body>
+          </html>
+        `,
+        text: content,
+      };
+
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log('📧 Notification email sent:', info.messageId);
+      return { success: true, messageId: info.messageId };
+    } catch (error) {
+      console.error('❌ Error sending notification email:', error);
+      return { success: false, message: 'Failed to send notification email' };
+    }
+  }
+
   async sendPasswordResetEmail(email, resetToken, displayName) {
     const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}`;
     

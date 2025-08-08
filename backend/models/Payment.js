@@ -23,6 +23,15 @@ const Payment = sequelize.define('Payment', {
       key: 'id',
     },
   },
+  // Optional association to a creator (for tips and subscription revenue attribution)
+  creatorId: {
+    type: DataTypes.UUID,
+    allowNull: true,
+    references: {
+      model: 'creators',
+      key: 'id',
+    },
+  },
   stripePaymentIntentId: {
     type: DataTypes.STRING,
     allowNull: true,
@@ -86,7 +95,7 @@ const Payment = sequelize.define('Payment', {
 });
 
 // Helper method to format amount for display
-Payment.prototype.getFormattedAmount = function() {
+Payment.prototype.getFormattedAmount = function () {
   return (this.amount / 100).toFixed(2);
 };
 
