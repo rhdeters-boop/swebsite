@@ -30,6 +30,8 @@ import TermsOfService from './pages/TermsOfService';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import RefundPolicy from './pages/RefundPolicy';
 import ProtectedRoute from './components/ProtectedRoute';
+import Notifications from './pages/Notifications';
+import Billing from './pages/Billing';
 
 // Context
 import { AuthProvider } from './context/AuthContext';
@@ -106,6 +108,22 @@ const AppContent = () => {
             element={
               <ProtectedRoute>
                 <CreatorDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/notifications"
+            element={
+              <ProtectedRoute>
+                <Notifications />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/billing"
+            element={
+              <ProtectedRoute>
+                <Billing />
               </ProtectedRoute>
             }
           />

@@ -13,47 +13,47 @@ const typeMeta: Record<
 > = {
   new_post: {
     label: 'New Post',
-    icon: <Bell className="h-4 w-4" />,
+    icon: <Bell className="h-4 w-4" aria-hidden="true" />,
     badgeClass: 'badge-primary',
   },
   new_comment: {
     label: 'New Comment',
-    icon: <MessageSquare className="h-4 w-4" />,
+    icon: <MessageSquare className="h-4 w-4" aria-hidden="true" />,
     badgeClass: 'badge-secondary',
   },
   new_follower: {
     label: 'New Follower',
-    icon: <Bell className="h-4 w-4" />,
+    icon: <Bell className="h-4 w-4" aria-hidden="true" />,
     badgeClass: 'badge-primary',
   },
   suggestion_creator: {
     label: 'Suggested Creator',
-    icon: <Info className="h-4 w-4" />,
+    icon: <Info className="h-4 w-4" aria-hidden="true" />,
     badgeClass: 'badge',
   },
   suggestion_content: {
     label: 'Suggested Content',
-    icon: <Info className="h-4 w-4" />,
+    icon: <Info className="h-4 w-4" aria-hidden="true" />,
     badgeClass: 'badge',
   },
   message: {
     label: 'Message',
-    icon: <MessageSquare className="h-4 w-4" />,
+    icon: <MessageSquare className="h-4 w-4" aria-hidden="true" />,
     badgeClass: 'badge',
   },
   billing_success: {
     label: 'Payment Succeeded',
-    icon: <CreditCard className="h-4 w-4" />,
+    icon: <CreditCard className="h-4 w-4" aria-hidden="true" />,
     badgeClass: 'badge-success',
   },
   billing_failure: {
     label: 'Payment Failed',
-    icon: <AlertTriangle className="h-4 w-4" />,
+    icon: <AlertTriangle className="h-4 w-4" aria-hidden="true" />,
     badgeClass: 'badge-error',
   },
   billing_expiring: {
     label: 'Upcoming Charge',
-    icon: <CreditCard className="h-4 w-4" />,
+    icon: <CreditCard className="h-4 w-4" aria-hidden="true" />,
     badgeClass: 'badge-warning',
   },
 };
@@ -71,10 +71,14 @@ const NotificationItem: React.FC<Props> = ({ item, onMarkRead }) => {
   const meta = typeMeta[item.type];
 
   return (
-    <div className={`card ${item.isRead ? '' : 'border-border-primary'} hover:shadow-card-hover transition-all`}>
+    <div
+      className={`card ${item.isRead ? '' : 'border-border-primary border-l-2 border-void-accent'} hover:shadow-card-hover transition-all animate-fade-in`}
+      role="listitem"
+      aria-live="polite"
+    >
       <div className="flex items-start gap-4">
         <div className="flex-shrink-0 mt-0.5 text-void-accent-light">
-          {meta?.icon ?? <Bell className="h-4 w-4" />}
+          {meta?.icon ?? <Bell className="h-4 w-4" aria-hidden="true" />}
         </div>
 
         <div className="flex-1">
@@ -95,9 +99,11 @@ const NotificationItem: React.FC<Props> = ({ item, onMarkRead }) => {
               <button
                 onClick={() => onMarkRead?.(item.id)}
                 className="btn-ghost-sm inline-flex items-center gap-2"
+                aria-label={`Mark ${meta?.label?.toLowerCase() || 'notification'} as read`}
+                title="Mark as read"
               >
-                <CheckCircle2 className="h-4 w-4" />
-                Mark as read
+                <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+                <span>Mark as read</span>
               </button>
             )}
           </div>
