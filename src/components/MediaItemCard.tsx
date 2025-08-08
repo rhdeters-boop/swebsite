@@ -64,6 +64,7 @@ const MediaItemCard: React.FC<MediaItemCardProps> = ({ item, viewMode }) => {
           <img
             src={item.thumbnailUrl}
             alt={item.title}
+            loading="lazy"
             className="w-full h-full object-cover"
           />
           {item.type === 'video' && (

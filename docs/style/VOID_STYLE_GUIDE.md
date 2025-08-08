@@ -357,3 +357,82 @@ Rules
 
 Changelog
 - v0.1.0 — Initial version extracted from current Tailwind config and component patterns (Notifications, Billing).
+==================================================
+12) Breadcrumbs & Pagination (New)
+==================================================
+
+Purpose
+- Provide a reusable, accessible pagination/breadcrumb pattern for media-heavy pages.
+- Must work without JavaScript; enhance progressively when JS is available.
+
+Component Reference
+- Reusable component: [BreadcrumbNav()](src/components/BreadcrumbNav.tsx:1)
+- Prefetch wrapper: [MediaPaginator()](src/components/MediaPaginator.tsx:1)
+- Example integration: [CreatorProfile.tsx](src/pages/CreatorProfile.tsx)
+
+A11y and Semantics
+- Container: use a semantic nav region with an aria-label describing its purpose.
+- Structure: ordered list for page items.
+  - Parent: <nav aria-label="Pagination" role="navigation">
+  - List: <ol role="list"> ... </ol>
+  - Item: <li role="listitem"> ... </li>
+- Active page: add aria-current="page" on the active page link.
+- Interactive elements:
+  - Use anchor links for page navigation (numbers, first/previous/next/last) when enabled.
+  - Disabled controls should not be anchors; use <span aria-disabled="true"> for non-interactive states.
+- Labels:
+  - Buttons must have clear labels (e.g., "Go to page 3", "Go to next page", "Go to last page").
+
+Keyboard
+- Enabled keystrokes when focus is NOT inside input/textarea/contenteditable and no modifier keys are pressed:
+  - Left Arrow: previous page (no wrap by default)
+  - Right Arrow: next page (no wrap by default)
+  - Home: first page
+  - End: last page
+- Focus styles: always include .focus-ring on focusable items for visibility.
+
+Progressive Enhancement
+- All page items should be anchors (<a href="...">) so navigation works without JS.
+- When JS is available, intercept onClick to do SPA navigation and smooth scroll; otherwise allow default anchor behavior.
+
+URL and State
+- Use search param page=1 (1-indexed).
+- Clamp invalid values to [1..totalPages] and update the URL when clamped.
+- Preserve other query params when updating page.
+
+Visual Recipe (Tailwind)
+- Container: flex items-center justify-center
+- Buttons:
+  - Base: inline-flex items-center justify-center min-w-9 h-9 px-3 rounded-md text-sm transition-colors focus-ring
+  - Numbered default: border border-border-secondary text-text-secondary hover:text-text-primary hover:bg-void-accent/10
+  - Active page: border border-void-accent text-void-accent bg-void-accent/10 cursor-default
+  - Disabled: border border-border-secondary text-text-muted cursor-not-allowed opacity-60
+- Ellipsis: <span className="px-2 text-text-tertiary select-none" aria-hidden="true">…</span>
+
+Defaults
+- Window size: current ±2 (at most 5 number buttons visible).
+- Always show first and last with ellipses when gaps exist.
+- No wrap-around for prev/next by default.
+- Default page size for creator media: 24; router should enforce a sensible max (<= 50).
+
+Performance
+- Adjacent page prefetch: when using React Query (or equivalent), prefetch neighbor pages (±1) after each navigation for smoother UX.
+- Media lists: Images should use loading="lazy" to defer off-screen loads. Example: see [MediaItemCard()](src/components/MediaItemCard.tsx:1).
+
+Usage Example
+- For SPA pages showing many media items:
+  - Render MediaPaginator with:
+    - currentPage: read from URL (?page=1)
+    - totalPages: from API response
+    - makeHref: builds the anchor URL preserving existing query params
+    - onNavigate: SPA navigation handler that updates URLSearchParams and scrolls to top
+    - onPrefetch: optional callback to prefetch adjacent pages
+- See [BreadcrumbNav()](src/components/BreadcrumbNav.tsx:1) and [MediaPaginator()](src/components/MediaPaginator.tsx:1) for implementation details.
+
+Quality Checklist
+- Anchor links work without JS (PE).
+- aria-current=page only on the active number.
+- Keyboard handlers skip when typing or with modifier keys.
+- Visible focus state using .focus-ring.
+- Prev/Next disabled on bounds; First/Last shown with ellipses when applicable.
+- No layout shifts on pagination; prefer smooth scroll-to-top on page change.

@@ -188,7 +188,7 @@ class CreatorService {
   /**
    * Get creator by ID with optional user status
    */
-  async getCreatorById(id, userId = null) {
+  async getCreatorById(id, userId = null, { page = 1, limit = 12 } = {}) {
     const creator = await Creator.findOne({
       where: { id, isActive: true },
       include: [
@@ -197,14 +197,6 @@ class CreatorService {
           as: 'user',
           attributes: ['displayName', 'username'],
         },
-        {
-          model: MediaItem,
-          as: 'mediaItems',
-          where: { isPublished: true },
-          required: false,
-          limit: 6,
-          order: [['publishedAt', 'DESC']],
-        },
       ],
     });
 
@@ -212,7 +204,24 @@ class CreatorService {
       throw new Error('Creator not found');
     }
 
+    // Pagination math
+    const parsedPage = parseInt(page);
+    const parsedLimit = parseInt(limit);
+    const safePage = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+    const safeLimit = Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 12;
+    const offset = (safePage - 1) * safeLimit;
+
+    // Fetch creator's media separately with pagination to keep response additive
+    const { rows: pageMedia, count: total } = await MediaItem.findAndCountAll({
+      where: { creatorId: creator.id, isPublished: true },
+      order: [['publishedAt', 'DESC']],
+      limit: safeLimit,
+      offset,
+    });
+
     let creatorData = creator.toJSON();
+    // Preserve existing shape: include mediaItems on creator (first page or current page)
+    creatorData.mediaItems = pageMedia;
 
     // Add user-specific status if authenticated
     if (userId) {
@@ -236,13 +245,20 @@ class CreatorService {
       creatorData.isSubscribed = !!subscription;
     }
 
-    return creatorData;
+    const mediaPagination = {
+      page: safePage,
+      limit: safeLimit,
+      total,
+      pages: Math.max(1, Math.ceil(total / safeLimit)),
+    };
+
+    return { creator: creatorData, mediaPagination };
   }
 
   /**
    * Get creator by username
    */
-  async getCreatorByUsername(username, userId = null) {
+  async getCreatorByUsername(username, userId = null, { page = 1, limit = 12 } = {}) {
     const creator = await Creator.findOne({
       where: { isActive: true },
       include: [
@@ -252,14 +268,6 @@ class CreatorService {
           where: { username },
           attributes: ['displayName', 'username'],
         },
-        {
-          model: MediaItem,
-          as: 'mediaItems',
-          where: { isPublished: true },
-          required: false,
-          limit: 6,
-          order: [['publishedAt', 'DESC']],
-        },
       ],
     });
 
@@ -267,7 +275,23 @@ class CreatorService {
       throw new Error('Creator not found');
     }
 
+    // Pagination math
+    const parsedPage = parseInt(page);
+    const parsedLimit = parseInt(limit);
+    const safePage = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+    const safeLimit = Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 12;
+    const offset = (safePage - 1) * safeLimit;
+
+    // Fetch creator's media separately with pagination
+    const { rows: pageMedia, count: total } = await MediaItem.findAndCountAll({
+      where: { creatorId: creator.id, isPublished: true },
+      order: [['publishedAt', 'DESC']],
+      limit: safeLimit,
+      offset,
+    });
+
     let creatorData = creator.toJSON();
+    creatorData.mediaItems = pageMedia;
 
     // Add user-specific status if authenticated
     if (userId) {
@@ -291,7 +315,14 @@ class CreatorService {
       creatorData.isSubscribed = !!subscription;
     }
 
-    return creatorData;
+    const mediaPagination = {
+      page: safePage,
+      limit: safeLimit,
+      total,
+      pages: Math.max(1, Math.ceil(total / safeLimit)),
+    };
+
+    return { creator: creatorData, mediaPagination };
   }
 
   /**

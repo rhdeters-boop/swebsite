@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import CreatorLikeButton from '../components/CreatorLikeButton';
 import MediaItemCard from '../components/MediaItemCard';
@@ -7,8 +7,9 @@ import UnauthenticatedContent from '../components/UnauthenticatedContent';
 import AuthenticatedContent from '../components/AuthenticatedContent';
 import SubscriptionCard from '../components/SubscriptionCard';
 import { useCreatorProfile } from '../hooks/useCreatorProfile';
-import { 
-  Users, 
+import MediaPaginator from '../components/MediaPaginator';
+import {
+  Users,
   MapPin,
   Instagram,
   Twitter,
@@ -33,18 +34,26 @@ const CreatorProfile: React.FC = () => {
   const { creatorId } = useParams<{ creatorId: string }>();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedTier, setSelectedTier] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
+  // Pagination: read from URL (?page=1), default 1, page-size 24
+  const initialPage = Number.parseInt(searchParams.get('page') || '1', 10);
+  const page = Number.isFinite(initialPage) && initialPage > 0 ? initialPage : 1;
+  const limit = 24;
+
   const {
     creatorData,
+    mediaPagination,
     isLoading,
     error,
     followMutation,
     handleFollow,
     handleSubscribe,
-    handleTip
-  } = useCreatorProfile(creatorId, isAuthenticated);
+    handleTip,
+    prefetchPages,
+  } = useCreatorProfile(creatorId, isAuthenticated, page, limit);
 
   const filteredMedia = creatorData?.creator?.mediaItems?.filter((item: MediaItem) => {
     if (!isAuthenticated && item.accessLevel === 'private') {
@@ -109,7 +118,8 @@ const CreatorProfile: React.FC = () => {
   const privateMedia = creator?.mediaItems?.filter((item: MediaItem) => item.accessLevel === 'private') || [];
   
   const stats = {
-    totalContent: creator?.mediaItems?.length || 0,
+    // Prefer server total if available (for overall count), fallback to current page length
+    totalContent: mediaPagination?.total ?? (creator?.mediaItems?.length || 0),
     totalImages: creator?.mediaItems?.filter((item: MediaItem) => item.type === 'image').length || 0,
     totalVideos: creator?.mediaItems?.filter((item: MediaItem) => item.type === 'video').length || 0,
     freeContent: freeMedia.length,
@@ -126,6 +136,18 @@ const CreatorProfile: React.FC = () => {
       </div>
     );
   }
+
+  // Clamp invalid page to valid bounds when data is known
+  useEffect(() => {
+    if (!mediaPagination) return;
+    const max = Math.max(1, mediaPagination.pages);
+    const clamped = Math.min(Math.max(page, 1), max);
+    if (clamped !== page) {
+      const sp = new URLSearchParams(searchParams);
+      sp.set('page', String(clamped));
+      setSearchParams(sp);
+    }
+  }, [mediaPagination, page, searchParams, setSearchParams]);
 
   return (
     <div className="py-2 sm:py-4 px-4 sm:px-6 lg:px-8">
@@ -263,14 +285,41 @@ const CreatorProfile: React.FC = () => {
                   creatorName={creator.displayName}
                 />
               ) : (
-                <AuthenticatedContent
-                  filteredMedia={filteredMedia}
-                  stats={stats}
-                  selectedTier={selectedTier}
-                  setSelectedTier={setSelectedTier}
-                  viewMode={viewMode}
-                  setViewMode={setViewMode}
-                />
+                <>
+                  <AuthenticatedContent
+                    filteredMedia={filteredMedia}
+                    stats={stats}
+                    selectedTier={selectedTier}
+                    setSelectedTier={setSelectedTier}
+                    viewMode={viewMode}
+                    setViewMode={setViewMode}
+                  />
+
+                  {/* Pagination */}
+                  {mediaPagination && mediaPagination.pages > 1 && (
+                    <div className="mt-6">
+                      <MediaPaginator
+                        currentPage={page}
+                        totalPages={mediaPagination.pages}
+                        makeHref={(p) => {
+                          const sp = new URLSearchParams(searchParams);
+                          sp.set('page', String(p));
+                          const path = window.location.pathname;
+                          return `${path}?${sp.toString()}`;
+                        }}
+                        onNavigate={(p) => {
+                          const sp = new URLSearchParams(searchParams);
+                          sp.set('page', String(p));
+                          setSearchParams(sp);
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        onPrefetch={(pages) => prefetchPages?.(pages)}
+                        windowSize={2}
+                        className="mt-4"
+                      />
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>

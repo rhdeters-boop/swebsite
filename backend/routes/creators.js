@@ -96,15 +96,33 @@ router.get('/new-rising', optionalAuth, async (req, res, next) => {
 });
 
 // Get creator by username (public)
-router.get('/username/:username', optionalAuth, async (req, res, next) => {
+router.get('/username/:username', optionalAuth, [
+  query('page').optional().isInt({ min: 1 }),
+  query('limit').optional().isInt({ min: 1, max: 50 }),
+], async (req, res, next) => {
   try {
-    const { username } = req.params;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
 
-    const creator = await CreatorService.getCreatorByUsername(username, req.user?.id);
+    const { username } = req.params;
+    const { page = 1, limit = 12 } = req.query;
+
+    const { creator, mediaPagination } = await CreatorService.getCreatorByUsername(
+      username,
+      req.user?.id,
+      { page, limit }
+    );
 
     res.json({
       success: true,
-      creator
+      creator,
+      mediaPagination
     });
   } catch (error) {
     if (error.message === 'Creator not found') {
@@ -118,15 +136,33 @@ router.get('/username/:username', optionalAuth, async (req, res, next) => {
 });
 
 // Get creator by ID (public)
-router.get('/:id', optionalAuth, async (req, res, next) => {
+router.get('/:id', optionalAuth, [
+  query('page').optional().isInt({ min: 1 }),
+  query('limit').optional().isInt({ min: 1, max: 50 }),
+], async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
 
-    const creator = await CreatorService.getCreatorById(id, req.user?.id);
+    const { id } = req.params;
+    const { page = 1, limit = 12 } = req.query;
+
+    const { creator, mediaPagination } = await CreatorService.getCreatorById(
+      id,
+      req.user?.id,
+      { page, limit }
+    );
 
     res.json({
       success: true,
-      creator
+      creator,
+      mediaPagination
     });
   } catch (error) {
     if (error.message === 'Creator not found') {
