@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Bell, Filter, CheckSquare, Loader2 } from 'lucide-react';
-import { useNotifications, useNotificationActions, NotificationType } from '../hooks/useNotifications';
+import { useNotifications, useNotificationActions } from '../hooks/useNotifications';
+import type { NotificationType } from '../hooks/useNotifications';
 import NotificationList from '../components/notifications/NotificationList';
 import NotificationSettings from '../components/notifications/NotificationSettings';
 
@@ -179,34 +180,30 @@ const NotificationsPage: React.FC = () => {
               ) : (
                 <>
                   <NotificationList
-                    notifications={notifications}
-                    isLoading={isLoading}
-                    onChange={(changed) => {
-                      // keep page; simply refetch list after change is handled within hooks
-                      if (changed) refetch();
-                    }}
+                  notifications={notifications}
+                  isLoading={isLoading}
                   />
                   {/* Pagination */}
                   {totalPages > 1 && (
-                    <div className="mt-4 flex items-center justify-between">
-                      <button
-                        className="btn-secondary-sm"
-                        disabled={page <= 1 || isLoading}
-                        onClick={() => setPage((p) => Math.max(1, p - 1))}
-                      >
-                        Previous
-                      </button>
-                      <p className="text-text-secondary text-sm">
-                        Page {pagination?.page ?? page} of {totalPages}
-                      </p>
-                      <button
-                        className="btn-secondary-sm"
-                        disabled={page >= totalPages || isLoading}
-                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                      >
-                        Next
-                      </button>
-                    </div>
+                  <div className="mt-4 flex items-center justify-between">
+                    <button
+                    className="btn-secondary-sm"
+                    disabled={page <= 1 || isLoading}
+                    onClick={() => setPage((p: number) => Math.max(1, p - 1))}
+                    >
+                    Previous
+                    </button>
+                    <p className="text-text-secondary text-sm">
+                    Page {(pagination?.page as number) ?? page} of {totalPages}
+                    </p>
+                    <button
+                    className="btn-secondary-sm"
+                    disabled={page >= totalPages || isLoading}
+                    onClick={() => setPage((p: number) => Math.min(totalPages, p + 1))}
+                    >
+                    Next
+                    </button>
+                  </div>
                   )}
                 </>
               )}

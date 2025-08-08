@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { AlertCircle, Loader2, Receipt, RotateCcw, X, ChevronLeft, ChevronRight } from 'lucide-react';
-import { PaymentHistoryItem, PaymentType, useBillingHistory, useRequestRefund } from '../../hooks/useBilling';
+import { AlertCircle, Loader2, Receipt, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { type PaymentHistoryItem, type PaymentType, useBillingHistory, useRequestRefund } from '../../hooks/useBilling';
 
 const TypeFilter: React.FC<{
   value: PaymentType | '' ;
@@ -244,7 +244,7 @@ const BillingHistoryTab: React.FC = () => {
       )}
 
       <div className="space-y-3" role="list" aria-label="Payments list">
-        {payments.map((p) => (
+        {payments.map((p: PaymentHistoryItem) => (
           <PaymentRow
             key={p.id}
             item={p}

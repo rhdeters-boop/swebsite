@@ -1,5 +1,5 @@
 import React from 'react';
-import { Loader2, AlertCircle, Layers } from 'lucide-react';
+import { AlertCircle, Layers } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCancelSubscription, useSubscriptions } from '../../hooks/useBilling';
 

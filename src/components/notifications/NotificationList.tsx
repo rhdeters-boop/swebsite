@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Bell, Sparkles } from 'lucide-react';
-import { NotificationItem as NotificationItemType } from '../../hooks/useNotifications';
+import type { NotificationItem as NotificationItemType } from '../../hooks/useNotifications';
 import NotificationItem from './NotificationItem';
 
 interface NotificationListProps {

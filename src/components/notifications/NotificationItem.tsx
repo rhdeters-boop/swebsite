@@ -1,6 +1,7 @@
 import React from 'react';
 import { CheckCircle2, Bell, MessageSquare, CreditCard, AlertTriangle, Info } from 'lucide-react';
-import { NotificationItem as NotificationItemType, NotificationType } from '../../hooks/useNotifications';
+import type { NotificationItem as NotificationItemType } from '../../hooks/useNotifications';
+import type { NotificationType } from '../../hooks/useNotifications';
 
 interface Props {
   item: NotificationItemType;

@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import axios from 'axios';
 
 // Types
@@ -86,7 +86,7 @@ export function useNotifications(filters: { isRead?: boolean; type?: Notificatio
   const query = useQuery({
     queryKey: qk.notifications(filters),
     queryFn: () => getNotifications(filters),
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
   return {
     ...query,

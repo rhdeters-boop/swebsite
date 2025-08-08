@@ -24,8 +24,9 @@ export interface BreadcrumbNavProps {
  *   currentPage={page}
  *   totalPages={totalPages}
  *   makeHref={(p) => `/creator/123?page=${p}`}
- *   onNavigate={(p) => { /* optional SPA navigation */ }}
- * />
+ *   onNavigate={(p) => { /* optional SPA navigation */ /*}}
+ *     console.log('Navigating to page:', p);
+ *   }}
  */
 const BreadcrumbNav: React.FC<BreadcrumbNavProps> = ({
   currentPage,

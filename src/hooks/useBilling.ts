@@ -139,7 +139,7 @@ export function useBillingHistory(filters: { page?: number; limit?: number; type
   const query = useQuery({
     queryKey: qk.history(filters),
     queryFn: () => fetchHistory(filters),
-    keepPreviousData: true,
+    staleTime: 1000 * 60, // 1 minute
   });
 
   return {
