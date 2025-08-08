@@ -278,6 +278,10 @@ export default {
         '.btn-primary': {
           '@apply bg-gradient-primary text-text-on-dark font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-glow-accent hover:shadow-glow-primary focus-ring': {},
         },
+        // Consistent small ghost-outline button used for Edit profile action
+        '.btn-edit': {
+          '@apply px-5 py-2 rounded-full border-2 border-border-primary text-text-primary hover:bg-void-accent/10 transition-colors': {},
+        },
         '.btn-secondary': {
           '@apply bg-background-card/80 hover:bg-void-dark-800 text-void-accent-light border-2 border-border-primary font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 focus-ring': {},
         },

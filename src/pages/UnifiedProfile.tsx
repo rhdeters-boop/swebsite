@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import ViewerProfile from '../components/profile/ViewerProfile';
+import UserProfile from './account/UserProfile';
 import BackButton from '../components/BackButton';
 
 const UnifiedProfile = () => {
@@ -18,7 +18,7 @@ const UnifiedProfile = () => {
 
   return (
     <>
-      <ViewerProfile username={username} />
+      <UserProfile username={username} />
     </>
   );
 };

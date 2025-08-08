@@ -28,7 +28,7 @@ async function seed() {
         location: 'Los Angeles',
         socialLinks: { instagram: 'alicestar', twitter: 'alicestar' },
         profileImageUrl: '/public/logo.png',
-        coverImageUrl: '/public/background1.jpg',
+        coverImageUrl: '/public/logo.png',
       },
       {
         displayName: 'Bob Blaze',
@@ -39,7 +39,7 @@ async function seed() {
         location: 'New York',
         socialLinks: { instagram: 'bobblaze', twitter: 'bobblaze' },
         profileImageUrl: '/public/symbol.png',
-        coverImageUrl: '/public/background2.jpg',
+        coverImageUrl: '/public/logo.png',
       },
     ]);
 

@@ -32,6 +32,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 // Context
 import { AuthProvider } from './context/AuthContext';
+import { AlertProvider } from './context/AlertContext';
 import CreateProfile from './pages/CreateProfile';
 import RegisterAsCreator from './pages/RegisterAsCreator';
 import CreateCreatorProfile from './pages/CreateCreatorProfile';
@@ -135,9 +136,11 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Elements stripe={stripePromise}>
         <AuthProvider>
-          <Router>
-            <AppContent />
-          </Router>
+          <AlertProvider>
+            <Router>
+              <AppContent />
+            </Router>
+          </AlertProvider>
         </AuthProvider>
       </Elements>
       <ReactQueryDevtools initialIsOpen={false} />
