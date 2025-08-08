@@ -6,10 +6,14 @@ const TypeFilter: React.FC<{
   value: PaymentType | '' ;
   onChange: (v: PaymentType | '') => void;
 }> = ({ value, onChange }) => {
+  const selectId = 'billing-type-filter';
   return (
     <div className="flex items-center gap-2">
+      <label htmlFor={selectId} className="sr-only">Filter payments by type</label>
       <span className="text-sm text-text-secondary">Filter:</span>
       <select
+        id={selectId}
+        aria-label="Filter payments by type"
         className="form-select w-44"
         value={value}
         onChange={(e) => onChange((e.target.value || '') as PaymentType | '')}
@@ -32,31 +36,39 @@ const RefundPanel: React.FC<{
   const [reason, setReason] = useState<string>('');
   return (
     <div className="mt-4 border-t border-border-secondary pt-4">
-      <p className="text-sm text-text-secondary mb-2">
+      <label htmlFor={`refund-reason-${payment.id}`} className="form-label">
         Optional: Describe the reason for your refund request (max 500 chars)
-      </p>
+      </label>
       <textarea
+        id={`refund-reason-${payment.id}`}
         className="form-textarea"
         rows={3}
         maxLength={500}
         value={reason}
         onChange={(e) => setReason(e.target.value)}
         placeholder="E.g., duplicate charge, incorrect amount, etc."
+        aria-describedby={`refund-help-${payment.id}`}
       />
       <div className="mt-3 flex items-center gap-3">
         <button
           onClick={() => onSubmit(payment.id, reason?.trim() || undefined)}
           disabled={submitting}
           className="btn-primary-sm disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+          aria-label={`Submit refund request for $${(payment.amount / 100).toFixed(2)}`}
         >
           {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <RotateCcw className="h-4 w-4" />}
           {submitting ? 'Submitting…' : 'Submit Request'}
         </button>
-        <button onClick={onCancel} disabled={submitting} className="btn-secondary-sm disabled:opacity-50">
+        <button
+          onClick={onCancel}
+          disabled={submitting}
+          className="btn-secondary-sm disabled:opacity-50"
+          aria-label="Cancel refund request"
+        >
           Cancel
         </button>
       </div>
-      <p className="text-xs text-text-muted mt-2">
+      <p id={`refund-help-${payment.id}`} className="text-xs text-text-muted mt-2">
         Note: Approved refunds may take 5–10 business days to appear on your statement.
       </p>
     </div>
@@ -90,7 +102,7 @@ const PaymentRow: React.FC<{
   })();
 
   return (
-    <div className="card">
+    <div className="card animate-fade-in" role="listitem">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-lg border border-border-secondary bg-background-secondary flex items-center justify-center">
@@ -125,6 +137,7 @@ const PaymentRow: React.FC<{
             <button
               onClick={() => onRefundClick(item.id)}
               className="btn-ghost-sm inline-flex items-center gap-2"
+              aria-label={`Request refund for ${item.description || (item.type === 'subscription' ? 'subscription payment' : item.type)} of $${amount}`}
             >
               <RotateCcw className="h-4 w-4" />
               Request refund
@@ -210,8 +223,8 @@ const BillingHistoryTab: React.FC = () => {
 
       {isLoading && (
         <>
-          <div className="card loading-shimmer h-24" />
-          <div className="card loading-shimmer h-24" />
+          <div className="card loading-shimmer h-24 animate-fade-in" />
+          <div className="card loading-shimmer h-24 animate-fade-in" />
         </>
       )}
 
@@ -223,10 +236,14 @@ const BillingHistoryTab: React.FC = () => {
       )}
 
       {!isLoading && !isError && payments.length === 0 && (
-        <div className="card text-text-secondary">No payments found.</div>
+        <div className="card text-center py-10 animate-fade-in">
+          <Receipt className="h-10 w-10 text-text-muted mx-auto mb-3" />
+          <p className="text-text-secondary mb-2">No payments found.</p>
+          <p className="text-text-muted text-sm">When you make payments, they’ll appear here.</p>
+        </div>
       )}
 
-      <div className="space-y-3">
+      <div className="space-y-3" role="list" aria-label="Payments list">
         {payments.map((p) => (
           <PaymentRow
             key={p.id}
@@ -247,6 +264,9 @@ const BillingHistoryTab: React.FC = () => {
           onPageChange={(p) => setPage(p)}
         />
       )}
+      <div aria-live="polite" role="status" className="sr-only">
+        {refund.isPending ? 'Submitting refund request…' : refund.isSuccess ? 'Refund request submitted.' : refund.isError ? 'Refund request failed.' : ''}
+      </div>
     </div>
   );
 };

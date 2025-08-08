@@ -89,7 +89,7 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ className =
 
   if (isLoading) {
     return (
-      <div className={`card ${className}`}>
+      <div className={`card animate-fade-in ${className}`}>
         <div className="h-6 w-48 loading-shimmer rounded mb-4" />
         <div className="space-y-3">
           {[...Array(6)].map((_, i) => (
@@ -102,7 +102,7 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ className =
 
   if (isError) {
     return (
-      <div className={`card ${className}`}>
+      <div className={`card animate-fade-in ${className}`}>
         <div className="alert alert-error">
           <p>Failed to load notification settings.</p>
         </div>
@@ -111,32 +111,42 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ className =
   }
 
   return (
-    <div className={`card ${className}`}>
+    <div className={`card animate-fade-in ${className}`}>
       <h3 className="text-lg font-semibold text-text-primary mb-4">Notification Preferences</h3>
-      <div className="space-y-3">
-        {toggles.map((t) => (
-          <div key={t.id} className="flex items-center justify-between p-4 border border-border-secondary rounded-xl bg-background-card/50">
-            <div className="mr-4">
-              <p className="font-medium text-text-primary">{t.label}</p>
-              <p className="text-sm text-text-muted">{t.description}</p>
-            </div>
-            <button
-              onClick={() => t.onChange(!t.checked)}
-              disabled={updateSettings.isPending}
-              className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
-                t.checked ? 'bg-void-accent' : 'bg-void-dark-300'
-              } ${updateSettings.isPending ? 'opacity-60 cursor-not-allowed' : ''}`}
-              aria-pressed={t.checked}
-              aria-label={t.label}
+      <div className="space-y-3" role="list" aria-label="Notification preferences">
+        {toggles.map((t) => {
+          const titleId = `label-${t.id}`;
+          const descId = `desc-${t.id}`;
+          return (
+            <div
+              key={t.id}
+              className="flex items-center justify-between p-4 border border-border-secondary rounded-xl bg-background-card/50"
+              role="listitem"
             >
-              <span
-                className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
-                  t.checked ? 'translate-x-6' : 'translate-x-1'
-                }`}
-              />
-            </button>
-          </div>
-        ))}
+              <div className="mr-4">
+                <p id={titleId} className="font-medium text-text-primary">{t.label}</p>
+                <p id={descId} className="text-sm text-text-muted">{t.description}</p>
+              </div>
+              <button
+                onClick={() => t.onChange(!t.checked)}
+                disabled={updateSettings.isPending}
+                className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus-ring ${
+                  t.checked ? 'bg-void-accent' : 'bg-void-dark-300'
+                } ${updateSettings.isPending ? 'opacity-60 cursor-not-allowed' : ''}`}
+                role="switch"
+                aria-checked={t.checked}
+                aria-labelledby={titleId}
+                aria-describedby={descId}
+              >
+                <span
+                  className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${
+                    t.checked ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+          );
+        })}
       </div>
       {updateSettings.isError && (
         <div className="mt-4 alert alert-error">
@@ -148,6 +158,9 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ className =
           <p>Settings updated.</p>
         </div>
       )}
+      <div aria-live="polite" role="status" className="sr-only">
+        {updateSettings.isPending ? 'Updating settings…' : updateSettings.isSuccess ? 'Settings updated.' : ''}
+      </div>
     </div>
   );
 };
