@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import { useSidebar } from '../../context/SidebarContext';
-import { NavItem } from '../../config/navigation';
+import type { NavItem } from '../../config/navigation';
 
 interface SidebarNavItemProps {
   item: NavItem;
@@ -18,7 +18,7 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
   const location = useLocation();
   const { isExpanded, expandedSections, toggleSection } = useSidebar();
   const [showTooltip, setShowTooltip] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   const hasChildren = item.children && item.children.length > 0;
   const isActive = item.path === location.pathname;
@@ -148,7 +148,7 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
           `}
           role="group"
         >
-          {item.children.map((child) => (
+          {item.children?.map((child) => (
             <SidebarNavItem
               key={child.id}
               item={child}

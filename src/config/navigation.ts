@@ -23,8 +23,10 @@ export interface NavItem {
   path?: string;
   children?: NavItem[];
   requiredAuth?: boolean;
-  requiredRole?: string[];
+  requiredRole?: UserRole[];
 }
+
+export type UserRole = 'viewer' | 'creator' | 'admin';
 
 export interface NavSection {
   id: string;
@@ -32,6 +34,7 @@ export interface NavSection {
   items: NavItem[];
   collapsible?: boolean;
   requiredAuth?: boolean;
+  requiredRole?: UserRole[];
 }
 
 export const navigationConfig: NavSection[] = [

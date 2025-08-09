@@ -26,7 +26,7 @@ Create a weather tracking app using React (vite), TypeScript, ShadCN, and Tailwi
 ```
 Frontend: TypeScript, React, Tailwind, ShadCN
 Backend: TypeScript, Python, Express.js, FastAPI, Django
-Databases: Postgres, MongoDB, Redis
+Databases: Postgres, Redis
 Cloud: Cloud Storage (S3), Supabase Auth, Cloud/Edge Functions
 ```
 ---

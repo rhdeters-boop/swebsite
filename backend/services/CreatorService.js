@@ -1,5 +1,13 @@
 import { Creator, User, MediaItem, CreatorSubscription, Follow, MediaAnalytics, CreatorLike } from '../models/index.js';
 import { Op, fn, col, literal } from 'sequelize';
+import {
+  createAnalyticsAggregation,
+  createCombinedAnalyticsAggregation,
+  createViewCountAggregation,
+  validateNumeric,
+  validateSortOrder,
+  sanitizeSearchString
+} from '../utils/queryHelpers.js';
 
 class CreatorService {
   /**
@@ -13,17 +21,25 @@ class CreatorService {
     limit = 12,
     userId = null
   }) {
-    const offset = (page - 1) * limit;
+    // Validate and sanitize inputs
+    const safeSearch = sanitizeSearchString(search);
+    const safeSortBy = validateSortOrder(sortBy, [
+      'popular', 'newest', 'rating', 'price_low', 'price_high',
+      'trending', 'top_performers', 'most_viewed', 'most_liked', 'likes'
+    ]);
+    const safePage = validateNumeric(page, 1, { min: 1, max: 1000 });
+    const safeLimit = validateNumeric(limit, 12, { min: 1, max: 100 });
+    const offset = (safePage - 1) * safeLimit;
     
     // Build where clause
     const where = {
       isActive: true,
     };
 
-    if (search) {
+    if (safeSearch) {
       where[Op.or] = [
-        { displayName: { [Op.iLike]: `%${search}%` } },
-        { bio: { [Op.iLike]: `%${search}%` } },
+        { displayName: { [Op.iLike]: `%${safeSearch}%` } },
+        { bio: { [Op.iLike]: `%${safeSearch}%` } },
       ];
     }
 
@@ -32,7 +48,7 @@ class CreatorService {
     }
 
     // Build order clause and includes
-    const { order, include } = this._buildSortingOptions(sortBy);
+    const { order, include } = this._buildSortingOptions(safeSortBy);
 
     const { rows: creators, count } = await Creator.findAndCountAll({
       where,
@@ -45,8 +61,8 @@ class CreatorService {
         ...include
       ],
       order,
-      limit: parseInt(limit),
-      offset: parseInt(offset),
+      limit: safeLimit,
+      offset: offset,
       distinct: true,
     });
 
@@ -59,10 +75,10 @@ class CreatorService {
     return {
       creators: creatorsWithStatus,
       pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
+        page: safePage,
+        limit: safeLimit,
         total: count,
-        pages: Math.ceil(count / limit)
+        pages: Math.ceil(count / safeLimit)
       },
       filters: {
         categories: [
@@ -77,6 +93,7 @@ class CreatorService {
    * Get top performing creators based on analytics
    */
   async getTopPerformers(limit = 10) {
+    const safeLimit = validateNumeric(limit, 10, { min: 1, max: 100 });
     const last30Days = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     const today = new Date().toISOString().split('T')[0];
 
@@ -107,11 +124,11 @@ class CreatorService {
         },
       ],
       order: [
-        [literal('(SELECT SUM(ma.daily_views) FROM "media_analytics" ma JOIN "media_items" mi ON ma.media_item_id = mi.id WHERE mi.creator_id = "Creator".id AND ma.date >= \'' + last30Days + '\')'), 'DESC NULLS LAST'],
+        [createAnalyticsAggregation('daily_views', last30Days), 'DESC NULLS LAST'],
         ['likeCount', 'DESC'],
         ['followerCount', 'DESC'],
       ],
-      limit: parseInt(limit),
+      limit: safeLimit,
     });
   }
 
@@ -119,6 +136,7 @@ class CreatorService {
    * Get trending creators based on recent engagement
    */
   async getTrendingCreators(limit = 10) {
+    const safeLimit = validateNumeric(limit, 10, { min: 1, max: 100 });
     const last7Days = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     const today = new Date().toISOString().split('T')[0];
 
@@ -149,10 +167,10 @@ class CreatorService {
         },
       ],
       order: [
-        [literal('(SELECT SUM(ma.daily_views + ma.daily_likes + ma.daily_shares) FROM "media_analytics" ma JOIN "media_items" mi ON ma.media_item_id = mi.id WHERE mi.creator_id = "Creator".id AND ma.date >= \'' + last7Days + '\')'), 'DESC NULLS LAST'],
+        [createCombinedAnalyticsAggregation(['daily_views', 'daily_likes', 'daily_shares'], last7Days), 'DESC NULLS LAST'],
         ['followerCount', 'DESC'],
       ],
-      limit: parseInt(limit),
+      limit: safeLimit,
     });
   }
 
@@ -160,6 +178,7 @@ class CreatorService {
    * Get new and rising creators
    */
   async getNewRisingCreators(limit = 10) {
+    const safeLimit = validateNumeric(limit, 10, { min: 1, max: 100 });
     const last60Days = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000);
 
     return await Creator.findAll({
@@ -181,7 +200,7 @@ class CreatorService {
         ['likeCount', 'DESC'],
         ['createdAt', 'DESC'],
       ],
-      limit: parseInt(limit),
+      limit: safeLimit,
     });
   }
 
@@ -487,7 +506,7 @@ class CreatorService {
           required: false,
         });
         order = [
-          [literal('(SELECT SUM(ma.daily_views + ma.daily_likes + ma.daily_shares) FROM "mediaAnalytics" ma JOIN "media_items" mi ON ma.media_item_id = mi.id WHERE mi.creator_id = "Creator".id AND ma.date >= \'' + last7Days + '\')'), 'DESC NULLS LAST'],
+          [createCombinedAnalyticsAggregation(['daily_views', 'daily_likes', 'daily_shares'], last7Days), 'DESC NULLS LAST'],
           ['followerCount', 'DESC'],
         ];
         break;
@@ -510,7 +529,7 @@ class CreatorService {
           required: false,
         });
         order = [
-          [literal('(SELECT SUM(ma.daily_views) FROM "mediaAnalytics" ma JOIN "media_items" mi ON ma.media_item_id = mi.id WHERE mi.creator_id = "Creator".id AND ma.date >= \'' + last30Days + '\')'), 'DESC NULLS LAST'],
+          [createAnalyticsAggregation('daily_views', last30Days), 'DESC NULLS LAST'],
           ['subscriberCount', 'DESC'],
         ];
         break;
@@ -522,7 +541,7 @@ class CreatorService {
           required: false,
         });
         order = [
-          [literal('(SELECT SUM(mi.view_count) FROM "media_items" mi WHERE mi.creator_id = "Creator".id)'), 'DESC NULLS LAST'],
+          [createViewCountAggregation(), 'DESC NULLS LAST'],
           ['followerCount', 'DESC'],
         ];
         break;

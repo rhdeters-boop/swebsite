@@ -2,26 +2,13 @@ import express from 'express';
 import { body, validationResult, query } from 'express-validator';
 import { authenticateToken, optionalAuth } from '../middleware/auth.js';
 import CreatorService from '../services/CreatorService.js';
+import { creatorValidation, sanitizeInputs, commonValidations } from '../middleware/validation.js';
 
 const router = express.Router();
 
 // Get all creators (public, with search and filters)
-router.get('/', optionalAuth, [
-  query('search').optional().trim(),
-  query('category').optional().trim(),
-  query('sortBy').optional().isIn(['newest', 'popular', 'likes', 'price_low', 'price_high', 'trending', 'top_performers', 'most_viewed', 'most_liked']),
-  query('page').optional().isInt({ min: 1 }),
-  query('limit').optional().isInt({ min: 1, max: 50 }),
-], async (req, res, next) => {
+router.get('/', optionalAuth, sanitizeInputs, creatorValidation.list, async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation errors',
-        errors: errors.array()
-      });
-    }
 
     const {
       search = '',
@@ -50,8 +37,19 @@ router.get('/', optionalAuth, [
 });
 
 // Analytics-based creator discovery routes (must be before /:id route)
-router.get('/top-performers', optionalAuth, async (req, res, next) => {
+router.get('/top-performers', optionalAuth, [
+  query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100').toInt()
+], sanitizeInputs, async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+    
     const { limit = 10 } = req.query;
     
     const creators = await CreatorService.getTopPerformers(limit);
@@ -65,8 +63,19 @@ router.get('/top-performers', optionalAuth, async (req, res, next) => {
   }
 });
 
-router.get('/trending', optionalAuth, async (req, res, next) => {
+router.get('/trending', optionalAuth, [
+  query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100').toInt()
+], sanitizeInputs, async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+    
     const { limit = 10 } = req.query;
     
     const creators = await CreatorService.getTrendingCreators(limit);
@@ -80,8 +89,19 @@ router.get('/trending', optionalAuth, async (req, res, next) => {
   }
 });
 
-router.get('/new-rising', optionalAuth, async (req, res, next) => {
+router.get('/new-rising', optionalAuth, [
+  query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100').toInt()
+], sanitizeInputs, async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+    
     const { limit = 10 } = req.query;
     
     const creators = await CreatorService.getNewRisingCreators(limit);
@@ -176,22 +196,8 @@ router.get('/:id', optionalAuth, [
 });
 
 // Apply to become a creator
-router.post('/apply', authenticateToken, [
-  body('displayName').trim().isLength({ min: 2, max: 50 }),
-  body('bio').optional().trim().isLength({ max: 1000 }),
-  body('categories').isArray({ min: 1, max: 5 }),
-  body('subscriptionPrice').isInt({ min: 299, max: 9999 }), // $2.99 to $99.99
-  body('socialLinks').optional().isObject(),
-], async (req, res, next) => {
+router.post('/apply', authenticateToken, sanitizeInputs, creatorValidation.create, async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation errors',
-        errors: errors.array()
-      });
-    }
 
     const {
       displayName,
@@ -246,22 +252,8 @@ router.get('/me/profile', authenticateToken, async (req, res, next) => {
 });
 
 // Update creator profile
-router.put('/me/profile', authenticateToken, [
-  body('displayName').optional().trim().isLength({ min: 2, max: 50 }),
-  body('bio').optional().trim().isLength({ max: 1000 }),
-  body('categories').optional().isArray({ min: 1, max: 5 }),
-  body('subscriptionPrice').optional().isInt({ min: 299, max: 9999 }),
-  body('socialLinks').optional().isObject(),
-], async (req, res, next) => {
+router.put('/me/profile', authenticateToken, sanitizeInputs, creatorValidation.update, async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation errors',
-        errors: errors.array()
-      });
-    }
 
     const updateData = {};
     const allowedFields = ['displayName', 'bio', 'categories', 'subscriptionPrice', 'socialLinks'];
@@ -309,24 +301,8 @@ router.get('/user/:userId', async (req, res, next) => {
 });
 
 // Update creator profile (use PUT /creators/profile instead of /creators/me/profile)
-router.put('/profile', authenticateToken, [
-  body('displayName').optional().trim().isLength({ min: 2, max: 50 }),
-  body('bio').optional().trim().isLength({ max: 1000 }),
-  body('categories').optional().isArray({ min: 0, max: 5 }),
-  body('subscriptionPrice').optional().isInt({ min: 299, max: 9999 }),
-  body('socialLinks').optional().isObject(),
-  body('profileImage').optional().isURL(),
-  body('coverImage').optional().isURL(),
-], async (req, res, next) => {
+router.put('/profile', authenticateToken, sanitizeInputs, creatorValidation.update, async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation errors',
-        errors: errors.array()
-      });
-    }
 
     const updatedCreator = await CreatorService.updateCreator(req.user.id, req.body);
 
