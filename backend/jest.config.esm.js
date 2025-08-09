@@ -20,7 +20,6 @@ export default {
       {
         useESM: true,
         tsconfig: '<rootDir>/tsconfig.testing.json',
-        isolatedModules: true,
         diagnostics: true,
       },
     ],

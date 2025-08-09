@@ -8,15 +8,28 @@ import nock from 'nock';
 // @ts-ignore
 (global as any).TextDecoder = (global as any).TextDecoder || TextDecoder;
 
-afterEach(() => {
-  nock.cleanAll();
-  nock.enableNetConnect(false); // Avoid unmocked network calls by default
-});
-
 beforeAll(() => {
   nock.disableNetConnect();
 });
 
+beforeEach(() => {
+  // Allow only loopback (supertest/server under test)
+  nock.enableNetConnect((host) =>
+    host === '127.0.0.1' ||
+    host.startsWith('127.0.0.1:') ||
+    host === 'localhost' ||
+    host.startsWith('localhost:')
+  );
+});
+
+afterEach(() => {
+  nock.cleanAll();
+  // Re-block everything after each test
+  nock.disableNetConnect();
+});
+
 afterAll(() => {
+  // Reset nock global state
+  nock.enableNetConnect();
   nock.restore();
 });
