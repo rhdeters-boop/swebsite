@@ -70,7 +70,7 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({ onClose }) => {
       return (
         <button
           onClick={toggleDropdown}
-          className="flex items-center space-x-2 text-text-secondary hover:text-seductive transition-colors duration-300 group px-2 py-3 h-12 rounded-md hover:bg-seductive/10"
+          className="flex items-center justify-center space-x-2 text-text-secondary hover:text-seductive transition-colors duration-300 group px-2 py-3 h-12 min-w-12 rounded-md hover:bg-seductive/10"
         >
           <User className="h-5 w-5 group-hover:text-seductive transition-colors duration-300" />
           {/* Show name and chevron on larger screens, hide on mobile */}

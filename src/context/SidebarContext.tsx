@@ -103,58 +103,37 @@ export const SidebarProvider: React.FC<SidebarProviderProps> = ({ children }) =>
 
   // Handle window resize and hover capability changes
   useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
+    const handleChange = () => {
       const isMobileDevice = detectMobile();
       
-      // Auto-collapse on tablets (desktop devices with smaller screens)
-      if (!isMobileDevice && width < TABLET_BREAKPOINT) {
-        setState(prev => {
-          if (prev.isExpanded) {
-            const newState = { ...prev, isExpanded: false };
-            savePreferences(newState);
-            return newState;
-          }
-          return prev;
-        });
-      }
-      
-      // Close mobile overlay when not on mobile device
+      // Close mobile overlay when switching from mobile to non-mobile device
       if (!isMobileDevice && state.isOpen) {
         setState(prev => ({ ...prev, isOpen: false }));
       }
     };
 
-    // Also listen for hover capability changes
+    handleChange(); // Check on mount
+
+    // Listen for both resize and hover capability changes
     const mediaQuery = window.matchMedia('(any-hover: none)');
-    const handleHoverChange = () => {
-      const isMobileDevice = detectMobile();
-      // Close mobile overlay when hover capability is detected (switched to desktop)
-      if (!isMobileDevice && state.isOpen) {
-        setState(prev => ({ ...prev, isOpen: false }));
-      }
-    };
-
-    handleResize(); // Check on mount
-
-    // Add event listeners
-    window.addEventListener('resize', handleResize);
+    
+    window.addEventListener('resize', handleChange);
     if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener('change', handleHoverChange);
+      mediaQuery.addEventListener('change', handleChange);
     } else if (mediaQuery.addListener) {
-      mediaQuery.addListener(handleHoverChange);
+      mediaQuery.addListener(handleChange);
     }
     
     // Cleanup
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('resize', handleChange);
       if (mediaQuery.removeEventListener) {
-        mediaQuery.removeEventListener('change', handleHoverChange);
+        mediaQuery.removeEventListener('change', handleChange);
       } else if (mediaQuery.removeListener) {
-        mediaQuery.removeListener(handleHoverChange);
+        mediaQuery.removeListener(handleChange);
       }
     };
-  }, [state.isOpen, savePreferences]);
+  }, [state.isOpen]);
 
   // Listen for storage events to sync across tabs
   useEffect(() => {
@@ -214,28 +193,41 @@ export const useSidebar = () => {
   return context;
 };
 
-// Hook to check if we're on mobile using hover capability detection
+// Hook to check if we're on mobile using hover capability and screen size detection
 export const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(() => detectMobile());
 
   useEffect(() => {
-    // Listen for media query changes to detect when hover capability changes
+    // Listen for both hover capability changes AND resize events
     const mediaQuery = window.matchMedia('(any-hover: none)');
     
     const handleChange = () => {
       setIsMobile(detectMobile());
     };
 
-    // Modern browsers
+    const handleResize = () => {
+      setIsMobile(detectMobile());
+    };
+
+    // Add resize listener for screen size changes
+    window.addEventListener('resize', handleResize);
+
+    // Add hover capability listener
     if (mediaQuery.addEventListener) {
       mediaQuery.addEventListener('change', handleChange);
-      return () => mediaQuery.removeEventListener('change', handleChange);
-    }
-    // Fallback for older browsers
-    else if (mediaQuery.addListener) {
+    } else if (mediaQuery.addListener) {
       mediaQuery.addListener(handleChange);
-      return () => mediaQuery.removeListener(handleChange);
     }
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener('change', handleChange);
+      } else if (mediaQuery.removeListener) {
+        mediaQuery.removeListener(handleChange);
+      }
+    };
   }, []);
 
   return isMobile;

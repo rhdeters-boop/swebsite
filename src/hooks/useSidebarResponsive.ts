@@ -6,25 +6,24 @@ const MOBILE_BREAKPOINT = 768;
 const TABLET_BREAKPOINT = 1024;
 
 interface UseResponsiveOptions {
-  onBreakpointChange?: (breakpoint: 'mobile' | 'tablet' | 'desktop') => void;
+  onBreakpointChange?: (breakpoint: 'mobile' | 'desktop') => void;
 }
 
 /**
  * Hook to handle responsive behavior for the sidebar
- * - Auto-collapses on tablet viewports (768px - 1024px)
- * - Closes mobile overlay when resizing to larger screens
- * - Restores user preference on desktop viewports
+ * - Mobile devices get overlay sidebar behavior
+ * - Non-mobile devices maintain user preference for collapsed/expanded state
+ * - Closes mobile overlay when switching to non-mobile devices
  */
 export const useSidebarResponsive = (options?: UseResponsiveOptions) => {
   const { isExpanded, isOpen, toggleExpanded, toggleOpen } = useSidebar();
   
-  const getBreakpoint = useCallback((width: number): 'mobile' | 'tablet' | 'desktop' => {
-    // Use hover-based detection for mobile vs non-mobile
+  const getBreakpoint = useCallback((width: number): 'mobile' | 'desktop' => {
+    // Use the new hybrid mobile detection
     const isMobileDevice = detectMobile();
     if (isMobileDevice) return 'mobile';
     
-    // For non-mobile devices, use width to distinguish tablet vs desktop layouts
-    if (width < TABLET_BREAKPOINT) return 'tablet';
+    // All non-mobile devices are treated as desktop (no tablet distinction)
     return 'desktop';
   }, []);
 
@@ -49,43 +48,20 @@ export const useSidebarResponsive = (options?: UseResponsiveOptions) => {
 
       // Handle mobile breakpoint
       if (currentBreakpoint === 'mobile') {
-        // Close mobile overlay if resizing down
+        // Close mobile overlay if resizing down from desktop
         if (isOpen && previousBreakpoint !== 'mobile') {
           toggleOpen();
         }
         return;
       }
 
-      // Handle tablet breakpoint - auto-collapse
-      if (currentBreakpoint === 'tablet') {
-        // Store user preference before auto-collapsing
-        if (previousBreakpoint === 'desktop') {
-          userPreferredExpanded = isExpanded;
-        }
-        
-        // Auto-collapse on tablet
-        if (isExpanded) {
-          toggleExpanded();
-        }
-        
-        // Close mobile overlay if it was open
-        if (isOpen) {
-          toggleOpen();
-        }
-        return;
-      }
-
-      // Handle desktop breakpoint - restore user preference
+      // Handle desktop breakpoint - maintain user preference
       if (currentBreakpoint === 'desktop') {
-        // Restore user preference when moving from tablet to desktop
-        if (previousBreakpoint === 'tablet' && userPreferredExpanded && !isExpanded) {
-          toggleExpanded();
-        }
-        
         // Close mobile overlay if it was open
         if (isOpen) {
           toggleOpen();
         }
+        // Don't auto-expand or collapse - let user control the sidebar state
       }
     };
 
@@ -102,8 +78,7 @@ export const useSidebarResponsive = (options?: UseResponsiveOptions) => {
   }, [isExpanded, isOpen, toggleExpanded, toggleOpen, getBreakpoint, getCurrentBreakpoint, options]);
 
   return {
-    isMobile: detectMobile(), // Use hover-based detection consistently
-    isTablet: getCurrentBreakpoint() === 'tablet',
+    isMobile: detectMobile(), // Use hybrid detection consistently
     isDesktop: getCurrentBreakpoint() === 'desktop',
     currentBreakpoint: getCurrentBreakpoint(),
   };

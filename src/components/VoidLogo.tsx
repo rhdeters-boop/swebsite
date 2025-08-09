@@ -1,7 +1,7 @@
 import React from 'react';
 import { Circle, Zap } from 'lucide-react';
 
-const VoidLogo: React.FC<{ className?: string }> = ({ className = "w-24 h-32" }) => {
+const VoidLogo: React.FC<{ className?: string }> = ({ className = "w-21 h-28" }) => {
   return (
     <div className={`relative flex items-end justify-center ${className}`}>
       <Circle className="h-5/6 w-5/6 text-void-accent group-hover:scale-110 transition-transform duration-200" />

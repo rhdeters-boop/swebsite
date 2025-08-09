@@ -11,11 +11,15 @@
 */
 
 /**
- * Detects if the current device is mobile based on hover capability.
- * Mobile devices typically cannot hover without clicking, so this checks
- * if the browser supports hover interactions.
- * 
- * @returns {boolean} true if mobile device (no hover capability), false if desktop (has hover)
+ * Detects if the current device should use mobile UI layout.
+ * This combines hover capability detection with screen size for better accuracy.
+ *
+ * Logic:
+ * - No hover capability = mobile (phones, tablets)
+ * - Has hover but small screen (< 768px) = mobile (small laptops, narrow windows)
+ * - Has hover and medium+ screen = desktop
+ *
+ * @returns {boolean} true if should use mobile UI, false for desktop UI
  */
 export const isMobile = (): boolean => {
   if (typeof window === 'undefined') {
@@ -23,11 +27,20 @@ export const isMobile = (): boolean => {
     return false;
   }
 
-  if (window.matchMedia && window.matchMedia("(any-hover: none)").matches) {
+  // Check for hover capability first
+  const hasHoverCapability = window.matchMedia && !window.matchMedia("(any-hover: none)").matches;
+  
+  // If no hover capability, definitely mobile
+  if (!hasHoverCapability) {
     return true;
-  } else {
-    return false;
   }
+  
+  // Has hover capability, but check screen size
+  // Small screens should still get mobile treatment even with hover
+  const screenWidth = window.innerWidth;
+  const MOBILE_BREAKPOINT = 768;
+  
+  return screenWidth < MOBILE_BREAKPOINT;
 };
 
 /**

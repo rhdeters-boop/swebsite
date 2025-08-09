@@ -74,7 +74,7 @@ const AppLayout = ({ children, hideSidebar }: { children: React.ReactNode; hideS
       <div
         className={`
           flex-1 flex flex-col transition-all duration-200
-          ${!hideSidebar && !isMobile ? (isExpanded ? 'lg:ml-60' : 'lg:ml-16') : ''}
+          ${!hideSidebar && !isMobile ? (isExpanded ? 'ml-60' : 'ml-16') : ''}
         `}
       >
         {children}

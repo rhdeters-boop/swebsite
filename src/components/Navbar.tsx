@@ -11,8 +11,8 @@ const Navbar: React.FC = () => {
   return (
     <nav className="bg-background-primary/95 backdrop-blur-sm shadow-xl border-b border-border-primary sticky top-0 z-30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16 nav:h-24 py-4">
-          <div className="flex items-center gap-3">
+        <div className="flex justify-between items-center h-16 nav:h-24 pt-4 pb-2">
+          <div className="flex items-end gap-3">
             {/* Mobile menu toggle - only show on mobile */}
             {isMobile && (
               <button
@@ -29,7 +29,7 @@ const Navbar: React.FC = () => {
             )}
             <NavbarLogo />
           </div>
-          {/* Auth Section - works for both desktop and mobile */}
+          {/* Account Dropdown - works for both desktop and mobile */}
           <div className="flex items-center space-x-6">
             <AccountDropdown />
           </div>

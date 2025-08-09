@@ -70,13 +70,13 @@ const SidebarMobileOverlay: React.FC<SidebarMobileOverlayProps> = ({ children })
     };
   }, [isOpen]);
 
-  if (!isOpen) return null;
-
   return (
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 md:hidden animate-fade-in"
+        className={`fixed inset-0 bg-black/80 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300 ease-out ${
+          isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
         onClick={toggleOpen}
         aria-hidden="true"
       />
@@ -84,11 +84,10 @@ const SidebarMobileOverlay: React.FC<SidebarMobileOverlayProps> = ({ children })
       {/* Sidebar container */}
       <div
         ref={overlayRef}
-        className="fixed inset-y-0 left-0 z-50 w-64 bg-background-primary border-r border-border-primary
-                   shadow-2xl md:hidden transform transition-transform duration-300 ease-out"
-        style={{
-          transform: isOpen ? 'translateX(0)' : 'translateX(-100%)',
-        }}
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-background-primary border-r border-border-primary
+                   shadow-2xl md:hidden transition-transform duration-300 ease-out ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
         role="dialog"
         aria-modal="true"
         aria-label="Navigation menu"

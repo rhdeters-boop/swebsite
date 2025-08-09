@@ -81,10 +81,10 @@ const Sidebar: React.FC = () => {
       </a>
 
       {/* Header with logo and toggle */}
-      <div className="relative flex items-center justify-between p-4 border-b border-border-primary min-h-[96px]">
+      <div className="relative flex items-center justify-between p-4 min-h-[96px]">
         {isExpanded || isMobile ? (
           <>
-            <VoidLogo className={`transition-all duration-200 ${isMobile ? 'w-16 h-20' : 'w-20 h-24'}`} />
+            <VoidLogo className={`transition-all duration-200 ${isMobile ? 'w-12 h-16' : 'w-12 h-16'}`} />
             <SidebarToggle />
           </>
         ) : (
@@ -117,7 +117,7 @@ const Sidebar: React.FC = () => {
 
       {/* Footer */}
       {isExpanded && (
-        <div className="p-4 border-t border-border-primary">
+        <div className="p-4">
           <p className="text-xs text-text-muted text-center">
             © {new Date().getFullYear()} Void of Desire
           </p>
@@ -144,7 +144,7 @@ const Sidebar: React.FC = () => {
     <aside
       ref={sidebarRef}
       className={`
-        fixed left-0 top-0 h-full bg-background-primary border-r border-border-primary
+        fixed left-0 top-0 h-full bg-background-primary border-r-4 border-border-primary
         shadow-xl flex flex-col transition-all duration-200 ease-out z-50
         ${isExpanded ? 'w-60' : 'w-20'}
       `}
