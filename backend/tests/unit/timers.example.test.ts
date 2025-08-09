@@ -1,3 +1,5 @@
+import { jest } from '@jest/globals';
+
 describe('Timers example', () => {
   test('delays callback', () => {
     jest.useFakeTimers({ legacyFakeTimers: false });

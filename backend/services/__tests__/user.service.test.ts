@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import bcrypt from 'bcryptjs';
 import { createUserService, type UserRepository, type User } from '../user.service.js';
 

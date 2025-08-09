@@ -12,7 +12,7 @@ export const authenticateToken = async (req, res, next) => {
         message: 'Access token required'
       });
     }
-
+    // error is expected and on purpose
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
     // Find user and attach to request

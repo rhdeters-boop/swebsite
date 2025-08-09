@@ -1,21 +1,18 @@
+import { jest } from '@jest/globals';
 import express from 'express';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
 
-// IMPORTANT: must mock the exact path used inside the middleware file
-// middleware/auth.js does: import { User } from '../models/index.js'
-// From this test file, that path is '../../models/index.js'
-jest.mock('../../models/index.js', () => {
-  return {
-    __esModule: true,
-    User: {
-      findByPk: jest.fn(),
-    },
-  };
-});
+// ESM-compatible mocking
+const mockFindByPk = jest.fn<() => Promise<any>>();
+await jest.unstable_mockModule('../../models/index.js', () => ({
+  User: {
+    findByPk: mockFindByPk,
+  },
+}));
 
-import { authenticateToken, requireRole } from '@/backend/middleware/auth.js';
-import { User as MockUser } from '../../models/index.js';
+// Import after mocking
+const { authenticateToken, requireRole } = await import('@/backend/middleware/auth.js');
 
 describe('Auth middleware (authenticateToken + requireRole)', () => {
   const secret = 'unit_test_secret';
@@ -43,18 +40,18 @@ describe('Auth middleware (authenticateToken + requireRole)', () => {
   test('200 with valid token and active user', async () => {
     const app = makeApp();
     const token = jwt.sign({ userId: 'u1' }, secret);
-    (MockUser.findByPk as jest.Mock).mockResolvedValue({ id: 'u1', isActive: true });
+    mockFindByPk.mockResolvedValue({ id: 'u1', isActive: true });
 
     const res = await request(app).get('/private').set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ ok: true });
-    expect(MockUser.findByPk).toHaveBeenCalledWith('u1', expect.any(Object));
+    expect(mockFindByPk).toHaveBeenCalledWith('u1', expect.any(Object));
   });
 
   test('403 for non-admin on admin route', async () => {
     const app = makeApp();
     const token = jwt.sign({ userId: 'u2' }, secret);
-    (MockUser.findByPk as jest.Mock).mockResolvedValue({ id: 'u2', isActive: true, role: 'user' });
+    mockFindByPk.mockResolvedValue({ id: 'u2', isActive: true, role: 'user' });
 
     const res = await request(app).get('/admin').set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(403);
@@ -72,7 +69,7 @@ describe('Auth middleware (authenticateToken + requireRole)', () => {
   test('401 when user not found or inactive', async () => {
     const app = makeApp();
     const token = jwt.sign({ userId: 'ghost' }, secret);
-    (MockUser.findByPk as jest.Mock).mockResolvedValue(null);
+    mockFindByPk.mockResolvedValue(null);
 
     const res = await request(app).get('/private').set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(401);
