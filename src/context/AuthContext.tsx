@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import axios from 'axios';
 
+type UserRole = 'viewer' | 'creator' | 'admin';
+
 // Types
 interface User {
   id: string;
@@ -12,6 +14,7 @@ interface User {
   bio?: string;
   isEmailVerified: boolean;
   lastLoginAt?: string;
+  role: UserRole;
 }
 
 interface AuthState {

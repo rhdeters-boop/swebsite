@@ -1,5 +1,6 @@
 import { useEffect, useCallback } from 'react';
-import { useSidebar } from '../context/SidebarContext';
+import { useSidebar, useIsMobile } from '../context/SidebarContext';
+import { isMobile as detectMobile } from '../utils/mobileDetection';
 
 const MOBILE_BREAKPOINT = 768;
 const TABLET_BREAKPOINT = 1024;
@@ -18,7 +19,11 @@ export const useSidebarResponsive = (options?: UseResponsiveOptions) => {
   const { isExpanded, isOpen, toggleExpanded, toggleOpen } = useSidebar();
   
   const getBreakpoint = useCallback((width: number): 'mobile' | 'tablet' | 'desktop' => {
-    if (width < MOBILE_BREAKPOINT) return 'mobile';
+    // Use hover-based detection for mobile vs non-mobile
+    const isMobileDevice = detectMobile();
+    if (isMobileDevice) return 'mobile';
+    
+    // For non-mobile devices, use width to distinguish tablet vs desktop layouts
     if (width < TABLET_BREAKPOINT) return 'tablet';
     return 'desktop';
   }, []);
@@ -97,7 +102,7 @@ export const useSidebarResponsive = (options?: UseResponsiveOptions) => {
   }, [isExpanded, isOpen, toggleExpanded, toggleOpen, getBreakpoint, getCurrentBreakpoint, options]);
 
   return {
-    isMobile: getCurrentBreakpoint() === 'mobile',
+    isMobile: detectMobile(), // Use hover-based detection consistently
     isTablet: getCurrentBreakpoint() === 'tablet',
     isDesktop: getCurrentBreakpoint() === 'desktop',
     currentBreakpoint: getCurrentBreakpoint(),

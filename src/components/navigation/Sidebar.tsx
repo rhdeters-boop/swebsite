@@ -81,15 +81,17 @@ const Sidebar: React.FC = () => {
       </a>
 
       {/* Header with logo and toggle */}
-      <div className="flex items-center justify-between p-4 border-b border-border-primary">
-        <div className={`flex items-center transition-all duration-200 ${!isExpanded && !isMobile ? 'justify-center w-full' : ''}`}>
-          {(isExpanded || isMobile) && (
-            <VoidLogo className="w-20 h-24 transition-all duration-200" />
-          )}
-        </div>
-        <div className={`${!isExpanded && !isMobile ? 'absolute top-4 left-3' : ''}`}>
-          <SidebarToggle />
-        </div>
+      <div className="relative flex items-center justify-between p-4 border-b border-border-primary min-h-[96px]">
+        {isExpanded || isMobile ? (
+          <>
+            <VoidLogo className={`transition-all duration-200 ${isMobile ? 'w-16 h-20' : 'w-20 h-24'}`} />
+            <SidebarToggle />
+          </>
+        ) : (
+          <div className="w-full flex justify-center">
+            <SidebarToggle />
+          </div>
+        )}
       </div>
 
       {/* Navigation sections */}
@@ -104,7 +106,7 @@ const Sidebar: React.FC = () => {
                 {section.title}
               </h3>
             )}
-            <ul className="space-y-1" role="list">
+            <ul className="space-y-1 text-white" role="list">
               {section.items.map(item => (
                 <SidebarNavItem key={item.id} item={item} />
               ))}
@@ -143,8 +145,8 @@ const Sidebar: React.FC = () => {
       ref={sidebarRef}
       className={`
         fixed left-0 top-0 h-full bg-background-primary border-r border-border-primary
-        shadow-xl flex flex-col transition-all duration-200 ease-out z-30
-        ${isExpanded ? 'w-60' : 'w-16'}
+        shadow-xl flex flex-col transition-all duration-200 ease-out z-50
+        ${isExpanded ? 'w-60' : 'w-20'}
       `}
       role="navigation"
     >

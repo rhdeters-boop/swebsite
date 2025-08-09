@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { isMobile as detectMobile } from '../utils/mobileDetection';
 
 interface SidebarContextState {
   isExpanded: boolean;
@@ -100,13 +101,14 @@ export const SidebarProvider: React.FC<SidebarProviderProps> = ({ children }) =>
   }, [savePreferences]);
 
 
-  // Handle window resize
+  // Handle window resize and hover capability changes
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
+      const isMobileDevice = detectMobile();
       
-      // Auto-collapse on tablets
-      if (width >= MOBILE_BREAKPOINT && width < TABLET_BREAKPOINT) {
+      // Auto-collapse on tablets (desktop devices with smaller screens)
+      if (!isMobileDevice && width < TABLET_BREAKPOINT) {
         setState(prev => {
           if (prev.isExpanded) {
             const newState = { ...prev, isExpanded: false };
@@ -117,15 +119,41 @@ export const SidebarProvider: React.FC<SidebarProviderProps> = ({ children }) =>
         });
       }
       
-      // Close mobile overlay when resizing to larger screens
-      if (width >= MOBILE_BREAKPOINT && state.isOpen) {
+      // Close mobile overlay when not on mobile device
+      if (!isMobileDevice && state.isOpen) {
+        setState(prev => ({ ...prev, isOpen: false }));
+      }
+    };
+
+    // Also listen for hover capability changes
+    const mediaQuery = window.matchMedia('(any-hover: none)');
+    const handleHoverChange = () => {
+      const isMobileDevice = detectMobile();
+      // Close mobile overlay when hover capability is detected (switched to desktop)
+      if (!isMobileDevice && state.isOpen) {
         setState(prev => ({ ...prev, isOpen: false }));
       }
     };
 
     handleResize(); // Check on mount
+
+    // Add event listeners
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleHoverChange);
+    } else if (mediaQuery.addListener) {
+      mediaQuery.addListener(handleHoverChange);
+    }
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener('change', handleHoverChange);
+      } else if (mediaQuery.removeListener) {
+        mediaQuery.removeListener(handleHoverChange);
+      }
+    };
   }, [state.isOpen, savePreferences]);
 
   // Listen for storage events to sync across tabs
@@ -186,19 +214,28 @@ export const useSidebar = () => {
   return context;
 };
 
-// Hook to check if we're on mobile
+// Hook to check if we're on mobile using hover capability detection
 export const useIsMobile = () => {
-  const [isMobile, setIsMobile] = useState(() => 
-    typeof window !== 'undefined' ? window.innerWidth < MOBILE_BREAKPOINT : false
-  );
+  const [isMobile, setIsMobile] = useState(() => detectMobile());
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    // Listen for media query changes to detect when hover capability changes
+    const mediaQuery = window.matchMedia('(any-hover: none)');
+    
+    const handleChange = () => {
+      setIsMobile(detectMobile());
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    // Modern browsers
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    }
+    // Fallback for older browsers
+    else if (mediaQuery.addListener) {
+      mediaQuery.addListener(handleChange);
+      return () => mediaQuery.removeListener(handleChange);
+    }
   }, []);
 
   return isMobile;

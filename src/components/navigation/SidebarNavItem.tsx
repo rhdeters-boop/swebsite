@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
-import { useSidebar } from '../../context/SidebarContext';
+import { useSidebar, useIsMobile } from '../../context/SidebarContext';
 import type { NavItem } from '../../config/navigation';
 
 interface SidebarNavItemProps {
@@ -10,15 +10,18 @@ interface SidebarNavItemProps {
   parentPath?: string;
 }
 
-const SidebarNavItem: React.FC<SidebarNavItemProps> = ({ 
-  item, 
+const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
+  item,
   depth = 0,
   parentPath = ''
 }) => {
   const location = useLocation();
   const { isExpanded, expandedSections, toggleSection } = useSidebar();
+  const isMobile = useIsMobile();
   const [showTooltip, setShowTooltip] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 76 });
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const itemRef = useRef<HTMLElement>(null);
   
   const hasChildren = item.children && item.children.length > 0;
   const isActive = item.path === location.pathname;
@@ -27,8 +30,36 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
   
   const Icon = item.icon;
 
+  const calculateTooltipPosition = () => {
+    if (!itemRef.current) return;
+    
+    const rect = itemRef.current.getBoundingClientRect();
+    const tooltipWidth = 200; // Approximate tooltip width
+    const tooltipHeight = 32; // Approximate tooltip height
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    let left = 76; // Default position after collapsed sidebar
+    let top = rect.top + (rect.height / 2) - (tooltipHeight / 2);
+    
+    // Check if tooltip would overflow viewport
+    if (left + tooltipWidth > viewportWidth) {
+      left = viewportWidth - tooltipWidth - 10;
+    }
+    
+    // Ensure tooltip stays within vertical viewport bounds
+    if (top < 10) {
+      top = 10;
+    } else if (top + tooltipHeight > viewportHeight - 10) {
+      top = viewportHeight - tooltipHeight - 10;
+    }
+    
+    setTooltipPosition({ top, left });
+  };
+
   const handleMouseEnter = () => {
     if (!isExpanded && !hasChildren) {
+      calculateTooltipPosition();
       timeoutRef.current = setTimeout(() => setShowTooltip(true), 500);
     }
   };
@@ -78,8 +109,8 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
               ${isActive ? 'text-void-accent' : 'text-text-tertiary group-hover:text-text-secondary'}
             `}
           />
-          {isExpanded && (
-            <span 
+          {(isExpanded || isMobile) && (
+            <span
               className={`
                 ml-3 text-sm font-medium truncate transition-all duration-200
                 ${isActive ? 'text-void-accent' : ''}
@@ -90,8 +121,8 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
           )}
         </div>
         
-        {hasChildren && isExpanded && (
-          <ChevronDown 
+        {hasChildren && (isExpanded || isMobile) && (
+          <ChevronDown
             className={`
               w-4 h-4 text-text-tertiary transition-transform duration-200
               ${isSectionExpanded ? 'rotate-180' : ''}
@@ -103,20 +134,46 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
       {/* Tooltip for collapsed state */}
       {!isExpanded && !hasChildren && showTooltip && (
         <div
-          className="absolute left-full ml-2 px-2 py-1 text-xs font-medium text-text-primary 
+          className="fixed px-2 py-1 text-xs font-medium text-text-primary
                      bg-background-card border border-border-primary rounded-md whitespace-nowrap
-                     shadow-lg z-50 pointer-events-none"
+                     shadow-lg z-[60] pointer-events-none"
           role="tooltip"
-          style={{ top: '50%', transform: 'translateY(-50%)' }}
+          style={{
+            left: `${tooltipPosition.left}px`,
+            top: `${tooltipPosition.top}px`,
+          }}
         >
           {item.label}
+        </div>
+      )}
+      
+      {/* Dropdown tooltip for collapsed state with children */}
+      {!isExpanded && hasChildren && showTooltip && (
+        <div
+          className="fixed px-2 py-2 bg-background-card border border-border-primary
+                     rounded-md shadow-lg z-[60] pointer-events-none"
+          role="tooltip"
+          style={{
+            left: `${tooltipPosition.left}px`,
+            top: `${tooltipPosition.top}px`,
+            minWidth: '160px'
+          }}
+        >
+          <div className="text-xs font-medium text-text-primary mb-1">{item.label}</div>
+          <div className="space-y-1">
+            {item.children?.map((child) => (
+              <div key={child.id} className="text-xs text-text-secondary pl-2">
+                • {child.label}
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </>
   );
 
   return (
-    <li>
+    <li ref={itemRef as React.RefObject<HTMLLIElement>}>
       {item.path && !hasChildren ? (
         <Link
           to={item.path}

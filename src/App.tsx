@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
+
+// Mobile detection utility
+import { attachGlobalIsMobile } from './utils/mobileDetection';
 
 // Components
 import Navbar from './components/Navbar';
@@ -186,6 +189,11 @@ const AppContent = () => {
 };
 
 function App() {
+  // Initialize global mobile detection function
+  useEffect(() => {
+    attachGlobalIsMobile();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <Elements stripe={stripePromise}>
