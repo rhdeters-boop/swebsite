@@ -18,7 +18,10 @@
     "logs:all": "concurrently --names \"BACKEND-LOG,FRONTEND-LOG\" --prefix-colors \"magenta,cyan\" \"npm run logs:backend\" \"npm run logs:frontend\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:backend": "npm --prefix ./backend run test",
+    "test:backend:containers": "npm --prefix ./backend run test:containers",
+    "test:backend:coverage": "npm --prefix ./backend run test:coverage"
   },
   "dependencies": {
     "@stripe/react-stripe-js": "^3.8.0",

@@ -378,7 +378,6 @@ class AuthService {
       createdAt: user.createdAt,
       lastLoginAt: user.lastLoginAt || user.createdAt,
       isEmailVerified: user.isEmailVerified || false,
-      totalSessions: 1,
       subscription: null
     };
 
@@ -449,18 +448,6 @@ class AuthService {
 
     return {
       message: 'Security settings updated successfully'
-    };
-  }
-
-  /**
-   * Logout all sessions
-   */
-  async logoutAllSessions(userId) {
-    // In a real app, invalidate all user sessions
-    console.log(`Logged out all sessions for user ${userId}`);
-
-    return {
-      message: 'All sessions have been logged out successfully'
     };
   }
 

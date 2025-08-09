@@ -44,7 +44,6 @@ const AccountSettings: React.FC = () => {
     resetEmailFields,
     changePassword,
     changeEmail,
-    logoutAllSessions,
     deleteAccount,
   } = useSecuritySettings();
 
@@ -363,21 +362,7 @@ const AccountSettings: React.FC = () => {
                         )}
                       </div>
                     </div>
-                    <div className="p-4 border border-gray-200 rounded-lg">
-                      <h4 className="font-medium text-gray-700">Active Sessions</h4>
-                      <p className="text-sm text-gray-600">{accountData.totalSessions || 1} session(s)</p>
-                    </div>
                   </div>
-                </div>
-
-                <div>
-                  <button
-                    onClick={logoutAllSessions}
-                    disabled={isLoading}
-                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 disabled:opacity-50"
-                  >
-                    {isLoading ? 'Logging out...' : 'Logout All Sessions'}
-                  </button>
                 </div>
               </div>
             )}

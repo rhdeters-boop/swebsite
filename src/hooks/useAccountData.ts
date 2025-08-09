@@ -11,7 +11,6 @@ export interface AccountData {
   createdAt: string;
   lastLoginAt: string;
   isEmailVerified: boolean;
-  totalSessions: number;
   subscription?: {
     tier: string;
     status: string;
@@ -66,7 +65,6 @@ const defaultAccountData: AccountData = {
   createdAt: '',
   lastLoginAt: '',
   isEmailVerified: false,
-  totalSessions: 0,
 };
 
 export const useAccountData = (): UseAccountDataReturn => {

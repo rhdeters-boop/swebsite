@@ -60,7 +60,6 @@ export interface UseSecuritySettingsReturn {
   resetAll: () => void;
   changePassword: () => Promise<void>;
   changeEmail: () => Promise<void>;
-  logoutAllSessions: () => Promise<void>;
   deleteAccount: (password: string) => Promise<void>;
 }
 
@@ -153,21 +152,6 @@ export const useSecuritySettings = (): UseSecuritySettingsReturn => {
     }
   }, [securitySettings, resetEmailFields]);
 
-  const logoutAllSessions = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      setError('');
-      setSuccess('');
-
-      await axios.post('/auth/logout-all-sessions');
-      setSuccess('All sessions have been logged out successfully!');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to logout all sessions.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
   const deleteAccount = useCallback(async (password: string) => {
     if (!password) {
       setError('Please enter your password to confirm account deletion.');
@@ -203,7 +187,6 @@ export const useSecuritySettings = (): UseSecuritySettingsReturn => {
     resetAll,
     changePassword,
     changeEmail,
-    logoutAllSessions,
     deleteAccount,
   };
 };

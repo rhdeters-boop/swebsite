@@ -1,0 +1,97 @@
+name: Backend Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  backend-tests:
+    name: backend-${{ matrix.target }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [ unit, api, contract, coverage ]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps (backend)
+        working-directory: backend
+        run: npm ci
+
+      - name: Cache Jest
+        uses: actions/cache@v4
+        with:
+          path: |
+            backend/.jest-cache
+          key: ${{ runner.os }}-jest-${{ hashFiles('backend/jest.config.esm.js') }}
+
+      - name: Lint
+        if: matrix.target == 'unit'
+        run: npm --prefix backend run lint
+
+      - name: Typecheck
+        if: matrix.target == 'unit'
+        run: npm --prefix backend run typecheck
+
+      - name: Run unit tests
+        if: matrix.target == 'unit'
+        run: npm --prefix backend run test:unit
+
+      - name: Run API tests (supertest; no containers)
+        if: matrix.target == 'api'
+        run: npm --prefix backend run test:api
+
+      - name: Run contract tests
+        if: matrix.target == 'contract'
+        run: npm --prefix backend run test:contract
+
+      - name: Run coverage (all)
+        if: matrix.target == 'coverage'
+        run: npm --prefix backend run test:coverage
+
+      - name: Upload coverage to Codecov
+        if: matrix.target == 'coverage'
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: backend/coverage
+          flags: backend
+          fail_ci_if_error: true
+
+  backend-integration-containers:
+    name: backend-integration-containers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps (backend)
+        working-directory: backend
+        run: npm ci
+
+      - name: Integration tests with Testcontainers
+        env:
+          JEST_INTEGRATION_MODE: testcontainers
+          DOCKER_HOST: unix:///var/run/docker.sock
+          TESTCONTAINERS_RYUK_DISABLED: 'true'
+        run: npm --prefix backend run test:containers
+
+      - name: Archive JUnit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-backend
+          path: backend/reports/junit.xml

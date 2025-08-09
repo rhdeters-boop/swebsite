@@ -42,6 +42,7 @@ import CreateCreatorProfile from './pages/CreateCreatorProfile';
 
 // Hooks
 import { useNavigationTracking } from './hooks/useNavigationTracking';
+import { RouteHistoryProvider } from './context/RouteHistoryContext';
 
 // Initialize Stripe
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_...');
@@ -165,7 +166,9 @@ function App() {
         <AuthProvider>
           <AlertProvider>
             <Router>
-              <AppContent />
+              <RouteHistoryProvider>
+                <AppContent />
+              </RouteHistoryProvider>
             </Router>
           </AlertProvider>
         </AuthProvider>

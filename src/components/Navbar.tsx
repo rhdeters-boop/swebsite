@@ -1,6 +1,6 @@
 import React from 'react';
-import NavbarLogo from './navbar/NavbarLogo';
-import AccountDropdown from './navbar/AccountDropdown';
+import NavbarLogo from './navigation/NavbarLogo'
+import AccountDropdown from './navigation/AccountDropdown';
 
 const Navbar: React.FC = () => {
   return (

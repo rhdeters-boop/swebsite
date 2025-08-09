@@ -385,20 +385,6 @@ router.put('/security-settings', authenticateToken, [
   }
 });
 
-// Logout all sessions
-router.post('/logout-all-sessions', authenticateToken, async (req, res, next) => {
-  try {
-    const result = await AuthService.logoutAllSessions(req.user.id);
-
-    res.json({
-      success: true,
-      ...result
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
 // Delete account
 router.delete('/delete-account', authenticateToken, [
   body('password').notEmpty().withMessage('Password is required to delete account'),

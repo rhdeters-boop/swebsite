@@ -76,6 +76,30 @@ export const optionalAuth = async (req, res, next) => {
   }
 };
 
+/**
+ * Require a specific role on the authenticated user.
+ * Intended for routes that need elevated privileges (e.g., admin).
+ * Responds with 401 if unauthenticated, 403 if role mismatch.
+ */
+export const requireRole = (role) => {
+  return (req, res, next) => {
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+    }
+    if (role === 'admin' && user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Forbidden'
+      });
+    }
+    return next();
+  };
+};
+
 export const requireSubscription = (requiredTier) => {
   return async (req, res, next) => {
     try {

@@ -33,7 +33,6 @@ const Security: React.FC = () => {
     resetEmailFields,
     changePassword,
     changeEmail,
-    logoutAllSessions,
     deleteAccount,
   } = useSecuritySettings();
 
@@ -315,23 +314,6 @@ const Security: React.FC = () => {
                         </p>
                       </div>
                     )}
-                  </div>
-                </div>
-
-                {/* Session Management */}
-                <div className="border-t border-border-muted pt-8">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-2xl font-semibold text-primary mb-2">Active Sessions</h3>
-                      <p className="text-secondary">Manage your active login sessions</p>
-                    </div>
-                    <button
-                      onClick={logoutAllSessions}
-                      disabled={securityLoading || privacyLoading || deletionLoading}
-                      className="btn-outline hover:border-secondary disabled:opacity-50"
-                    >
-                      {(securityLoading || privacyLoading || deletionLoading) ? 'Logging out...' : 'Logout All Sessions'}
-                    </button>
                   </div>
                 </div>
               </div>
