@@ -71,6 +71,49 @@ export default tseslint.config([
     },
   },
 
+  // Backend TypeScript configuration
+  {
+    files: ['backend/**/*.{ts,tsx}'],
+    extends: [
+      ...tseslint.configs.recommended,
+    ],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: {
+        ...globals.node,
+        ...globals.es2022,
+        ...globals.jest,
+      },
+    },
+    rules: {
+      // TS handles undefineds; disable base rule to avoid false positives
+      'no-undef': 'off',
+      // Allow console in backend
+      'no-console': 'off',
+      // Align unused vars rule with JS config
+      '@typescript-eslint/no-unused-vars': ['warn', {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
+      }],
+    },
+  },
+
+  // Tests in backend: allow console
+  {
+    files: ['backend/**/__tests__/**/*.{ts,js}', 'backend/tests/**/*.{ts,js}', 'backend/test/**/*.{ts,js}'],
+    languageOptions: {
+      globals: {
+        ...globals.jest,
+        ...globals.node,
+      },
+    },
+    rules: {
+      'no-console': 'off',
+    },
+  },
+
   // Configuration files
   {
     files: ['*.config.{js,ts,mjs}', '.eslintrc.{js,cjs}'],

@@ -1,4 +1,4 @@
-export function toSlug(input) {
+export function toSlug(input: unknown): string {
   return String(input)
     .trim()
     .toLowerCase()

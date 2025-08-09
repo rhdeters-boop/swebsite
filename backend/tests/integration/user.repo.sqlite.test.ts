@@ -11,7 +11,7 @@ describe('Sequelize repo on sqlite::memory:', () => {
         const m = await (User as any).findOne({ where: { email } });
         return m ? (m.toJSON() as unknown as User) : null;
       },
-      async create(data) {
+  async create(data: { email: string; password_hash: string }) {
         const created = await (User as any).create(data);
         return created.toJSON() as unknown as User;
       },

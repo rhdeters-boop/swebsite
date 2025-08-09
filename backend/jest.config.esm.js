@@ -31,7 +31,7 @@ export default {
   testTimeout: useContainers ? 60000 : 20000,
   collectCoverage: isCI || !!process.env.COVERAGE,
   collectCoverageFrom: [
-    '<rootDir>/**/*.{ts,js}',
+    '<rootDir>/**/*.ts',
     '!<rootDir>/**/*.d.ts',
     '!<rootDir>/**/__tests__/**',
     '!<rootDir>/**/test/**',

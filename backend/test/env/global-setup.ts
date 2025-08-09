@@ -30,10 +30,13 @@ async function runMigrationsAndSeed(pgUrl: string) {
 
 export default async function globalSetup() {
   const container = await new GenericContainer('postgres:16-alpine')
-    .withEnv('POSTGRES_PASSWORD', 'postgres')
-    .withEnv('POSTGRES_DB', 'testdb')
+    .withEnvironment({
+      POSTGRES_PASSWORD: 'postgres',
+      POSTGRES_DB: 'testdb',
+      POSTGRES_USER: 'postgres',
+    })
     .withExposedPorts(5432)
-    .withWaitStrategy(Wait.forLogMessage('database system is ready to accept connections'))
+    .withWaitStrategy(Wait.forLogMessage(/database system is ready to accept connections/i))
     .start();
 
   const mappedPort = container.getMappedPort(5432);
@@ -46,8 +49,6 @@ export default async function globalSetup() {
   process.env.DB_USER = 'postgres';
   process.env.DB_PASSWORD = 'postgres';
   process.env.DATABASE_URL = pgUrl;
-
-  await runMigrationsAndSeed(pgUrl);
 
   // @ts-ignore - attach to global for teardown
   (global as any).__TESTCONTAINERS_STATE__ = { container, pgUrl } as GlobalState;
