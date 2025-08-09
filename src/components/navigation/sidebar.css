@@ -1,0 +1,98 @@
+/* Sidebar animations and transitions */
+
+/* Smooth width transition for sidebar */
+.sidebar-transition {
+  transition: width 200ms ease-out, transform 200ms ease-out;
+}
+
+/* Mobile slide animation */
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutLeft {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+.sidebar-mobile-enter {
+  animation: slideInLeft 300ms ease-out;
+}
+
+.sidebar-mobile-exit {
+  animation: slideOutLeft 300ms ease-out;
+}
+
+/* Tooltip animations */
+.sidebar-tooltip {
+  transition: opacity 200ms ease-out, transform 150ms ease-out;
+  transform-origin: left center;
+}
+
+/* Icon rotation for chevrons */
+.chevron-transition {
+  transition: transform 200ms ease-in-out;
+}
+
+/* Height transition for nested menus */
+.menu-height-transition {
+  transition: max-height 200ms ease-out, opacity 200ms ease-out;
+}
+
+/* Focus visible styles for better accessibility */
+.sidebar-nav-item:focus-visible {
+  outline: 2px solid rgba(168, 85, 247, 0.5);
+  outline-offset: 2px;
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-transition,
+  .sidebar-tooltip,
+  .chevron-transition,
+  .menu-height-transition {
+    transition-duration: 0.01ms !important;
+  }
+  
+  .sidebar-mobile-enter,
+  .sidebar-mobile-exit {
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Loading shimmer for dynamic content */
+.sidebar-loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar-loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(168, 85, 247, 0.1),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    left: 100%;
+  }
+}

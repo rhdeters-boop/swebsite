@@ -1,3 +1,4 @@
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
@@ -8,6 +9,7 @@ import { Elements } from '@stripe/react-stripe-js';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
+import Sidebar from './components/navigation/Sidebar';
 import Landing from './pages/Landing';
 import Explore from './pages/Explore';
 import MyFeed from './pages/MyFeed';
@@ -36,6 +38,7 @@ import Billing from './pages/Billing';
 // Context
 import { AuthProvider } from './context/AuthContext';
 import { AlertProvider } from './context/AlertContext';
+import { SidebarProvider, useSidebar, useIsMobile } from './context/SidebarContext';
 import CreateProfile from './pages/CreateProfile';
 import RegisterAsCreator from './pages/RegisterAsCreator';
 import CreateCreatorProfile from './pages/CreateCreatorProfile';
@@ -57,6 +60,26 @@ const queryClient = new QueryClient({
   },
 });
 
+// Component to handle layout with sidebar
+const AppLayout = ({ children, hideSidebar }: { children: React.ReactNode; hideSidebar: boolean }) => {
+  const { isExpanded } = useSidebar();
+  const isMobile = useIsMobile();
+
+  return (
+    <div className="bg-abyss-black flex min-h-screen">
+      {!hideSidebar && <Sidebar />}
+      <div
+        className={`
+          flex-1 flex flex-col transition-all duration-200
+          ${!hideSidebar && !isMobile ? (isExpanded ? 'lg:ml-60' : 'lg:ml-16') : ''}
+        `}
+      >
+        {children}
+      </div>
+    </div>
+  );
+};
+
 // Create a component that conditionally renders navbar
 const AppContent = () => {
   const location = useLocation();
@@ -64,18 +87,21 @@ const AppContent = () => {
   // Track navigation for login redirect
   useNavigationTracking();
   
-  // Routes where navbar should be hidden
+  // Routes where navbar and sidebar should be hidden
   const authRoutes = ['/login', '/register', '/register-creator', '/forgot-password', '/reset-password'];
   const hideNavbar = authRoutes.includes(location.pathname);
 
   return (
-    <div className="bg-abyss-black flex flex-col min-h-screen">
+    <AppLayout hideSidebar={hideNavbar}>
       <ScrollToTop />
       {!hideNavbar && <Navbar />}
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Explore />} />
           <Route path="/my-feed" element={<MyFeed />} />
+          <Route path="/categories" element={<div className="container-app py-8">Categories Page (Coming Soon)</div>} />
+          <Route path="/favorites" element={<ProtectedRoute><div className="container-app py-8">Favorites Page (Coming Soon)</div></ProtectedRoute>} />
+          <Route path="/creator-dashboard/upload" element={<ProtectedRoute><div className="container-app py-8">Upload Content Page (Coming Soon)</div></ProtectedRoute>} />
           <Route path="/landing" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -155,7 +181,7 @@ const AppContent = () => {
         </Routes>
       </main>
       {!hideNavbar && <Footer />}
-    </div>
+    </AppLayout>
   );
 };
 
@@ -167,7 +193,9 @@ function App() {
           <AlertProvider>
             <Router>
               <RouteHistoryProvider>
-                <AppContent />
+                <SidebarProvider>
+                  <AppContent />
+                </SidebarProvider>
               </RouteHistoryProvider>
             </Router>
           </AlertProvider>

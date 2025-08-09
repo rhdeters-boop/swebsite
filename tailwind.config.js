@@ -488,6 +488,23 @@ export default {
           '@apply animate-glow': {},
         },
         
+        // ===== SIDEBAR COMPONENTS =====
+        '.sidebar-expanded': {
+          '@apply w-60 transition-all duration-200 ease-out': {},
+        },
+        '.sidebar-reduced': {
+          '@apply w-16 transition-all duration-200 ease-out': {},
+        },
+        '.sidebar-item': {
+          '@apply flex items-center justify-between w-full px-3 py-2.5 rounded-md transition-all duration-200 group relative text-text-secondary hover:text-text-primary hover:bg-background-card': {},
+        },
+        '.sidebar-item-active': {
+          '@apply bg-void-accent/10 text-void-accent border-l-2 border-void-accent -ml-[2px] pl-[14px]': {},
+        },
+        '.sidebar-tooltip': {
+          '@apply absolute left-full ml-2 px-2 py-1 text-xs font-medium text-text-primary bg-background-card border border-border-primary rounded-md whitespace-nowrap shadow-lg z-50 pointer-events-none': {},
+        },
+        
         // ===== LOGO & RESPONSIVE COMPONENTS =====
         '.logo-responsive': {
           '@apply transition-all duration-300 ease-in-out': {},
