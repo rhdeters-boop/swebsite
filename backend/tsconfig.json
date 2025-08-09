@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "target": "ES2021",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "outDir": "./dist",
+    "rootDir": "./",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["../*"],
+      "@/backend/app": ["./app.ts"],
+      "@/backend/services/user.service": ["./services/user.service.ts"],
+      "@/backend/tests/helpers/sequelize-inmemory": ["./tests/helpers/sequelize-inmemory.ts"],
+      "@/backend/tests/helpers/httpMock": ["./tests/helpers/httpMock.ts"],
+      "@/backend/utils/slug": ["./utils/slug.ts"]
+    },
+    "types": ["node", "jest"],
+    "isolatedModules": true,
+    "allowJs": true
+  },
+  "include": [
+    "./**/*.ts",
+    "./**/*.d.ts",
+    "./**/*.js"
+  ],
+  "exclude": [
+    "**/dist/**",
+    "**/coverage/**",
+    "**/node_modules/**"
+  ]
+}

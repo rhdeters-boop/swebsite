@@ -14,7 +14,6 @@ How to use and update
 
 References
 - tailwind.config.js: holds semantic tokens and component classes.
-- .kilocode/rules/ui_rules.md: operational rules and conventions.
 - This style guide ties both together for practical usage in the app.
 
 

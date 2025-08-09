@@ -1,12 +1,8 @@
 /* Jest per-test-file setup for the backend. */
-import { TextEncoder, TextDecoder } from 'util';
 import nock from 'nock';
 
-// Polyfills for some libs on Node
-// @ts-ignore
-(global as any).TextEncoder = (global as any).TextEncoder || TextEncoder;
-// @ts-ignore
-(global as any).TextDecoder = (global as any).TextDecoder || TextDecoder;
+// Note: TextEncoder/TextDecoder are available as globals in Node 18+
+// No need for polyfills
 
 beforeAll(() => {
   nock.disableNetConnect();
