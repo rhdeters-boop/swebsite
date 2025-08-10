@@ -3,7 +3,7 @@ import { Menu, X } from 'lucide-react';
 import { useSidebar, useIsMobile } from '../../context/SidebarContext';
 
 const SidebarToggle: React.FC = () => {
-  const { isExpanded, isOpen, toggleExpanded, toggleOpen } = useSidebar();
+  const { isExpanded, isOpen, toggleExpanded, toggleOpen, collapseExpanded } = useSidebar();
   const isMobile = useIsMobile();
   const [showTooltip, setShowTooltip] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
@@ -14,6 +14,7 @@ const SidebarToggle: React.FC = () => {
     if (isMobile) {
       toggleOpen();
     } else {
+      collapseExpanded('Settings')
       toggleExpanded();
     }
   };

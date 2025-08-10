@@ -65,7 +65,6 @@ export const navigationConfig: NavSection[] = [
   {
     id: 'account',
     title: 'Account',
-    requiredAuth: true,
     items: [
       {
         id: 'my-feed',
@@ -100,28 +99,24 @@ export const navigationConfig: NavSection[] = [
         label: 'Settings',
         icon: Settings,
         path: '/account-settings',
-        requiredAuth: true,
         children: [
           {
             id: 'profile',
             label: 'Profile',
             icon: User,
-            path: '/account-settings',
-            requiredAuth: true
+            path: '/account-settings'
           },
           {
             id: 'security',
             label: 'Security',
             icon: Shield,
-            path: '/security',
-            requiredAuth: true
+            path: '/security'
           },
           {
             id: 'billing',
             label: 'Billing',
             icon: CreditCard,
-            path: '/billing',
-            requiredAuth: true
+            path: '/billing'
           }
         ]
       }

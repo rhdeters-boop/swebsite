@@ -16,9 +16,10 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
   parentPath = ''
 }) => {
   const location = useLocation();
-  const { isExpanded, expandedSections, toggleSection } = useSidebar();
+  const { isExpanded, expandedSections, toggleSection, toggleExpanded } = useSidebar();
   const isMobile = useIsMobile();
   const [showTooltip, setShowTooltip] = useState(false);
+  const [showCollapsedMenu, setShowCollapsedMenu] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 76 });
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const itemRef = useRef<HTMLElement>(null);
@@ -58,9 +59,11 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
   };
 
   const handleMouseEnter = () => {
-    if (!isExpanded && !hasChildren) {
+    if (!isExpanded) {
       calculateTooltipPosition();
-      timeoutRef.current = setTimeout(() => setShowTooltip(true), 500);
+      if (!hasChildren) {
+        timeoutRef.current = setTimeout(() => setShowTooltip(true), 500);
+      }
     }
   };
 
@@ -83,7 +86,13 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
   const handleClick = (e: React.MouseEvent) => {
     if (hasChildren) {
       e.preventDefault();
-      toggleSection(item.id);
+      if (!isMobile && !isExpanded) {
+        setShowCollapsedMenu(!showCollapsedMenu);
+        setShowTooltip(false);
+      } else {
+        console.log(`Toggling section: ${item.id}`);
+        toggleSection(item.id);
+      }
     }
   };
 
@@ -121,7 +130,7 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
           )}
         </div>
         
-        {hasChildren && (isExpanded || isMobile) && (
+        {hasChildren && (
           <ChevronDown
             className={`
               w-4 h-4 text-text-tertiary transition-transform duration-200
@@ -147,34 +156,48 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
         </div>
       )}
       
-      {/* Dropdown tooltip for collapsed state with children */}
-      {!isExpanded && hasChildren && showTooltip && (
+      {/* Collapsed submenu overlay */}
+      {!isExpanded && hasChildren && showCollapsedMenu && (
         <div
-          className="fixed px-2 py-2 bg-background-card border border-border-primary
-                     rounded-md shadow-lg z-[60] pointer-events-none"
-          role="tooltip"
+          className="fixed px-0 py-2 bg-background-card border border-border-primary
+                     rounded-md shadow-xl z-[60] min-w-[180px]"
           style={{
             left: `${tooltipPosition.left}px`,
             top: `${tooltipPosition.top}px`,
-            minWidth: '160px'
           }}
         >
-          <div className="text-xs font-medium text-text-primary mb-1">{item.label}</div>
+          <div className="px-3 py-1 text-xs font-semibold text-text-muted uppercase tracking-wider border-b border-border-primary mb-1">
+            {item.label}
+          </div>
           <div className="space-y-1">
             {item.children?.map((child) => (
-              <div key={child.id} className="text-xs text-text-secondary pl-2">
-                • {child.label}
-              </div>
+              <Link
+                key={child.id}
+                to={child.path || '#'}
+                className="flex items-center px-3 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-background-secondary transition-colors"
+                onClick={() => setShowCollapsedMenu(false)}
+              >
+                <child.icon className="w-4 h-4 mr-3 text-text-tertiary" />
+                {child.label}
+              </Link>
             ))}
           </div>
         </div>
+      )}
+      
+      {/* Backdrop to close collapsed menu */}
+      {!isExpanded && hasChildren && showCollapsedMenu && (
+        <div
+          className="fixed inset-0 z-[59]"
+          onClick={() => setShowCollapsedMenu(false)}
+        />
       )}
     </>
   );
 
   return (
     <li ref={itemRef as React.RefObject<HTMLLIElement>}>
-      {item.path && !hasChildren ? (
+      {item.path ? (
         <Link
           to={item.path}
           className="block relative"

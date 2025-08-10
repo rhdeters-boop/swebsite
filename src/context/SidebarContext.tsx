@@ -11,6 +11,7 @@ interface SidebarContextValue extends SidebarContextState {
   toggleExpanded: () => void;
   toggleOpen: () => void;
   toggleSection: (sectionId: string) => void;
+  collapseExpanded: (expandedLabel: string) => void;
 }
 
 const STORAGE_KEY = 'sidebar-preferences';
@@ -24,7 +25,8 @@ const defaultValue: SidebarContextValue = {
   expandedSections: [],
   toggleExpanded: () => {},
   toggleOpen: () => {},
-  toggleSection: () => {}
+  toggleSection: () => {},
+  collapseExpanded: () => {}
 };
 
 const SidebarContext = createContext<SidebarContextValue>(defaultValue);
@@ -75,8 +77,10 @@ export const SidebarProvider: React.FC<SidebarProviderProps> = ({ children }) =>
   // Toggle expanded/collapsed state
   const toggleExpanded = useCallback(() => {
     setState(prev => {
-      const newState = { ...prev, isExpanded: !prev.isExpanded };
+      const newSections = prev.isExpanded ? [] : prev.expandedSections;
+      const newState = { ...prev, isExpanded: !prev.isExpanded, expandedSections: newSections };
       savePreferences(newState);
+
       return newState;
     });
   }, [savePreferences]);
@@ -100,6 +104,15 @@ export const SidebarProvider: React.FC<SidebarProviderProps> = ({ children }) =>
     });
   }, [savePreferences]);
 
+  // Collapse by label
+  const collapseExpanded = useCallback((expandedLabel: string) => {
+    setState(prev => {
+      const expandedSections = prev.expandedSections.filter(label => label !== expandedLabel);
+      const newState = { ...prev, expandedSections };
+      savePreferences(newState);
+      return newState;
+    });
+  }, [savePreferences]);
 
   // Handle window resize and hover capability changes
   useEffect(() => {
@@ -174,7 +187,8 @@ export const SidebarProvider: React.FC<SidebarProviderProps> = ({ children }) =>
     ...state,
     toggleExpanded,
     toggleOpen,
-    toggleSection
+    toggleSection,
+    collapseExpanded,
   };
 
   return (
