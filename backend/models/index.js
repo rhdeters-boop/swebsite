@@ -10,6 +10,10 @@ import CreatorLike from './CreatorLike.js';
 import { PasswordResetToken } from './PasswordResetToken.js';
 import Notification from './Notification.js';
 import NotificationSetting from './NotificationSetting.js';
+import SupportTicket from './SupportTicket.js';
+import TicketResponse from './TicketResponse.js';
+import SupportTeam from './SupportTeam.js';
+import TicketAssignment from './TicketAssignment.js';
 
 // User associations
 User.hasMany(Subscription, {
@@ -76,6 +80,99 @@ User.hasOne(NotificationSetting, {
 NotificationSetting.belongsTo(User, {
   foreignKey: 'userId',
   as: 'user',
+});
+
+// Support Ticket associations
+User.hasMany(SupportTicket, {
+  foreignKey: 'userId',
+  as: 'supportTickets',
+  onDelete: 'CASCADE',
+});
+
+SupportTicket.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user',
+});
+
+SupportTicket.hasMany(TicketResponse, {
+  foreignKey: 'ticketId',
+  as: 'responses',
+  onDelete: 'CASCADE',
+});
+
+SupportTicket.hasMany(TicketAssignment, {
+  foreignKey: 'ticketId',
+  as: 'assignments',
+  onDelete: 'CASCADE',
+});
+
+// Get current assignment for a ticket
+SupportTicket.hasOne(TicketAssignment, {
+  foreignKey: 'ticketId',
+  as: 'currentAssignment',
+  scope: {
+    isActive: true
+  }
+});
+
+// Ticket Response associations
+TicketResponse.belongsTo(SupportTicket, {
+  foreignKey: 'ticketId',
+  as: 'ticket',
+});
+
+TicketResponse.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user',
+});
+
+// Support Team associations
+User.hasOne(SupportTeam, {
+  foreignKey: 'userId',
+  as: 'supportTeam',
+  onDelete: 'CASCADE',
+});
+
+SupportTeam.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user',
+});
+
+// Ticket Assignment associations
+TicketAssignment.belongsTo(SupportTicket, {
+  foreignKey: 'ticketId',
+  as: 'ticket',
+});
+
+TicketAssignment.belongsTo(User, {
+  foreignKey: 'assignedToId',
+  as: 'assignedTo',
+});
+
+TicketAssignment.belongsTo(User, {
+  foreignKey: 'assignedById',
+  as: 'assignedBy',
+});
+
+TicketAssignment.belongsTo(User, {
+  foreignKey: 'previousAssigneeId',
+  as: 'previousAssignee',
+});
+
+// Support agent's active tickets
+User.hasMany(TicketAssignment, {
+  foreignKey: 'assignedToId',
+  as: 'activeTicketAssignments',
+  scope: {
+    isActive: true
+  }
+});
+
+// User's ticket responses (for both customers and support agents)
+User.hasMany(TicketResponse, {
+  foreignKey: 'userId',
+  as: 'ticketResponses',
+  onDelete: 'CASCADE',
 });
 
 // Creator associations
@@ -211,6 +308,10 @@ export {
   PasswordResetToken,
   Notification,
   NotificationSetting,
+  SupportTicket,
+  TicketResponse,
+  SupportTeam,
+  TicketAssignment,
 };
 
 // Export default for convenience
@@ -227,4 +328,8 @@ export default {
   PasswordResetToken,
   Notification,
   NotificationSetting,
+  SupportTicket,
+  TicketResponse,
+  SupportTeam,
+  TicketAssignment,
 };

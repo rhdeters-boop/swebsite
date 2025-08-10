@@ -21,6 +21,8 @@ import analyticsRoutes from './routes/analytics.js';
 import likesRoutes from './routes/likes.js';
 import notificationsRoutes from './routes/notifications.js';
 import billingRoutes from './routes/billing.js';
+import supportRoutes from './routes/support.js';
+import adminSupportRoutes from './routes/admin/support.js';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler.js';
@@ -163,6 +165,8 @@ app.use('/api/creators', creatorRoutes); // Mixed public and protected routes
 app.use('/api/likes', likesRoutes); // Like/dislike functionality
 app.use('/api/notifications', authenticateToken, notificationsRoutes); // Notifications
 app.use('/api/billing', authenticateToken, billingRoutes); // Billing
+app.use('/api/support', supportRoutes); // Support tickets (mixed public and protected)
+app.use('/api/admin/support', adminSupportRoutes); // Admin support routes (protected)
 
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {

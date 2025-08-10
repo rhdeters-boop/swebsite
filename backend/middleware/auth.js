@@ -78,10 +78,11 @@ export const optionalAuth = async (req, res, next) => {
 
 /**
  * Require a specific role on the authenticated user.
- * Intended for routes that need elevated privileges (e.g., admin).
+ * Intended for routes that need elevated privileges (e.g., admin, support).
  * Responds with 401 if unauthenticated, 403 if role mismatch.
+ * @param {string|string[]} roles - Single role or array of allowed roles
  */
-export const requireRole = (role) => {
+export const requireRole = (roles) => {
   return (req, res, next) => {
     const user = req.user;
     if (!user) {
@@ -90,13 +91,24 @@ export const requireRole = (role) => {
         message: 'Unauthorized'
       });
     }
-    if (role === 'admin' && user.role !== 'admin') {
-      return res.status(403).json({
-        success: false,
-        message: 'Forbidden'
-      });
+    
+    // Convert single role to array for consistent handling
+    const allowedRoles = Array.isArray(roles) ? roles : [roles];
+    
+    // Check regular role
+    if (allowedRoles.includes('admin') && user.role === 'admin') {
+      return next();
     }
-    return next();
+    
+    // Check support roles
+    if (user.supportRole && allowedRoles.includes(user.supportRole)) {
+      return next();
+    }
+    
+    return res.status(403).json({
+      success: false,
+      message: 'Forbidden - insufficient permissions'
+    });
   };
 };
 
@@ -148,3 +160,4 @@ export const requireSubscription = (requiredTier) => {
 
 // Alias for authenticateToken to match common naming conventions
 export const requireAuth = authenticateToken;
+export const authenticate = authenticateToken;

@@ -73,6 +73,11 @@ const User = sequelize.define('User', {
     allowNull: true,
     comment: 'Tracks when username was last changed for 30-day restriction',
   },
+  supportRole: {
+    type: DataTypes.ENUM('support_agent', 'support_admin'),
+    allowNull: true,
+    comment: 'Support team role for accessing admin support interface',
+  },
 }, {
   indexes: [
     {
