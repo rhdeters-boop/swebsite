@@ -240,6 +240,47 @@ export const legalDocuments: LegalDocument[] = [
       },
     ],
   },
+  {
+    id: 'refund-policy',
+    title: 'Refund Policy',
+    slug: 'refund',
+    category: 'legal',
+    version: '1.0',
+    lastUpdated: '2024-01-01',
+    content: 'Full refund policy content...',
+    sections: [
+      {
+        id: 'eligibility',
+        title: '1. Refund Eligibility',
+        content: `Refunds may be available for subscriptions under certain circumstances. All refund requests must be submitted within 7 days of the charge.`,
+      },
+      {
+        id: 'non-refundable',
+        title: '2. Non-Refundable Items',
+        content: `The following are non-refundable: tips to creators, one-time purchases, consumed content, and subscriptions after 7 days.`,
+      },
+      {
+        id: 'process',
+        title: '3. Refund Process',
+        content: `To request a refund, contact our support team with your transaction details. Refunds are processed within 5-10 business days.`,
+      },
+      {
+        id: 'chargebacks',
+        title: '4. Chargebacks',
+        content: `Users who initiate chargebacks without first contacting support may have their accounts suspended or terminated.`,
+      },
+      {
+        id: 'creator-refunds',
+        title: '5. Creator Earnings',
+        content: `Refunded transactions will be deducted from creator earnings. Creators are responsible for providing content as advertised.`,
+      },
+      {
+        id: 'exceptions',
+        title: '6. Exceptions',
+        content: `We may make exceptions to this policy on a case-by-case basis for technical issues, unauthorized charges, or other special circumstances.`,
+      },
+    ],
+  },
 ];
 
 // Helper functions

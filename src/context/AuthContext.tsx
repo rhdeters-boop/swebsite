@@ -15,6 +15,7 @@ interface User {
   isEmailVerified: boolean;
   lastLoginAt?: string;
   role: UserRole;
+  supportRole?: 'support_agent' | 'support_admin' | null;
 }
 
 interface AuthState {

@@ -30,6 +30,8 @@ import CreatorProfile from './pages/CreatorProfile';
 import UnifiedProfile from './pages/UnifiedProfile';
 import CreatorApplicationSuccess from './pages/CreatorApplicationSuccess';
 import HelpCenter from './pages/HelpCenter';
+import ArticlePage from './pages/ArticlePage';
+import HelpCategory from './pages/HelpCategory';
 import Contact from './pages/Contact';
 import TermsOfService from './pages/TermsOfService';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -45,6 +47,12 @@ import { SidebarProvider, useSidebar, useIsMobile } from './context/SidebarConte
 import CreateProfile from './pages/CreateProfile';
 import RegisterAsCreator from './pages/RegisterAsCreator';
 import CreateCreatorProfile from './pages/CreateCreatorProfile';
+import AdminSupportDashboard from './pages/admin/AdminSupportDashboard';
+import SubmitTicket from './pages/SubmitTicket';
+import MyTickets from './pages/MyTickets';
+import TicketDetail from './pages/TicketDetail';
+import LegalPage from './pages/LegalPage';
+import SafetyCenter from './pages/SafetyCenter';
 
 // Hooks
 import { useNavigationTracking } from './hooks/useNavigationTracking';
@@ -118,12 +126,37 @@ const AppContent = () => {
           <Route path="/creator/:creatorId" element={<CreatorProfile />} />
           <Route path="/user/:username" element={<UnifiedProfile />} />
           <Route path="/help" element={<HelpCenter />} />
-          <Route path="/contact" element={<Contact />} />
+          <Route path="/help/article/:slug" element={<ArticlePage />} />
+          <Route path="/help/category/:categorySlug" element={<HelpCategory />} />
+          <Route path="/help/category/:categorySlug/:subcategorySlug" element={<HelpCategory />} />
+          <Route path="/contact" element={<SubmitTicket />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
 
-          
+          {/* Legal and Safety Routes */}
+          <Route path="/legal/:slug" element={<LegalPage />} />
+          <Route path="/safety" element={<SafetyCenter />} />
+
+          {/* Support Ticket Routes */}
+          <Route path="/support/submit" element={<SubmitTicket />} />
+          <Route
+            path="/support/tickets"
+            element={
+              <ProtectedRoute>
+                <MyTickets />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/support/tickets/:ticketId"
+            element={
+              <ProtectedRoute>
+                <TicketDetail />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Protected Routes */}
           <Route
             path="/dashboard"
@@ -178,6 +211,30 @@ const AppContent = () => {
             element={
               <ProtectedRoute>
                 <CreatorApplicationSuccess />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/support"
+            element={
+              <ProtectedRoute>
+                <AdminSupportDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-tickets"
+            element={
+              <ProtectedRoute>
+                <MyTickets />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ticket/:ticketNumber"
+            element={
+              <ProtectedRoute>
+                <TicketDetail />
               </ProtectedRoute>
             }
           />
