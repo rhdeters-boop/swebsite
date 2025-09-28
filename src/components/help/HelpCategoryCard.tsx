@@ -4,7 +4,7 @@ import {
   Rocket, User, CreditCard, Star, Settings, Shield,
   ChevronRight, FileText
 } from 'lucide-react';
-import { HelpCategory } from '../../data/helpContent';
+import type { HelpCategory } from '../../data/helpContent';
 
 interface HelpCategoryCardProps {
   category: HelpCategory;
