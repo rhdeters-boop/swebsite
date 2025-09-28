@@ -41,6 +41,7 @@ export const navigationConfig: NavSection[] = [
   {
     id: 'media',
     title: 'Media',
+    requiredAuth: false,
     items: [
       {
         id: 'explore',
@@ -65,6 +66,7 @@ export const navigationConfig: NavSection[] = [
   {
     id: 'account',
     title: 'Account',
+    requiredAuth: true,
     items: [
       {
         id: 'my-feed',
@@ -99,6 +101,7 @@ export const navigationConfig: NavSection[] = [
         label: 'Settings',
         icon: Settings,
         path: '/account-settings',
+        requiredAuth: true,
         children: [
           {
             id: 'profile',
@@ -149,6 +152,7 @@ export const navigationConfig: NavSection[] = [
   {
     id: 'support',
     title: 'Support',
+    requiredAuth: false,
     items: [
       {
         id: 'help',

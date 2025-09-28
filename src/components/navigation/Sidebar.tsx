@@ -9,10 +9,12 @@ import VoidLogo from '../VoidLogo';
 import './sidebar.css';
 
 const Sidebar: React.FC = () => {
-  const { isExpanded, isOpen } = useSidebar();
+  const { isExpanded } = useSidebar();
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const sidebarRef = useRef<HTMLElement>(null);
+
+  console.log("Rendering Sidebar - isExpanded:", isExpanded, "isMobile:", isMobile, "user:", user);
 
   // Filter navigation sections based on auth state and user role
   const filteredSections = navigationConfig.filter(section => {
@@ -95,6 +97,7 @@ const Sidebar: React.FC = () => {
       </div>
 
       {/* Navigation sections */}
+      {console.log("Filtered Sections:", filteredSections)}
       <nav 
         className="flex-1 overflow-y-auto px-3 py-4 scrollbar-thin"
         aria-label="Main navigation"
