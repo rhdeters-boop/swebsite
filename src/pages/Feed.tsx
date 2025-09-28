@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MyFeed from "../components/feed/MyFeed";
 import Explore from "../components/feed/Explore";
@@ -11,10 +11,17 @@ const FEED_TABS = [
 const Feed: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>(window.location.pathname === '/' ? FEED_TABS[0].key : FEED_TABS[1].key);
   const navigate = useNavigate();
-  console.log("Rendering Feed - current path:", window.location.pathname);
   
+  useEffect(() => {
+    console.log("Feed component mounted or path changed:", window.location.pathname);
+    if (window.location.pathname === '/') {
+      setActiveTab(FEED_TABS[0].key);
+    } else if (window.location.pathname === '/explore') {
+      setActiveTab(FEED_TABS[1].key);
+    }
+  }, [window.location.pathname]);
+
   const onTabChange = (tab: string) => {
-    setActiveTab(tab);
     navigate(tab === 'my-feed' ? '/' : '/explore');
   }
 
@@ -43,8 +50,9 @@ const Feed: React.FC = () => {
     </div>
 
       {/* Feed Content */}
+      <>{console.log("Active Tab:", activeTab)}</>
       <div>
-        {window.location.pathname === '/' ? <MyFeed /> : <Explore />}
+        {activeTab === 'my-feed' ? <MyFeed /> : <Explore />}
       </div>
     </div>
   );
