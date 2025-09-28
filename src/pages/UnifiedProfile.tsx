@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import UserProfile from './account/UserProfile';
-import BackButton from '../components/BackButton';
+import BackButton from '../components/navigation/BackButton';
 
 const UnifiedProfile = () => {
   const { username } = useParams<{ username: string }>();

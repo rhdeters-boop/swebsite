@@ -6,7 +6,7 @@ import AuthSection from '../components/auth/AuthSection';
 import FormInput from '../components/form/FormInput';
 import PasswordInput from '../components/form/PasswordInput';
 import VoidLogo from '../components/VoidLogo';
-import BackButton from '../components/BackButton';
+import BackButton from '../components/navigation/BackButton';
 import { useUsernameValidation } from '../hooks/useUsernameValidation';
 import { usePasswordValidation } from '../hooks/usePasswordValidation';
 import { getUsernameStatusIcon, getUsernameError, getPasswordError } from '../utils/registerHelpers';

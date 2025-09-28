@@ -1,8 +1,8 @@
 import React from 'react';
 import { Menu } from 'lucide-react';
-import NavbarLogo from './navigation/NavbarLogo'
-import AccountDropdown from './navigation/AccountDropdown';
-import { useSidebar, useIsMobile } from '../context/SidebarContext';
+import NavbarLogo from './NavbarLogo'
+import AccountDropdown from './AccountDropdown';
+import { useSidebar, useIsMobile } from '../../context/SidebarContext';
 
 const Navbar: React.FC = () => {
   const { toggleOpen } = useSidebar();

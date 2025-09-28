@@ -9,7 +9,7 @@ import { Elements } from '@stripe/react-stripe-js';
 import { attachGlobalIsMobile } from './utils/mobileDetection';
 
 // Components
-import Navbar from './components/Navbar';
+import Navbar from './components/navigation/Navbar';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
 import Sidebar from './components/navigation/Sidebar';
@@ -36,7 +36,7 @@ import Contact from './pages/Contact';
 import TermsOfService from './pages/TermsOfService';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import RefundPolicy from './pages/RefundPolicy';
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 import Notifications from './pages/Notifications';
 import Billing from './pages/Billing';
 
@@ -108,8 +108,8 @@ const AppContent = () => {
       {!hideNavbar && <Navbar />}
       <main className="flex-1">
         <Routes>
-          <Route path="/" element={<Explore />} />
-          <Route path="/my-feed" element={<MyFeed />} />
+          <Route path="/" element={<MyFeed />} />
+          <Route path="/explore" element={<Explore />} />
           <Route path="/categories" element={<div className="container-app py-8">Categories Page (Coming Soon)</div>} />
           <Route path="/favorites" element={<ProtectedRoute><div className="container-app py-8">Favorites Page (Coming Soon)</div></ProtectedRoute>} />
           <Route path="/creator-dashboard/upload" element={<ProtectedRoute><div className="container-app py-8">Upload Content Page (Coming Soon)</div></ProtectedRoute>} />

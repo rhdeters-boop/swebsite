@@ -5,7 +5,7 @@ import { Loader2, Star, Users, DollarSign } from 'lucide-react';
 import AuthSection from '../components/auth/AuthSection';
 import FormInput from '../components/form/FormInput';
 import VoidLogo from '../components/VoidLogo';
-import BackButton from '../components/BackButton';
+import BackButton from '../components/navigation/BackButton';
 
 const CreateCreatorProfile: React.FC = () => {
   const [formData, setFormData] = useState({

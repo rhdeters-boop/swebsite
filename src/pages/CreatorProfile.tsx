@@ -7,7 +7,7 @@ import UnauthenticatedContent from '../components/UnauthenticatedContent';
 import AuthenticatedContent from '../components/AuthenticatedContent';
 import SubscriptionCard from '../components/SubscriptionCard';
 import { useCreatorProfile } from '../hooks/useCreatorProfile';
-import MediaPaginator from '../components/MediaPaginator';
+import MediaPaginator from '../components/navigation/MediaPaginator';
 import {
   Users,
   MapPin,

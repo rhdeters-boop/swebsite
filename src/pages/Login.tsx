@@ -2,7 +2,7 @@ import React from 'react';
 import AuthSection from '../components/auth/AuthSection';
 import LoginForm from '../components/auth/LoginForm';
 import VoidLogo from '../components/VoidLogo';
-import BackButton from '../components/BackButton';
+import BackButton from '../components/navigation/BackButton';
 
 const Login: React.FC = () => {
   return (
