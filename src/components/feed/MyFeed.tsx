@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { TrendingUp, Crown, Users } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { useFollowedCreators } from '../hooks/useSubscriptions';
-import CreatorRow from '../components/CreatorRow';
+import { useAuth } from '../../context/AuthContext';
+import { useFollowedCreators } from '../../hooks/useSubscriptions';
+import CreatorRow from '../../components/CreatorRow';
 
 const MyFeed: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -24,25 +24,6 @@ const MyFeed: React.FC = () => {
   if (!isAuthenticated) {
     return (
       <div className="bg-abyss-black min-h-screen">
-        {/* Tab Navigation */}
-        <div className="border-b border-void-500/20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <nav className="flex space-x-8">
-              <button
-                onClick={() => { handleTabChange('explore'); }}
-                className="py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 border-transparent text-abyss-light-gray hover:text-white hover:border-void-500"
-              >
-                Explore
-              </button>
-              <button
-                onClick={() => { handleTabChange('feed'); }}
-                className="py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 border-seductive text-seductive"
-              >
-                My Feed
-              </button>
-            </nav>
-          </div>
-        </div>
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center mb-8">

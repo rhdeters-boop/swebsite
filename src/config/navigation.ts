@@ -47,7 +47,7 @@ export const navigationConfig: NavSection[] = [
         id: 'explore',
         label: 'Explore',
         icon: Compass,
-        path: '/'
+        path: '/explore'
       },
       {
         id: 'categories',
@@ -72,7 +72,7 @@ export const navigationConfig: NavSection[] = [
         id: 'my-feed',
         label: 'My Feed',
         icon: Home,
-        path: '/my-feed',
+        path: '/',
         requiredAuth: true
       },
       {

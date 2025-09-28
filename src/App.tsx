@@ -14,8 +14,7 @@ import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
 import Sidebar from './components/navigation/Sidebar';
 import Landing from './pages/Landing';
-import Explore from './pages/Explore';
-import MyFeed from './pages/MyFeed';
+import Feed from './pages/Feed';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
@@ -108,8 +107,8 @@ const AppContent = () => {
       {!hideNavbar && <Navbar />}
       <main className="flex-1">
         <Routes>
-          <Route path="/" element={<MyFeed />} />
-          <Route path="/explore" element={<Explore />} />
+          <Route path="/" element={<Feed />} />
+          <Route path="/explore" element={<Feed />} />
           <Route path="/categories" element={<div className="container-app py-8">Categories Page (Coming Soon)</div>} />
           <Route path="/favorites" element={<ProtectedRoute><div className="container-app py-8">Favorites Page (Coming Soon)</div></ProtectedRoute>} />
           <Route path="/creator-dashboard/upload" element={<ProtectedRoute><div className="container-app py-8">Upload Content Page (Coming Soon)</div></ProtectedRoute>} />
